@@ -1,7 +1,7 @@
-exptDir = '~/code/rtAttention/';
+exptDir = '~/code/rtAttenPenn/';
 cd(exptDir)
 subjectNum = 1;
-subjectName = 'rtAttenUP_1;
+subjectName = 'rtAttenPenn1';
 matchNum = 0;
 useButtonBox=1;
 realtimeData = 1;

@@ -3,7 +3,7 @@
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
 subjectNum = 1;
-subjectName = 'rtAttenUP1';
+subjectName = 'rtAttenPenn1';
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')

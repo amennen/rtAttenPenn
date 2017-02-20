@@ -430,12 +430,12 @@ Priority(MaxPriority(screenNum));
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 if (rtData )
-    if strcmp(computer,'MACI')
+   % if strcmp(computer,'MACI') % taking out because we're running on a linux!
         runStart = WaitTRPulsePTB3_skyra(1);
-    else
-        WaitSecs(.5);
-        runStart = KbWait;
-    end
+   % else
+   %     WaitSecs(.5);
+   %     runStart = KbWait;
+   % end
 else
     runStart = GetSecs;
 end
