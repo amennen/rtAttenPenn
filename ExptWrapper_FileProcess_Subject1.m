@@ -4,6 +4,7 @@
 %cd(exptDir);
 subjectNum = 1;
 projectName = 'rtAttenPenn';
+runNum = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -47,11 +48,10 @@ end
 %% Generate mask
 
 scanNum = 6;
-
 if scanNum < 10
-    fn = ['/rt_test/temp/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/001_00000' num2str(scanNum) '_000006.dcm'];
+    fn = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/001_00000' num2str(scanNum) '_000006.dcm'];
 else
-    fn = ['/rt_test/temp/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/001_0000' num2str(scanNum) '_000006.dcm'];
+    fn = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/001_0000' num2str(scanNum) '_000006.dcm'];
 end
 mask = GenerateMask(fn);
 
@@ -73,12 +73,13 @@ fMRI = 8;
 
 runNum = 2;
 fMRI = 10;
+fMRI = 18
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%
 
 runNum = 3;
-fMRI = 12;
+fMRI = 18;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 

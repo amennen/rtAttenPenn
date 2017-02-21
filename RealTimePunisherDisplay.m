@@ -25,7 +25,7 @@ function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,r
 % Last modified: 10/14/11
 
 %% check inputs
-
+KbName('UnifyKeyNames');
 %check that there is a sufficient number of inputs
 if nargin < 8
     error('8 inputs are required: subjectNum, subjectName, matchNum, runNum, useButtonBox, fMRI, rtData, debug');
@@ -75,15 +75,15 @@ end
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
-if strcmp(computer,'MACI');
-    %dataHeader = ['data/' num2str(subjectNum)];
-elseif strcmp(computer,'PCWIN')
-    %dataHeader = ['data/' num2str(subjectNum)];
-elseif findstr(computer,'64')
-    error('psychtoolbox requires 64-bit OS, you are on: %s\n',computer);
-else
-    error('this code is only written to run on macs, not %s\n',computer);
-end
+% if strcmp(computer,'MACI');
+%     %dataHeader = ['data/' num2str(subjectNum)];
+% elseif strcmp(computer,'PCWIN')
+%     %dataHeader = ['data/' num2str(subjectNum)];
+% elseif findstr(computer,'64')
+%     error('psychtoolbox requires 64-bit OS, you are on: %s\n',computer);
+% else
+%     error('this code is only written to run on macs, not %s\n',computer);
+% end
 
 if rtData
     imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
@@ -152,9 +152,9 @@ ScreenResY = 900;
 %% Response Mapping and Counterbalancing
 
 % skyra: use current design button box (keys 1,2,3,4)
+KbName('UnifyKeyNames');
 LEFT = KbName('1!');
-DEVICENAME = '932';
-
+DEVICENAME = 'Current Designs, Inc. 932';
 if useButtonBox && (~debug)
     [index devName] = GetKeyboardIndices;
     for device = 1:length(index)
@@ -210,8 +210,11 @@ if debug
     screenX = 800;
     screenY = 800;
 else
-    [screenX screenY] = Screen('WindowSize',screenNum);
+    % first just make the screen tiny
     
+    [screenX screenY] = Screen('WindowSize',screenNum);
+    screenX = 800;
+    screenY = 800;
     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
@@ -219,11 +222,13 @@ else
 end
 
 %create main window
-if (useButtonBox)%scanner display monitor has error with inputs of screen size
-    mainWindow = Screen(screenNum,'OpenWindow',backColor);
-else
+% ACM: took out if statement because specifying top doesn't work on penn
+% comp
+%if (useButtonBox)%scanner display monitor has error with inputs of screen size
+%    mainWindow = Screen(screenNum,'OpenWindow',backColor);
+%else
     mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
-end
+%end
 
 % details of main window
 centerX = screenX/2; centerY = screenY/2;

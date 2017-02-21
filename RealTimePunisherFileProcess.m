@@ -474,7 +474,7 @@ end
 trainPats = [trainPats1;trainPats2];
 trainLabels = [trainLabels1;trainLabels2];
 
-trainedModel = classifierLogisticRegression(trai nPats,trainLabels); %train the model
+trainedModel = classifierLogisticRegression(trainPats,trainLabels); %train the model
 
 trainingOnlyTime = toc(trainStart);  %end timing
 

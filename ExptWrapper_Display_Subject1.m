@@ -3,6 +3,7 @@ cd(exptDir)
 subjectNum = 1;
 %subjectName = 'rtAttenPenn1';
 projectName = 'rtAttenPenn';
+runNum = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -21,6 +22,7 @@ fMRI = 8;
 %%
 runNum=2;
 fMRI = 10;
+fMRI = 18
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
