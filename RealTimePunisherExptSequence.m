@@ -238,7 +238,7 @@ cd ..;
 %% Generate Trial and Block Sequences
 
 % counterbalance block order across runs and subjects
-if negdist
+if negdist %if negative displays why are we only doing scenes?
     categOrderPhase1 = [SCENE SCENE SCENE SCENE];
     categOrderPhase2 = [SCENE SCENE SCENE SCENE];
 else

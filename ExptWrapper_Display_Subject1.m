@@ -1,7 +1,10 @@
 exptDir = '~/code/rtAttenPenn/';
 cd(exptDir)
 subjectNum = 1;
-subjectName = 'rtAttenPenn1';
+%subjectName = 'rtAttenPenn1';
+projectName = 'rtAttenPenn';
+%subjectName = 'rtAttenPenn1';
+subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
 useButtonBox=1;
 realtimeData = 1;
