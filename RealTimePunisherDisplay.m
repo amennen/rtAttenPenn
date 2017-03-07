@@ -143,6 +143,7 @@ x_shift = .2;
 y_shift = .15;
 steepness = .9;
 
+% CHECK HERE!!
 ScreenResX = 1600;
 ScreenResY = 900;
 
@@ -436,7 +437,7 @@ Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 if (rtData )
    % if strcmp(computer,'MACI') % taking out because we're running on a linux!
-        runStart = WaitTRPulsePTB3_skyra(1);
+        runStart = WaitTRPulsePTB3_skyra(1,DEVICE);
    % else
    %     WaitSecs(.5);
    %     runStart = KbWait;
@@ -524,7 +525,7 @@ for iBlock=1:numel(indBlocksPhase1)
         
         %wait for pulse
         if (rtData) && mod(iTrial,nTrialsPerTR)==1
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
         else
             blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
@@ -691,7 +692,7 @@ end
 
 % wait for pulse
 if rtData
-    [phase2Start,~] = WaitTRPulsePTB3_skyra(1);
+    [phase2Start,~] = WaitTRPulsePTB3_skyra(1,DEVICE);
     
     if phase2Start == -1
         phase2Start = GetSecs;
@@ -802,7 +803,7 @@ for iBlock=indBlocksPhase2
         
         %wait for pulse
         if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1))
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
         else
             blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
