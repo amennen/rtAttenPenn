@@ -2,9 +2,9 @@
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
-subjectNum = 1;
+subjectNum = 2;
 projectName = 'rtAttenPenn';
-runNum = 1;
+runNum = 2;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -46,8 +46,9 @@ if matchNum ==0
 end
 
 %% Generate mask
-
-scanNum = 6;
+% first localizer: 1 files
+% then 5 is the first functional
+scanNum = 3;
 if scanNum < 10
     fn = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/001_00000' num2str(scanNum) '_000006.dcm'];
 else
@@ -64,7 +65,9 @@ end
 %% Run 1 file process
 
 runNum = 1;
-fMRI = 8;
+fMRI = 5;
+%today's testing 3/7
+fMRI = 5;
 %testing file processing
 % put this in to test:fMRI = 2;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
@@ -72,8 +75,7 @@ fMRI = 8;
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 10;
-fMRI = 18
+fMRI = 7;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%

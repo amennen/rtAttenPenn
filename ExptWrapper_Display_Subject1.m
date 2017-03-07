@@ -1,9 +1,9 @@
 exptDir = '~/code/rtAttenPenn/';
 cd(exptDir)
-subjectNum = 1;
+subjectNum = 2;
 %subjectName = 'rtAttenPenn1';
 projectName = 'rtAttenPenn';
-runNum = 1;
+runNum = 2;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -15,14 +15,17 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 %%
 runNum=1;
-fMRI = 8;
+fMRI = 5;
+
+% today's scanning number
+fMRI = 5;
+
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum=2;
-fMRI = 10;
-fMRI = 18
+fMRI = 7;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
