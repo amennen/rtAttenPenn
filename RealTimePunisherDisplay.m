@@ -143,9 +143,8 @@ x_shift = .2;
 y_shift = .15;
 steepness = .9;
 
-% CHECK HERE!!
-ScreenResX = 1280;
-ScreenResY = 720;
+ScreenResX = 1600;
+ScreenResY = 900;
 
 %trainedModelFile = 'trainingcomplete.mat';
 
@@ -157,7 +156,7 @@ KbName('UnifyKeyNames');
 LEFT = KbName('1!');
 DEVICENAME = 'Current Designs, Inc. 932';
 if useButtonBox && (~debug)
-    [index, devName] = GetKeyboardIndices;
+    [index devName] = GetKeyboardIndices;
     for device = 1:length(index)
         if strcmp(devName(device),DEVICENAME)
             DEVICE = index(device);
@@ -166,7 +165,9 @@ if useButtonBox && (~debug)
 else
     DEVICE = -1;
 end
-
+KbName('UnifyKeyNames')
+TRIGGER = '5%';
+TRIGGER_keycode = getKeys(TRIGGER);
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
 respMap = mod(subjectNum-1,4)+1;
@@ -214,20 +215,23 @@ else
     % first just make the screen tiny
     
     [screenX screenY] = Screen('WindowSize',screenNum);
-    %screenX = 800;
-    %screenY = 800;
+    screenX = 800;
+    screenY = 800;
     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
-%     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
-%         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
-%     end
+    if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
+        fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
+    end
 end
-windowSize.degrees = [51 30];
-resolution = Screen('Resolution', screenNum);
-windowSize.pixels = [resolution.width/2 resolution.height];
-screenX = windowSize.pixels(1);
-screenY = windowSize.pixels(2);
+
 %create main window
-mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+% ACM: took out if statement because specifying top doesn't work on penn
+% comp
+%if (useButtonBox)%scanner display monitor has error with inputs of screen size
+%    mainWindow = Screen(screenNum,'OpenWindow',backColor);
+%else
+    mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+%end
+
 % details of main window
 centerX = screenX/2; centerY = screenY/2;
 Screen(mainWindow,'TextFont',textFont);
@@ -434,7 +438,8 @@ Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 if (rtData )
    % if strcmp(computer,'MACI') % taking out because we're running on a linux!
-        runStart = WaitTRPulsePTB3_skyra(1);
+        %runStart = WaitTRPulsePTB3_skyra(1);
+        runStart = WaitTRPulse(TRIGGER_keycode,DEVICE);
    % else
    %     WaitSecs(.5);
    %     runStart = KbWait;
@@ -522,7 +527,8 @@ for iBlock=1:numel(indBlocksPhase1)
         
         %wait for pulse
         if (rtData) && mod(iTrial,nTrialsPerTR)==1
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+            %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
         else
             blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
@@ -689,8 +695,8 @@ end
 
 % wait for pulse
 if rtData
-    [phase2Start,~] = WaitTRPulsePTB3_skyra(1);
-    
+    %[phase2Start,~] = WaitTRPulsePTB3_skyra(1);
+    [phase2Start,~] = WaitTRPulse(TRIGGER_keycode,DEVICE);
     if phase2Start == -1
         phase2Start = GetSecs;
     end
@@ -799,8 +805,9 @@ for iBlock=indBlocksPhase2
         tRespTimeout = blockData(iBlock).plannedtrialonsets(iTrial)+respWindow;
         
         %wait for pulse
-        if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1))
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+        if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1)) % this will be true for every other then
+            %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
+            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
         else
             blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>

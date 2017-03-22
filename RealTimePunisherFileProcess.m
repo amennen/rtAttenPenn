@@ -461,14 +461,14 @@ if runNum == 1
 %     trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1,1));
 %     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
 %     trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
-else
-    trainIdx1 = any(oldpats.patterns.regressor(:,1:lastVolPhase1),1);
-    trainLabels1 = oldpats.patterns.regressor(:,trainIdx1)'; %find the labels of those indices
-    trainPats1 = oldpats.patterns.raw_sm_z(trainIdx1,:); %retrieve the patterns of those indices
-    
-    trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1),1);
-    trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
-    trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
+% else
+%     trainIdx1 = any(oldpats.patterns.regressor(:,1:lastVolPhase1),1);
+%     trainLabels1 = oldpats.patterns.regressor(:,trainIdx1)'; %find the labels of those indices
+%     trainPats1 = oldpats.patterns.raw_sm_z(trainIdx1,:); %retrieve the patterns of those indices
+%     
+%     trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1),1);
+%     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
+%     trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
 end
 
 trainPats = [trainPats1;trainPats2];
