@@ -123,7 +123,7 @@ allowance = .05;    % secs
 % display parameters
 textColor = 0;
 textFont = 'Arial';
-textSize = 18;
+textSize = 25;
 textSpacing = 25;
 fixColor = 0;
 respColor = 255;
@@ -143,8 +143,8 @@ x_shift = .2;
 y_shift = .15;
 steepness = .9;
 
-ScreenResX = 1600;
-ScreenResY = 900;
+ScreenResX = 1280;
+ScreenResY = 720;
 
 %trainedModelFile = 'trainingcomplete.mat';
 
@@ -215,14 +215,18 @@ else
     % first just make the screen tiny
     
     [screenX screenY] = Screen('WindowSize',screenNum);
-    screenX = 800;
-    screenY = 800;
-    %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
-    if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
-        fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
-    end
+%     screenX = 800;
+%     screenY = 800;
+%     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
+%     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
+%         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
+%     end
 end
-
+windowSize.degrees = [51 30];
+resolution = Screen('Resolution', screenNum);
+windowSize.pixels = [resolution.width/2 resolution.height];
+screenX = windowSize.pixels(1);
+screenY = windowSize.pixels(2);
 %create main window
 % ACM: took out if statement because specifying top doesn't work on penn
 % comp

@@ -2,9 +2,9 @@
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
-subjectNum = 2;
+subjectNum = 3;
 projectName = 'rtAttenPenn';
-runNum = 2;
+runNum = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -67,7 +67,7 @@ end
 runNum = 1;
 fMRI = 5;
 %today's testing 3/7
-fMRI = 5;
+fMRI = 10
 %testing file processing
 % put this in to test:fMRI = 2;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
@@ -75,34 +75,34 @@ fMRI = 5;
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 7;
+fMRI = 12;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%
 
 runNum = 3;
-fMRI = 18;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
-
-
-%%
-
-runNum = 4;
 fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
-runNum = 5;
+runNum = 4;
 fMRI = 16;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
-runNum = 6;
+runNum = 5;
 fMRI = 18;
+[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+
+
+%%
+
+runNum = 6;
+fMRI = 20;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 

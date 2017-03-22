@@ -1,9 +1,10 @@
 exptDir = '~/code/rtAttenPenn/';
 cd(exptDir)
-subjectNum = 2;
+subjectNum = 3;
 %subjectName = 'rtAttenPenn1';
 projectName = 'rtAttenPenn';
-runNum = 2;
+Screen('Preference', 'SkipSyncTests', 1);
+runNum = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -18,37 +19,37 @@ runNum=1;
 fMRI = 5;
 
 % today's scanning number
-fMRI = 5;
+fMRI = 10
 
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum=2;
-fMRI = 7;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
-
-
-%%
-runNum = 3;
 fMRI = 12;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
-runNum = 4;
+runNum = 3;
 fMRI = 14;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
-runNum = 5;
+runNum = 4;
 fMRI = 16;
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
+
+
+%%
+runNum = 5;
+fMRI = 18;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 %%
 runNum = 6;
-fMRI = 18;
+fMRI = 20;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
