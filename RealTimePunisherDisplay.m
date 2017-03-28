@@ -539,7 +539,7 @@ for iBlock=1:numel(indBlocksPhase1)
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW>
         end
         stimOn = 1;
-        
+        FlushEvents('keyDown');
         while(GetSecs < tRespTimeout)
             
             % remove stimulus and wait for response
@@ -583,73 +583,6 @@ for iBlock=1:numel(indBlocksPhase1)
             end
         end
         
-        %load rtfeedback values once per TR
-        if rtfeedback
-            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
-                %number of odd trials - paired with TRs
-                iTrialOdd = ceil(iTrial/2);
-                
-                %preset the file load to 0 and the timeout
-                blockData(iBlock).classOutputFileLoad(iTrial) = 0; %#ok<AGROW>
-                tClassOutputFileTimeout = GetSecs + deltat;
-                
-                %check for classifier output file
-                while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
-                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1); %#ok<AGROW>
-                end
-                
-                %load classifier output file
-                if blockData(iBlock).classOutputFileLoad(iTrial)
-                    tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
-                    blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
-                else
-                    blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
-                end
-                
-                %constrain the proportion of attended image
-                if isnan(blockData(iBlock).categsep(iTrial)) %attImgProp for that trial for some reason was NaN
-                    tempLastClassOutput = find(~isnan(blockData(iBlock).categsep),1,'last');
-                    if ~isempty(tempLastClassOutput)
-                        blockData(iBlock).attImgProp(iTrial+1) = blockData(iBlock).attImgProp(tempLastClassOutput); %#ok<AGROW>
-                    else
-                        blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-                    end
-                else
-                    blockData(iBlock).attImgProp(iTrial+1) = steepness./(1+exp(-gain*(blockData(iBlock).categsep(iTrial)-x_shift)))+y_shift; %#ok<AGROW>
-                end
-                
-                %set for next trial
-                if ((iTrial+2)<blockData(iBlock).trialsPerBlock)
-                    blockData(iBlock).attImgProp(iTrial+2) = blockData(iBlock).attImgProp(iTrial+1); %#ok<AGROW>
-                end
-                
-                %smooth the trials
-                if iTrialOdd == 2
-                    blockData(iBlock).smoothAttImgProp(2,iTrialOdd) = .5*blockData(iBlock).attImgProp(2,iTrialOdd-1)+.5*blockData(iBlock).attImgProp(2,iTrialOdd); %#ok<AGROW>
-                else
-                    blockData(iBlock).smoothAttImgProp(2,iTrialOdd) = (1/3)*blockData(iBlock).attImgProp(2,iTrialOdd-2)+(1/3)*blockData(iBlock).attImgProp(2,iTrialOdd-1)+(1/3)*blockData(iBlock).attImgProp(2,iTrialOdd); %#ok<AGROW>
-                end
-                
-                %set for next trial
-                if ((iTrial+2)<=blockData(iBlock).trialsPerBlock)
-                    blockData(iBlock).smoothAttImgProp(iTrial+2) = blockData(iBlock).smoothAttImgProp(iTrial+1); %#ok<AGROW>
-                end
-            else
-                blockData(iBlock).classOutputFile{iTrial} = '12orev'; %#ok<AGROW>
-            end
-        else
-            if ((iTrial+1)<=blockData(iBlock).trialsPerBlock)
-                blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-                blockData(iBlock).smoothAttImgProp(iTrial+1)= attImgPropPhase2; %#ok<AGROW>
-            end
-            
-            if ((iTrial+2)<=blockData(iBlock).trialsPerBlock-2)
-                blockData(iBlock).attImgProp(iTrial+2) = attImgPropPhase2; %#ok<AGROW>
-                blockData(iBlock).smoothAttImgProp(iTrial+2)= attImgPropPhase2; %#ok<AGROW>
-            end
-            blockData(iBlock).classOutputFile{iTrial} = 'notrt'; %#ok<AGROW>
-            blockData(iBlock).classOutputFile{iTrial} = NaN; %#ok<AGROW>
-        end
         
         % print trial results
         fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).pulses(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),NaN,NaN,NaN,blockData(iBlock).attImgProp(iTrial),NaN);
@@ -819,7 +752,7 @@ for iBlock=indBlocksPhase2
         end
         
         stimOn = 1;
-        
+        FlushEvents('keyDown');
         while(GetSecs < tRespTimeout)
             
             % check for responses if none received yet
