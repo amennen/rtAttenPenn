@@ -1,4 +1,4 @@
-function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback)
 % function [testTiming blockData] = RealTimePunisherExptOutline(subjectNum,subjectName,runNum)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -117,7 +117,8 @@ RTFEED = 2;         % numerical designation of the block type feedback
 
 %experimental order of block types
 if (rtfeedback == 1)
-    typeOrder = [RTFEED*ones(1,nBlocksPerPhase) RTFEED*ones(1,nBlocksPerPhase)];
+    %typeOrder = [RTFEED*ones(1,nBlocksPerPhase) RTFEED*ones(1,nBlocksPerPhase)];
+    typeOrder = [STABLE*ones(1,nBlocksPerPhase) RTFEED*ones(1,nBlocksPerPhase)];
 elseif (rtfeedback == 0)
     typeOrder = [STABLE*ones(1,nBlocksPerPhase) STABLE*ones(1,nBlocksPerPhase)];
 end
@@ -238,39 +239,43 @@ cd ..;
 %% Generate Trial and Block Sequences
 
 % counterbalance block order across runs and subjects
-if negdist %if negative displays why are we only doing scenes?
-    categOrderPhase1 = [SCENE SCENE SCENE SCENE];
-    categOrderPhase2 = [SCENE SCENE SCENE SCENE];
-else
-    if (mod(subjectNum,2)==1)
-        if (mod(runNum,2)==1)
-            blockSequencePhase1 = [SCENE FACE FACE SCENE];
-            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-            
-            blockSequencePhase2 = [FACE SCENE SCENE FACE];
-            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
-        else
-            blockSequencePhase1 = [FACE SCENE SCENE FACE];
-            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-            
-            blockSequencePhase2 = [SCENE FACE FACE SCENE];
-            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
-        end
+% counterbalance block order across runs and subjects
+if (mod(subjectNum,8) == 1) || (mod(subjectNum,8) == 2) || (mod(subjectNum,8) == 3) || (mod(subjectNum,8) == 4)
+    if (mod(runNum,2)==1)
+        blockSequencePhase1 = [SCENE FACE FACE SCENE];
+        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+
+        blockSequencePhase2 = [FACE SCENE SCENE FACE];
+        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
     else
-        if (mod(runNum,2)==1)
-            blockSequencePhase1 = [FACE SCENE SCENE FACE];
-            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-            
-            blockSequencePhase2 = [SCENE FACE FACE SCENE];
-            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
-        else
-            blockSequencePhase1 = [SCENE FACE FACE SCENE];
-            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-            
-            blockSequencePhase2 = [FACE SCENE SCENE FACE];
-            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
-        end
+        blockSequencePhase1 = [FACE SCENE SCENE FACE];
+        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+
+        blockSequencePhase2 = [SCENE FACE FACE SCENE];
+        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
     end
+else
+    if (mod(runNum,2)==1)
+        blockSequencePhase1 = [FACE SCENE SCENE FACE];
+        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+
+        blockSequencePhase2 = [SCENE FACE FACE SCENE];
+        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+    else
+        blockSequencePhase1 = [SCENE FACE FACE SCENE];
+        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+
+        blockSequencePhase2 = [FACE SCENE SCENE FACE];
+        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+    end
+end
+
+if rtfeedback
+    negdistblocks = [0 0 0 0 1 1 1 1];
+    blockSequencePhase2 = [SCENE SCENE SCENE SCENE];
+    categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+else
+    negdistblocks = [0 0 0 0 0 0 0 0];
 end
 
 attCategOrder = [categOrderPhase1 categOrderPhase2];
@@ -314,23 +319,23 @@ for iBlock=1:numBlocks
     blockData(iBlock).smoothAttImgProp = nan(2,ceil(blockData(iBlock).trialsPerBlock/2));  %#ok<AGROW>
     blockData(iBlock).categs{blockData(iBlock).attCateg} = PsychRandSample(randSampAttCategList(blockData(iBlock).attCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
     tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg));
-    while ((numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>48))
+    while ((numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)) %change from 48 from Megan's code
         blockData(iBlock).categs{blockData(iBlock).attCateg} = PsychRandSample(randSampAttCategList(blockData(iBlock).attCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg)); %#ok<NOPRT>
     end
 
-    if negdist
-        blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
+    if negdistblocks(iBlock) && (blockData(iBlock).attCateg==SCENE)
+        blockData(iBlock).categs{blockData(iBlock).inattCateg} = RandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+2); %#ok<NOPRT>
         while (numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)
-            blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
+            blockData(iBlock).categs{blockData(iBlock).inattCateg} = RandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
             tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+2); %#ok<NOPRT>
         end
     else
-        blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
+        blockData(iBlock).categs{blockData(iBlock).inattCateg} = RandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg));
         while (numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)
-            blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
+            blockData(iBlock).categs{blockData(iBlock).inattCateg} = RandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
             tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)); %#ok<NOPRT>
         end
     end

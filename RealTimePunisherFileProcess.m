@@ -65,13 +65,8 @@ GetSecs;
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
 if matchNum == 0
-    if rtData
-        dataHeader = ['data/' num2str(subjectNum)];
-        runHeader = [dataHeader '/run' num2str(runNum)];
-    else
-        dataHeader = pwd;
-            runHeader = [dataHeader '/run' num2str(runNum+2)];
-    end
+    dataHeader = ['data/' num2str(subjectNum)];
+    runHeader = [dataHeader '/run' num2str(runNum)];
     classOutputDir = [runHeader '/classoutput'];
     
     matchDataHeader = ['data/' num2str(subjectNum) '_match'];
@@ -127,19 +122,11 @@ end
     
 %load previous patterns
 if runNum>1
-    if rtData
     patsfn = ls([dataHeader '/patternsdata_' num2str(runNum-1) '_*']);
     oldpats = load(deblank(patsfn));
     
-    modelfn = ls([dataHeader '/trainedModel_1_*']);
+    modelfn = ls([dataHeader '/trainedModel_' num2str(runNum-1) '_*']);
     load(deblank(modelfn),'trainedModel');
-    else
-    patsfn = ls([dataHeader '/patternsdata_' num2str(runNum+1) '_*']);
-    oldpats = load(deblank(patsfn));
-    
-    modelfn = ls([dataHeader '/trainedModel_1_*']);
-    load(deblank(modelfn),'trainedModel'); 
-    end
 end
 
 
@@ -212,27 +199,15 @@ fprintf('run\tblock\ttrial\tbltyp\tblcat\tstim\tfilenum\tloaded\toutput\tavg\n')
 
 %% acquiring files
 
-fileCounter = firstVolPhase1-1; %file number = # of TR pulses
+ffileCounter = firstVolPhase1-1; %file number = # of TR pulses
 
 for iTrialPhase1 = 1:nVolsPhase1
-         
+    
     %increase the count of TR pulses
     fileCounter = fileCounter+1;
     
     %save this into the structure
     patterns.fileNum(iTrialPhase1) =  fileCounter+disdaqs/TR;
-    
-    if iTrialPhase1 == 3;
-        if rtfeedback && runNum>1
-            %z-score
-            patterns.initialVolumesMean = oldpats.patterns.trainingAndFixDataMean;  %mean across all volumes per voxel
-            patterns.initialVolumesStd = oldpats.patterns.trainingAndFixDataStd; %std dev across all volumes per voxel %MDB: LOAD THE PREVIOUS RUN'S STANDARD DEVIATION
-        else
-            %z-score
-            patterns.initialVolumesMean = nan(1,numel(roiInds));  %mean across all volumes per voxel
-            patterns.initialVolumesStd = nan(1,numel(roiInds)); %std dev across all volumes per voxel
-        end
-    end
     
     %check for new files from the scanner
     patterns.fileAvail(iTrialPhase1) = 0;
@@ -242,8 +217,8 @@ for iTrialPhase1 = 1:nVolsPhase1
         [patterns.fileAvail(iTrialPhase1) patterns.newFile{iTrialPhase1}] = GetSpecificFMRIFile(imgDir,fMRI,patterns.fileNum(iTrialPhase1));
     end
     
-    %if desired file is recognized, pause for 150ms to complete transfer
-    pause(.15);
+    %if desired file is recognized, pause for 100ms to complete transfer
+    pause(.2);
     
     % if file available, load it
     if (patterns.fileAvail(iTrialPhase1))
@@ -262,37 +237,11 @@ for iTrialPhase1 = 1:nVolsPhase1
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
-    if iTrialPhase1 >=3
-        patterns.raw_sm_tempz(iTrialPhase1,:) = (patterns.raw_sm(iTrialPhase1,:) - patterns.initialVolumesMean)./patterns.initialVolumesStd;
-    end
-        
-    if rtfeedback
-        if any(patterns.regressor(:,fileCounter))
-            [patterns.predict(fileCounter),~,~,patterns.activations(:,fileCounter)] = Test_L2_RLR_realtime(trainedModel,patterns.raw_sm_tempz(fileCounter,:),patterns.regressor(:,fileCounter)); %#ok<NODEF>
-            
-            categ = find(patterns.regressor(:,fileCounter));
-            otherCateg = mod(categ,2)+1;
-            patterns.categoryseparation(fileCounter) = patterns.activations(categ,fileCounter)-patterns.activations(otherCateg,fileCounter);
-            
-            classOutput = patterns.categoryseparation(fileCounter); %#ok<NASGU>
-            save([classOutputDir '/vol_' num2str(patterns.fileNum(fileCounter))],'classOutput');
-        else
-            patterns.categoryseparation(fileCounter) = NaN;
-            
-            classOutput = patterns.categoryseparation(fileCounter); %#ok<NASGU>
-            
-            save([classOutputDir '/vol_' num2str(patterns.fileNum(fileCounter))],'classOutput');
-        end
-    else
-        patterns.categoryseparation(fileCounter) = NaN;
-    end
-    
     % print trial results
-    fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),patterns.categoryseparation(fileCounter),nanmean(patterns.categoryseparation(firstVolPhase1:fileCounter)));
-    fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),patterns.categoryseparation(fileCounter),nanmean(patterns.categoryseparation(firstVolPhase1:fileCounter)));
+    fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
+    fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     
 end % Phase1 loop
-
 
 %% pre-process the files that were obtained during training
 
@@ -356,6 +305,7 @@ fprintf(dataFile,'beginning model testing...\n');
 fprintf('\n*********************************************\n');
 fprintf('beginning model testing...\n');
 
+%% testing
 
 %% testing
 
@@ -378,7 +328,7 @@ for iTrialPhase2=1:(nVolsPhase2+1)
     % if file available, perform preprocessing and test classifier
     if (patterns.fileAvail(fileCounter))
         
-        pause(.15);
+        pause(.1);
         
         [newVol patterns.timeRead{fileCounter}] = ReadFile([imgDir patterns.newFile{fileCounter}],imgmat,roi);
         patterns.raw(fileCounter,:) = newVol;  % keep patterns for later training
@@ -450,17 +400,17 @@ if runNum == 1
     trainPats2mean = mean(trainPats2_notz,1);
     trainPats2std = std(trainPats2_notz,[],1);
     trainPats2 = (trainPats2_notz - repmat(trainPats2mean,numel(trainIdx2),1))./repmat(trainPats2std,numel(trainIdx2),1);
-% elseif runNum == 2
-%     trainIdx1 = find(any(oldpats.patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
-%     trainLabels1 = oldpats.patterns.regressor(:,firstVolPhase2+trainIdx1)'; %find the labels of those indices
-%     trainPats1_notz = oldpats.patterns.raw_sm(firstVolPhase2+trainIdx1,:); %retrieve the patterns of those indices
-%     trainPats1mean = mean(trainPats1_notz,1);
-%     trainPats1std = std(trainPats1_notz,[],1);
-%     trainPats1 = (trainPats1_notz - repmat(trainPats1mean,numel(trainIdx1),1))./repmat(trainPats1std,numel(trainIdx1),1);
-%     
-%     trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1,1));
-%     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
-%     trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
+elseif runNum == 2
+    trainIdx1 = find(any(oldpats.patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
+    trainLabels1 = oldpats.patterns.regressor(:,firstVolPhase2+trainIdx1)'; %find the labels of those indices
+    trainPats1_notz = oldpats.patterns.raw_sm(firstVolPhase2+trainIdx1,:); %retrieve the patterns of those indices
+    trainPats1mean = mean(trainPats1_notz,1);
+    trainPats1std = std(trainPats1_notz,[],1);
+    trainPats1 = (trainPats1_notz - repmat(trainPats1mean,numel(trainIdx1),1))./repmat(trainPats1std,numel(trainIdx1),1);
+    
+    trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1,1));
+    trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
+    trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
 else
     trainIdx1 = any(oldpats.patterns.regressor(:,1:lastVolPhase1),1);
     trainLabels1 = oldpats.patterns.regressor(:,trainIdx1)'; %find the labels of those indices
@@ -486,6 +436,7 @@ if isfield(trainedModel,'biases')
     fprintf(dataFile,'model biases: \t%.3f\t%.3f\n',trainedModel.biases(1),trainedModel.biases(2));
     fprintf('model biases: \t%.3f\t%.3f\n',trainedModel.biases(1),trainedModel.biases(2));
 end
+
 
 
 
