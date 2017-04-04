@@ -403,35 +403,35 @@ Screen('Flip',mainWindow);
 
 
 %% hack
-if strcmp(computer,'PCWIN');
-    
-    % clear screen
-    Screen(mainWindow,'FillRect',backColor);
-    Screen('Flip',mainWindow);
-    FlushEvents('keyDown');
-    
-    % show instructions
-    runInstruct{1} = sceneInstruct;
-    runInstruct{2} = faceInstruct;
-    
-    for instruct=1:length(runInstruct)
-        tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
-        Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
-        clear tempBounds;
-    end
-    Screen('Flip',mainWindow);
-    
-    % wait for experimenter to advance with 'q' key
-    FlushEvents('keyDown');
-    while(1)
-        temp = GetChar;
-        if (temp == 'q')
-            break;
-        end
-    end
-    Screen(mainWindow,'FillRect',backColor);
-    Screen('Flip',mainWindow);
-end
+% if strcmp(computer,'PCWIN');
+%     
+%     % clear screen
+%     Screen(mainWindow,'FillRect',backColor);
+%     Screen('Flip',mainWindow);
+%     FlushEvents('keyDown');
+%     
+%     % show instructions
+%     runInstruct{1} = sceneInstruct;
+%     runInstruct{2} = faceInstruct;
+%     
+%     for instruct=1:length(runInstruct)
+%         tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+%         Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+%         clear tempBounds;
+%     end
+%     Screen('Flip',mainWindow);
+%     
+%     % wait for experimenter to advance with 'q' key
+%     FlushEvents('keyDown');
+%     while(1)
+%         temp = GetChar;
+%         if (temp == 'q')
+%             break;
+%         end
+%     end
+%     Screen(mainWindow,'FillRect',backColor);
+%     Screen('Flip',mainWindow);
+% end
 
 
 %% Start Experiment

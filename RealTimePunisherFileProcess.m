@@ -199,7 +199,7 @@ fprintf('run\tblock\ttrial\tbltyp\tblcat\tstim\tfilenum\tloaded\toutput\tavg\n')
 
 %% acquiring files
 
-ffileCounter = firstVolPhase1-1; %file number = # of TR pulses
+fileCounter = firstVolPhase1-1; %file number = # of TR pulses
 
 for iTrialPhase1 = 1:nVolsPhase1
     

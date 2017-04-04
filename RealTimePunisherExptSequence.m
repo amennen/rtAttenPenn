@@ -136,7 +136,8 @@ MALE = 3;           % faces
 FEMALE = 4;         % faces
 MALESAD = 5;
 FEMALESAD = 6;
-
+MALEHAPPY=7;
+FEMALEHAPPY=8;
 
 %experimental design
 goCategPercent = .9;% prevalence of category with go response
