@@ -4,9 +4,20 @@
 %cd(exptDir);
 subjectNum = 3;
 projectName = 'rtAttenPenn';
+<<<<<<< HEAD
 subjectRun = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
+=======
+runNum = 1;
+% **** types of stimuli to train/show to subjects *******
+NEUTRAL = 1;
+SAD = 2;
+HAPPY = 3;
+% *******************************************************
+typeNum = NEUTRAL;
+subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+>>>>>>> ea6e01e95f499c6a45b3112de8177d47203d06c0
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
@@ -16,33 +27,27 @@ addpath(genpath('/opt/psychtoolbox/'))
 if matchNum ==0
     runNum = 1;
     rtfeedback = 0;
-    negdist = 0;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 2;
     rtfeedback = 1;
-    negdist = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 3;
     rtfeedback = 1;
-    negdist = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 4;
     rtfeedback = 1;
-    negdist = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 5;
     rtfeedback = 1;
-    negdist = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 6;
     rtfeedback = 1;
-    negdist = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,negdist)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
 end
 
 %% Generate mask
