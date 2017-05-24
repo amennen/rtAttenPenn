@@ -2,22 +2,19 @@
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
-subjectNum = 3;
+subjectNum = 100;
 projectName = 'rtAttenPenn';
-<<<<<<< HEAD
 subjectRun = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
-=======
 runNum = 1;
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
 HAPPY = 3;
 % *******************************************************
-typeNum = NEUTRAL;
+typeNum = HAPPY;
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
->>>>>>> ea6e01e95f499c6a45b3112de8177d47203d06c0
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
@@ -74,6 +71,9 @@ fMRI = 5;
 %today's testing 3/7
 fMRI = 10
 %testing file processing
+realtimeData = 0;
+fMRI = 0;
+debug = 1
 % put this in to test:fMRI = 2;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 

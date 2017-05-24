@@ -291,6 +291,10 @@ for categ=1:nSubCategs
         cd male_sad;
     elseif (categ == FEMALESAD)
         cd female_sad;
+    elseif (categ == MALEHAPPY)
+        cd male_happy;
+    elseif (categ == FEMALEHAPPY)
+        cd female_happy;
     else
         error('Impossible category!');
     end

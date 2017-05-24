@@ -9,7 +9,7 @@ NEUTRAL = 1;
 SAD = 2;
 HAPPY = 3;
 % *******************************************************
-typeNum = NEUTRAL;
+typeNum = HAPPY;
 
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
@@ -25,13 +25,20 @@ fMRI = 5;
 
 % today's scanning number
 fMRI = 10
-
+realtimeData = 0;
+fMRI = 0;
+debug = 1
+useButtonBox = 0
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum=2;
 fMRI = 12;
+fMRI = 0
+useButtonBox = 0
+realtimeData = 0
+debug = 1
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
