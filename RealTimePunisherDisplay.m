@@ -215,6 +215,11 @@ else
     % first just make the screen tiny
     
     [screenX screenY] = Screen('WindowSize',screenNum);
+    windowSize.degrees = [51 30];
+    resolution = Screen('Resolution', screenNum);
+    windowSize.pixels = [resolution.width/2 resolution.height];
+    screenX = windowSize.pixels(1);
+    screenY = windowSize.pixels(2);
 %     screenX = 800;
 %     screenY = 800;
 %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
@@ -222,11 +227,7 @@ else
 %         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
 %     end
 end
-windowSize.degrees = [51 30];
-resolution = Screen('Resolution', screenNum);
-windowSize.pixels = [resolution.width/2 resolution.height];
-screenX = windowSize.pixels(1);
-screenY = windowSize.pixels(2);
+
 %create main window
 % ACM: took out if statement because specifying top doesn't work on penn
 % comp
@@ -263,8 +264,9 @@ else
 end
 runHeader = [dataHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
-fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
-load(deblank(fn));
+fname = findNewestFile(runHeader, fullfile(runHeader, ['blockdatadesign_' num2str(runNum) '*.mat']));
+%fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
+load(fname);
 
 if any([blockData.type]==2) %#ok<NODEF>
     restInstruct = 'The feedback blocks will start soon';
@@ -405,37 +407,6 @@ end
 Screen(mainWindow,'FillRect',backColor);
 Screen('Flip',mainWindow);
 
-
-%% hack
-% if strcmp(computer,'PCWIN');
-%     
-%     % clear screen
-%     Screen(mainWindow,'FillRect',backColor);
-%     Screen('Flip',mainWindow);
-%     FlushEvents('keyDown');
-%     
-%     % show instructions
-%     runInstruct{1} = sceneInstruct;
-%     runInstruct{2} = faceInstruct;
-%     
-%     for instruct=1:length(runInstruct)
-%         tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
-%         Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
-%         clear tempBounds;
-%     end
-%     Screen('Flip',mainWindow);
-%     
-%     % wait for experimenter to advance with 'q' key
-%     FlushEvents('keyDown');
-%     while(1)
-%         temp = GetChar;
-%         if (temp == 'q')
-%             break;
-%         end
-%     end
-%     Screen(mainWindow,'FillRect',backColor);
-%     Screen('Flip',mainWindow);
-% end
 
 
 %% Start Experiment
@@ -793,6 +764,8 @@ for iBlock=indBlocksPhase2
         end
         
 
+         % *************
+
         %load rtfeedback values once per TR
         if rtfeedback
             if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
@@ -824,8 +797,13 @@ for iBlock=indBlocksPhase2
                     else
                         blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
                     end
+                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
+                    vals = linspace(0,.8,25);
+                    blockData(iBlock).attImgProp(iTrial+1) = vals(iTrialOdd);
+                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
                 else
                     blockData(iBlock).attImgProp(iTrial+1) = steepness./(1+exp(-gain*(blockData(iBlock).categsep(iTrial)-x_shift)))+y_shift; %#ok<AGROW>
+                    
                 end
                 
                 %set for next trial
@@ -852,11 +830,11 @@ for iBlock=indBlocksPhase2
                 blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
                 blockData(iBlock).smoothAttImgProp(iTrial+1)= attImgPropPhase2; %#ok<AGROW>
             end
-            
             if ((iTrial+2)<=blockData(iBlock).trialsPerBlock-2)
                 blockData(iBlock).attImgProp(iTrial+2) = attImgPropPhase2; %#ok<AGROW>
                 blockData(iBlock).smoothAttImgProp(iTrial+2)= attImgPropPhase2; %#ok<AGROW>
             end
+          
             blockData(iBlock).classOutputFile{iTrial} = 'notrt'; %#ok<AGROW>
             blockData(iBlock).classOutputFile{iTrial} = NaN; %#ok<AGROW>
         end

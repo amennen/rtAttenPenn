@@ -354,20 +354,24 @@ for iBlock=1:numBlocks
             blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
             tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+2); %#ok<NOPRT>
         end
-    elseif emblocks(iBlock) && typeNum == HAPPY % then get happy images
-        blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+4,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
-        tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+4); %#ok<NOPRT>
-        while (numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)
-            blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+4,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
-            tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+4); %#ok<NOPRT>
-        end
-    else % so this is for all neutral runs
+    else
+        
         blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg));
         while (numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)
             blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:),[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
             tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)); %#ok<NOPRT>
         end
+        
+        if emblocks(iBlock) && typeNum == HAPPY % then get happy images--redo attended categories
+            blockData(iBlock).categs{blockData(iBlock).attCateg} = PsychRandSample(randSampAttCategList(blockData(iBlock).attCateg,:)+4,[1 blockData(iBlock).trialsPerBlock]); % this randomly samples the probability list so that ratio of go/no trials are kept
+            tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg)+4); % this finds where the no go trials are
+            while ((numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)) % don't want the no go trials to be too early, too frequent, or too late
+                blockData(iBlock).categs{blockData(iBlock).attCateg} = PsychRandSample(randSampAttCategList(blockData(iBlock).attCateg,:)+4,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
+                tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg)+4); %#ok<NOPRT>
+            end
+        end
+        
     end
     blockData(iBlock).images{SCENE} = nan(1,blockData(iBlock).trialsPerBlock); %#ok<AGROW>
     blockData(iBlock).images{FACE} = nan(1,blockData(iBlock).trialsPerBlock); %#ok<AGROW>
@@ -414,8 +418,15 @@ for iBlock=1:numBlocks
             % category
             blockData(iBlock).images{half}(iTrial) = imageShuffle{blockData(iBlock).categs{half}(iTrial)}(categCounter(blockData(iBlock).categs{half}(iTrial))); %#ok<AGROW
         end
-        
-        blockData(iBlock).corrresps(iTrial) = correctResp{blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial)}; %#ok<AGROW>
+        if blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial) > 4 % then we're using an emotion
+            if blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial) > 6 % then subtract 4 because happy
+                blockData(iBlock).corrresps(iTrial) = correctResp{blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial)-4};
+            else
+                blockData(iBlock).corrresps(iTrial) = correctResp{blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial)-2};
+            end
+        else
+            blockData(iBlock).corrresps(iTrial) = correctResp{blockData(iBlock).categs{blockData(iBlock).attCateg}(iTrial)}; %#ok<AGROW>
+        end
         
         trialCounter = trialCounter+1;
         blockData(iBlock).trialCount(iTrial) = trialCounter; %#ok<AGROW>

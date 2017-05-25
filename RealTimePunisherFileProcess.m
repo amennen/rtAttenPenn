@@ -77,8 +77,10 @@ else
     runHeader = [dataHeader '/run' num2str(runNum)];
     classOutputDir = [runHeader '/controlneverseenclassoutput'];
 end
-fn = ls([runHeader '/patternsdesign_' num2str(runNum) '_*']);
-load(deblank(fn));
+fname = findNewestFile(runHeader, fullfile(runHeader, ['patternsdesign_' num2str(runNum) '*.mat']));
+
+%fn = ls([runHeader '/patternsdesign_' num2str(runNum) '_*']);
+load(fname);
     
 if rtData
     %imgDir = ['/rt_test/20120604.' subjectName '.' subjectName '/'];

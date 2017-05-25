@@ -27,6 +27,7 @@ if matchNum ==0
     [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     
     runNum = 2;
+    % changing it here for behavioral have rtfeedback = 0
     rtfeedback = 1;
     [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
     

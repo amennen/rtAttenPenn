@@ -1,5 +1,5 @@
-exptDir = '~/code/rtAttenPenn/';
-cd(exptDir)
+%exptDir = '~/code/rtAttenPenn/';
+%cd(exptDir)
 subjectNum = 3;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
