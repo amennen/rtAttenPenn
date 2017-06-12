@@ -66,8 +66,8 @@ if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
     
     
-    ListenChar(2);  %prevent command window output
-    HideCursor;     %hide mouse cursor    
+   % ListenChar(2);  %prevent command window output
+   % HideCursor;     %hide mouse cursor    
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end
@@ -215,8 +215,10 @@ else
     % first just make the screen tiny
     
     [screenX screenY] = Screen('WindowSize',screenNum);
+    % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
+    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
     windowSize.pixels = [resolution.width/2 resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);

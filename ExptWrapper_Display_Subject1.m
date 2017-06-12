@@ -1,6 +1,6 @@
 %exptDir = '~/code/rtAttenPenn/';
 %cd(exptDir)
-subjectNum = 3;
+subjectNum = 100;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
 runNum = 1;
@@ -38,7 +38,7 @@ fMRI = 12;
 fMRI = 0
 useButtonBox = 0
 realtimeData = 0
-debug = 1
+debug = 0
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
