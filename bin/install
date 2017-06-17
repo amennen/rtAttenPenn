@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+# Apt
+sudo apt update
+sudo apt install -y \
+  unzip
+
+# Install MATLAB
+# TODO: get MATLAB
+mkdir matlab
+# unzip matlab_R2017a_glnxa64.zip -d matlab
+
+
+# Install MATLAB Runtime
+wget https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
+
+
+rm *.zip
+
+# Install fsl-core
+wget -O- http://neuro.debian.net/lists/yakkety.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+sudo apt-key adv --recv-keys --keyserver hkp://pgp.mit.edu:80 0xA5D32F012649A5A9
+sudo apt-get update
+sudo apt-get install fsl-core -y
+
+# Install bxh/xcede tools from biac
+# wget http://www.nitrc.org/frs/download.php/7384/bxh_xcede_tools-1.11.1-lsb30.x86_64.tgz
+# tar zxvf *.tgz
+
+# Install BIAC Matlab Tools
+wget https://wiki.biac.duke.edu/_media/biac:biac_matlab_06172014.tgz -O biac.tgz
+tar zxvf biac.tgz
+
+rm *.tgz
+
