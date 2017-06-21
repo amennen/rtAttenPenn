@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+# Run from Princeton-connected machine
+sudo mkdir -p /mnt/MATLAB
+sudo chmod 755 /mnt/MATLAB
+
+sudo apt install -y cifs-utils
+sudo mount.cifs //files.princeton.edu/Licensed /mnt/MATLAB -o username=dsuo,domain=princeton,sec=ntlmv2
+
+# Run from EC2
+# scp data from [PRINCETON]:/mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX /mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX
+sudo /mnt/MATLAB/Products/Matlab/R2016b/Unix_macOSX/install -inputFile ./conf/matlab/installer_input.txt
+sudo /usr/local/MATLAB/R2017a/bin/activate_matlab.sh -propertiesFile ./conf/matlab/activate.ini
+
 # Apt
 sudo apt update
 sudo apt install -y \
