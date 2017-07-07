@@ -1,4 +1,4 @@
-function [blockData] = RealTimeGazeDisplay(subjectNum,matchNum,eyeTrack,debug)
+function RealTimeGazeDisplay(subjectNum,matchNum,eyeTrack,debug)
 % function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -24,12 +24,12 @@ if nargin < 4
 end
 
 if ~isnumeric(subjectNum)
-   error('subjectNum must be a number'); 
+    error('subjectNum must be a number');
 end
 
 
 if ~isnumeric(matchNum)
-   error('matchNum must be a number'); 
+    error('matchNum must be a number');
 end
 
 
@@ -50,8 +50,8 @@ if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
     
     
-   % ListenChar(2);  %prevent command window output
-   % HideCursor;     %hide mouse cursor    
+    % ListenChar(2);  %prevent command window output
+    % HideCursor;     %hide mouse cursor
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end
@@ -75,10 +75,8 @@ instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
 
 % trial timing
-stimDur = 30;        % secs
-deltat = .1;        % secs
-allowance = .05;    % secs
-fixation = 1; %ITI
+stim.picDuration = 30;        % secs
+stim.isiDuration = 1; %ITI
 
 % display parameters
 textColor = 0;
@@ -103,7 +101,6 @@ KbName('UnifyKeyNames');
 DEVICE = -1;
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
-instruct = 'Please look at the computer screen for the allotted time in the trial.';
 
 % want to have it so there are 20 trials
 % 8 filler trials: neutral fillers
@@ -119,26 +116,26 @@ NEUTRAL = 3;
 POSITIVE = 4;
 NEUTRALFILLER = 5;
 
-order(DYSPHORIC,:) = randperm(nImages);
-order(THREAT,:) = randperm(nImages);
-order(NEUTRAL,:) = randperm(nImages);
-order(POSITIVE,:) = randperm(nImages);
+stim.order(:,DYSPHORIC) = randperm(nImages);
+stim.order(:,THREAT) = randperm(nImages);
+stim.order(:,NEUTRAL) = randperm(nImages);
+stim.order(:,POSITIVE) = randperm(nImages);
 nCategories = 4;
 
 % now for the positioning
 done = 0;
 while ~done
     for t = 1:nTrialsReg
-        position(t,:) = randperm(nCategories);
+        stim.position(t,:) = randperm(nCategories);
     end
     % make sure there 3x repeats in each cateogry
-    if length(find(position(:,1)==1)) == 3 && length(find(position(:,2)==1)) ==3 && length(find(position(:,3)==1))==3 && length(find(position(:,4)==1))==3 && length(find(position(:,1)==2)) == 3 && length(find(position(:,2)==2)) ==3 && length(find(position(:,3)==2))==3 && length(find(position(:,4)==2))==3 && length(find(position(:,1)==3)) == 3 && length(find(position(:,2)==3)) ==3 && length(find(position(:,3)==3))==3 && length(find(position(:,4)==3))==3 && length(find(position(:,1)==4)) == 3 && length(find(position(:,2)==4)) ==3 && length(find(position(:,3)==4))==3 && length(find(position(:,4)==4))==3
+    if length(find(stim.position(:,1)==1)) == 3 && length(find(stim.position(:,2)==1)) ==3 && length(find(stim.position(:,3)==1))==3 && length(find(stim.position(:,4)==1))==3 && length(find(stim.position(:,1)==2)) == 3 && length(find(stim.position(:,2)==2)) ==3 && length(find(stim.position(:,3)==2))==3 && length(find(stim.position(:,4)==2))==3 && length(find(stim.position(:,1)==3)) == 3 && length(find(stim.position(:,2)==3)) ==3 && length(find(stim.position(:,3)==3))==3 && length(find(stim.position(:,4)==3))==3 && length(find(stim.position(:,1)==4)) == 3 && length(find(stim.position(:,2)==4)) ==3 && length(find(stim.position(:,3)==4))==3 && length(find(stim.position(:,4)==4))==3
         done = 1;
     end
 end
 
 % now counterbalance types of trials
-trialType = Shuffle([ones(1,nTrialsReg) 2*ones(1,nFillers)]);
+stim.trialType = Shuffle([ones(1,nTrialsReg) 2*ones(1,nFillers)]);
 % so 1 = regular trial and 2 = filler
 %% Initialize Screens
 
@@ -153,7 +150,7 @@ end
 
 %retrieve the size of the display screen
 if debug
-    screenX = 800;
+    screenX = 1000;
     screenY = 800;
 else
     % first just make the screen tiny
@@ -162,27 +159,31 @@ else
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
-    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
     windowSize.pixels = [resolution.width resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
 end
 
 mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
-
+ifi = Screen('GetFlipInterval', mainWindow);
+SLACK  = ifi/2;
 % details of main window
 centerX = screenX/2; centerY = screenY/2;
 Screen(mainWindow,'TextFont',textFont);
 Screen(mainWindow,'TextSize',textSize);
 
 % placeholder for images
-imageRect = [0,0,imageSize,imageSize];
+imageRect = [0,0,imageSize(1),imageSize(2)];
+destDims = imageSize/round(screenX/imageSize(1));
+BorderX = screenX/10;
+BorderY = screenX/10;
 
+% position of each image
 % position of images
-centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
-
-% position of fixation dot
-fixDotRect = [centerX-fixationSize,centerY-fixationSize,centerX+fixationSize,centerY+fixationSize];
+imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderX+destDims(2)];
+imPos(2,:) = [screenX-BorderX-destDims(1),BorderY,screenX-BorderX,BorderY+destDims(2)];
+imPos(3,:) = [BorderX,screenY-BorderY-destDims(2),BorderX+destDims(1),screenY-BorderY];
+imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-BorderX,screenY-BorderY];
 
 % image loading progress bar
 progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
@@ -190,17 +191,23 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
-% if matchNum == 0
-%     dataHeader = ['data/' num2str(subjectNum)];
-% else
-%     dataHeader = ['data/' num2str(subjectNum) '_match'];
-% end
+if matchNum == 0
+    dataHeader = ['data/' num2str(subjectNum)];
+    if ~exist(dataHeader)
+        mkdir(dataHeader);
+        MdataHeader = ['data/' num2str(subjectNum) '_match'];
+        mkdir(MdataHeader);
+    end
+else
+    dataHeader = ['data/' num2str(subjectNum) '_match'];
+end
+
 % runHeader = [dataHeader '/run' num2str(runNum)];
 % classOutputDir = [runHeader '/classoutput'];
 % fname = findNewestFile(runHeader, fullfile(runHeader, ['blockdatadesign_' num2str(runNum) '*.mat']));
 % %fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
 % load(fname);
-% 
+%
 % if any([blockData.type]==2) %#ok<NODEF>
 %     restInstruct = 'The feedback blocks will start soon';
 % else
@@ -252,7 +259,7 @@ for categ=1:nSubCategs
 %                 Screen('FillRect',mainWindow,0,progRect);
 %                 Screen('FillRect',mainWindow,[255 0 0],progRect-[0 0 round((1-img/numImages(categ))*progWidth) 0]);
 %                 Screen('Flip',mainWindow);
-                
+%                 
                 % read images
                 images{categ,img} = imread(dirList{categ}(img).name); %#ok<AGROW>
             end
@@ -272,50 +279,35 @@ Screen('Flip',mainWindow);
 % open and set-up output file
 dataFile = fopen([dataHeader '/behavior.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
-fprintf(dataFile,'* Punisher Experiment v.2.0\n');
+fprintf(dataFile,'* Gaze Experiment v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(dataFile,['* Seed: ' num2str(seed) '\n']);
 fprintf(dataFile,['* Subject Number: ' num2str(subjectNum) '\n']);
-fprintf(dataFile,['* Subject Name: ' subjectName '\n']);
-fprintf(dataFile,['* Run Number: ' num2str(runNum) '\n']);
-fprintf(dataFile,['* Use Button Box: ' num2str(useButtonBox) '\n']);
-fprintf(dataFile,['* rtData: ' num2str(rtData) '\n']);
 fprintf(dataFile,['* debug: ' num2str(debug) '\n']);
 fprintf(dataFile,'*********************************************\n\n');
 
-% print header to command window
-fprintf('\n*********************************************\n');
-fprintf('* Punisher Experiment v.2.0\n');
-fprintf(['* Date/Time: ' datestr(now,0) '\n']);
-fprintf(['* Seed: ' num2str(seed) '\n']);
-fprintf(['* Subject Number: ' num2str(subjectNum) '\n']);
-fprintf(['* Subject Name: ' subjectName '\n']);
-fprintf(['* Run Number: ' num2str(runNum) '\n']);
-fprintf(['* Use Button Box: ' num2str(useButtonBox) '\n']);
-fprintf(['* rtData: ' num2str(rtData) '\n']);
-fprintf(['* debug: ' num2str(debug) '\n']);
-fprintf('*********************************************\n\n');
 
 
 %% Show Instructions
+instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
 
 % clear screen
 Screen(mainWindow,'FillRect',backColor);
 Screen('Flip',mainWindow);
 FlushEvents('keyDown');
 
-% show instructions
-if (blockData(1).type == 1)
-    runInstruct{1} = sceneInstruct;
-    runInstruct{2} = faceInstruct;
-else
-    runInstruct{1} = faceInstruct;
-    runInstruct{2} = sceneInstruct;
-end
+% % show instructions
+% if (blockData(1).type == 1)
+%     runInstruct{1} = sceneInstruct;
+%     runInstruct{2} = faceInstruct;
+% else
+%     runInstruct{1} = faceInstruct;
+%     runInstruct{2} = sceneInstruct;
+% end
 
-for instruct=1:length(runInstruct)
-    tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
-    Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+for i=1:length(instruct)
+    tempBounds = Screen('TextBounds',mainWindow,instruct{i});
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(i-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
@@ -343,425 +335,59 @@ Screen('Flip',mainWindow);
 Priority(0);
 
 
-%% set up
+%% set up timing
+config.TR = 2;
+config.nTRs.ISI = stim.isiDuration/config.TR;
+config.nTRs.pic = stim.picDuration/config.TR;
+config.nTrials = nTrials;
 
-for iBlock = 1:numel(blockData)
-    %block instructions
-    if (blockData(iBlock).attCateg==SCENE)
-        blockInstruct{1} = sceneShorterInstruct; %#ok<AGROW>
-    elseif (blockData(iBlock).attCateg==FACE)
-        blockInstruct{2} = faceShorterInstruct; %#ok<AGROW>
-    end
-    
-    %timing
-    blockDur(iBlock+1) = TR*(instructLen+blockData(iBlock).trialsPerBlock/nTrialsPerTR+IBI); %#ok<AGROW>
-    blockOnsets(iBlock) = disdaqs + sum(blockDur(1:iBlock)); %#ok<AGROW>
-end
+config.nTRs.perTrial = config.nTRs.ISI + config.nTRs.pic;
+config.nTRS.perBlock = (config.nTRs.perTrial)*config.nTrials + config.nTRs.ISI; % includes last ISI at the end
 
-typeOrder = [blockData.type];
-indBlocksPhase1 = 1:(numel(typeOrder)/2);
-indBlocksPhase2 = (numel(typeOrder)/2+1):numel(typeOrder);
+timing.plannedOnsets.preITI(1:config.nTrials) = runStart + ((0:config.nTrials-1)*config.nTRs.perTrial)*config.TR;
+timing.plannedOnsets.pic(1:config.nTrials) = timing.plannedOnsets.preITI + config.nTRs.ISI*config.TR;
+timing.plannedOnsets.lastITI = timing.plannedOnsets.pic(end) + config.nTRs.pic*config.TR;
+%% Begin experiment
 
-%% Block Sequence - Phase 1
-
-trialCounter = 0;
-volCounter = 1+disdaqs/TR-1;
-for iBlock=1:numel(indBlocksPhase1)
-    
-    % timing
-    blockData(iBlock).actualblockonset = GetSecs; %#ok<AGROW>
-    blockData(iBlock).plannedinstructonset = blockOnsets(iBlock)+runStart; %#ok<AGROW>
-    blockData(iBlock).plannedtrialonsets = blockData(iBlock).plannedinstructonset + TR*instructTRnum + [0 cumsum(repmat(TR/nTrialsPerTR,1,blockData(iBlock).trialsPerBlock))]; %#ok<AGROW>
-    
-    % show instructions
-    tempBounds = Screen('TextBounds',mainWindow,blockInstruct{blockData(iBlock).attCateg});
-    Screen('drawtext',mainWindow,blockInstruct{blockData(iBlock).attCateg},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
-    clear tempBounds;
-    blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,blockData(iBlock).plannedinstructonset+instructOn); %#ok<AGROW> % turn on
-    
-    % show fixation
-    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow,blockData(iBlock).actualinstructonset+instructOn+instructDur); %turn off
-    
-    % start trial sequence
-    for iTrial=1:(blockData(iBlock).trialsPerBlock)
-        
-        trialCounter = trialCounter+1;
-            
-
-        % generate image
-        fullImage = uint8((1-blockData(iBlock).attImgProp(iTrial))*tempImage{SCENE}+blockData(iBlock).attImgProp(iTrial)*tempImage{FACE});
-        
-        % make textures
-        imageTex = Screen('MakeTexture',mainWindow,fullImage);
-        Screen('PreloadTextures',mainWindow,imageTex);
-        
-        % wait for trigger and show image
-        FlushEvents('keyDown');
-        Priority(MaxPriority(screenNum));
-        Screen('FillRect',mainWindow,backColor);
-        Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
-        Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-        tRespTimeout = blockData(iBlock).plannedtrialonsets(iTrial)+respWindow; %response timeout
-        
-        %wait for pulse
-        if (rtData) && mod(iTrial,nTrialsPerTR)==1
-            %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
-        else
-            blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW>
-        end
-        stimOn = 1;
-        FlushEvents('keyDown');
-        while(GetSecs < tRespTimeout)
-            
-            % remove stimulus and wait for response
-%            if (stimOn && (GetSecs-blockData(iBlock).actualtrialonsets(iTrial) > stimDur))
-%                 Screen('FillRect',mainWindow,backColor);
-%                 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-%                 Screen('Flip',mainWindow);
-%                stimOn = 0;
-%            end
-            
-            % check for responses if none received yet
-            if isnan(blockData(iBlock).rts(iTrial))
-                [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
-                if keyIsDown
-                    if (keyCode(LEFT))
-                        blockData(iBlock).rts(iTrial) = secs-blockData(iBlock).actualtrialonsets(iTrial); %#ok<AGROW> NTB: deltasecs is timed to last KbCheck call
-                        blockData(iBlock).resps(iTrial) = find(keyCode,1); %#ok<AGROW>
-                        Screen('FillRect',mainWindow,backColor);
-                        if (stimOn) % leave image up if response before image duration
-                            Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
-                        end
-                        Screen(mainWindow,'FillOval',respColor,fixDotRect);
-                        Screen('Flip',mainWindow);
-                    end
-                end
-            end
-        end
-        
-        %accuracy
-        if ~isnan(blockData(iBlock).corrresps(iTrial)) %go trial
-            if (blockData(iBlock).resps(iTrial)==blockData(iBlock).corrresps(iTrial)) %made correct response
-                blockData(iBlock).accs(iTrial) = 1; %#ok<AGROW>
-            else
-                blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
-            end
-        else %nogo trial
-            if isnan(blockData(iBlock).resps(iTrial)) %correctly did NOT make a response
-                blockData(iBlock).accs(iTrial) = 2; %#ok<AGROW>
-            else %made a response
-                blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
-            end
-        end
-        
-        
-        % print trial results
-        fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).pulses(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),NaN,NaN,NaN,blockData(iBlock).attImgProp(iTrial),NaN);
-        fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).pulses(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),NaN,NaN,NaN,blockData(iBlock).attImgProp(iTrial),NaN);
-        
-    end % trial loop
-    
-    while ((GetSecs-blockData(iBlock).actualtrialonsets(iTrial) < stimDur))
-        1;
-    end
-    
-    Screen('FillRect',mainWindow,backColor);
-    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow);
-    
-end % end phase 1 block loop
-
-
-%% pause & wait for model to be trained
-
+% instructions
 
 % show instructions
-tempBounds = Screen('TextBounds',mainWindow,restInstruct);
-Screen('drawtext',mainWindow,restInstruct,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
-clear tempBounds;
-restOnset = Screen('Flip',mainWindow); % show instructions
-
-save([runHeader '/blockdata_training'],'blockData');
 
 % show fixation
-Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-Screen('Flip',mainWindow,restOnset+restDur); %turn off
 
-% check for model training to be complete
-trainedModelComplete = 0;
-filePrevFirstVolPhase2 = firstVolPhase2 + (disdaqs/TR) - 2;
-
-if rtData
-    while (trainedModelComplete==0)
-        [trainedModelComplete tempFileTrainingComplete] = GetSpecificFMRIFile(imgDir,fMRI,filePrevFirstVolPhase2); %#ok<NASGU>
-        %     else
-        %         if exist(fullfile(classOutputDir,trainedModelFile),'file')
-        %             trainedModelComplete = 1;
-        %         end
-    end
-end
-
-% wait for pulse
-if rtData
-    %[phase2Start,~] = WaitTRPulsePTB3_skyra(1);
-    [phase2Start,~] = WaitTRPulse(TRIGGER_keycode,DEVICE);
-    if phase2Start == -1
-        phase2Start = GetSecs;
-    end
-    
-    phase2Start= phase2Start+TR;
-    
-else
-    FlushEvents('keyDown');
-
-    WaitSecs(IBI*2);
-    phase2Start = GetSecs+TR;
-
-end
-
-iBlockPhase2 = 0;
-for iBlock = indBlocksPhase2 %Megan Check this!!!
-    iBlockPhase2 = iBlockPhase2+1;
-    blockDurPhase2(iBlockPhase2+1) = TR*(instructLen+blockData(iBlock).trialsPerBlock/nTrialsPerTR+IBI); %#ok<AGROW>
-    blockOnsetsPhase2(iBlockPhase2) = phase2Start + sum(blockDurPhase2(1:iBlockPhase2)); %#ok<AGROW>
-end
-Screen(mainWindow,'FillRect',backColor);
-Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-Screen('Flip',mainWindow);
-
-
-
-%% Block Sequence - Phase2
-
-% prepare for trial sequence
-fprintf(dataFile,'run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
-fprintf('run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
-
-trialCounter = 0;
-volCounter = firstVolPhase2+disdaqs/TR-1;
-
-for iBlock=indBlocksPhase2
-
-    if ~isfield(blockData,'categsep')
-        blockData(iBlock).categsep = NaN(1,blockData(iBlock).trialsPerBlock); %#ok<AGROW>
-    end
-    
-    volCounter = volCounter+1;
-    
-    % timing
-    blockData(iBlock).actualblockonset = GetSecs; %#ok<AGROW>
-    blockData(iBlock).plannedinstructonset = blockOnsetsPhase2(iBlock-indBlocksPhase2(1)+1); %#ok<AGROW>
-    blockData(iBlock).plannedtrialonsets = blockData(iBlock).plannedinstructonset + TR*instructTRnum + [0 cumsum(repmat(TR/nTrialsPerTR,1,blockData(iBlock).trialsPerBlock))]; %#ok<AGROW>
-    
-    % show instructions
-    tempBounds = Screen('TextBounds',mainWindow,blockInstruct{blockData(iBlock).attCateg});
-    Screen('drawtext',mainWindow,blockInstruct{blockData(iBlock).attCateg},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
-    clear tempBounds;
-    blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,blockData(iBlock).plannedinstructonset+instructOn); %#ok<AGROW> % turn on
-    
-    % show instructions
-    tempBounds = Screen('TextBounds',mainWindow,blockInstruct{blockData(iBlock).attCateg});
-    Screen('drawtext',mainWindow,blockInstruct{blockData(iBlock).attCateg},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
-    clear tempBounds;
-    blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,blockData(iBlock).plannedinstructonset+instructOn); %#ok<AGROW>
-    
-    % show fixation
-    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow,blockData(iBlock).actualinstructonset+instructOn+instructDur); %turn off
-    
-    % start trial sequence
-    for iTrial=1:(blockData(iBlock).trialsPerBlock)
-        
-        trialCounter = trialCounter+1;
-        if (mod(iTrial,nTrialsPerTR)==1) 
-            volCounter = volCounter+1;
-        end
-        blockData(iBlock).volCounter(iTrial) = volCounter; %#ok<AGROW>
-        
-        % prep images
-        for half=[SCENE FACE]
-            % get current images
-            tempPower{half} = imagePower{blockData(iBlock).categs{half}(iTrial),blockData(iBlock).images{half}(iTrial)}; %#ok<AGROW>
-            tempImagePhase{half} = imagePhase{blockData(iBlock).categs{half}(iTrial),blockData(iBlock).images{half}(iTrial)}; %#ok<AGROW>
-            tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
-        end
-        
-        if iTrial <= nTrialsPerTR %initialize attImgProp
-            if iTrial == 1
-                blockData(iBlock).attImgProp(iTrial) = attImgPropPhase2; %#ok<AGROW>
-                blockData(iBlock).smoothAttImgProp(iTrial) = attImgPropPhase2; %#ok<AGROW>
-            end
-            blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-            blockData(iBlock).smoothAttImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-        end
-        
-        % generate image
-        fullImage = uint8((1-blockData(iBlock).smoothAttImgProp(iTrial))*tempImage{blockData(iBlock).inattCateg}+blockData(iBlock).smoothAttImgProp(iTrial)*tempImage{blockData(iBlock).attCateg});
-        
-        % make textures
-        imageTex = Screen('MakeTexture',mainWindow,fullImage);
-        Screen('PreloadTextures',mainWindow,imageTex);
-        
-        % wait for trigger and show image
-        FlushEvents('keyDown');
-        Priority(MaxPriority(screenNum));
-        Screen('FillRect',mainWindow,backColor);
-        Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
-        Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-        
-        
-        tRespTimeout = blockData(iBlock).plannedtrialonsets(iTrial)+respWindow;
-        
-        %wait for pulse
-        if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1)) % this will be true for every other then
-            %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
-        else
-            blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW>
-        end
-        
-        stimOn = 1;
-        FlushEvents('keyDown');
-        while(GetSecs < tRespTimeout)
-            
-            % check for responses if none received yet
-            if isnan(blockData(iBlock).rts(iTrial))
-                [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
-                if keyIsDown
-                    if (keyCode(LEFT))
-                        blockData(iBlock).rts(iTrial) = secs-blockData(iBlock).actualtrialonsets(iTrial); %#ok<AGROW> NTB: deltasecs is timed to last KbCheck call
-                        blockData(iBlock).resps(iTrial) = find(keyCode,1); %#ok<AGROW>
-                        Screen('FillRect',mainWindow,backColor);
-                        if (stimOn) % leave image up if response before image duration
-                            Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
-                        end
-                        Screen(mainWindow,'FillOval',respColor,fixDotRect);
-                        Screen('Flip',mainWindow);
-                    end
-                end
-            end
-        end
-        
-        %accuracy
-        if ~isnan(blockData(iBlock).corrresps(iTrial)) %go trial
-            if (blockData(iBlock).resps(iTrial)==blockData(iBlock).corrresps(iTrial)) %made correct response
-                blockData(iBlock).accs(iTrial) = 1; %#ok<AGROW>
-            else
-                blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
-            end
-        else %nogo trial
-            if isnan(blockData(iBlock).resps(iTrial)) %correctly did NOT make a response
-                blockData(iBlock).accs(iTrial) = 2; %#ok<AGROW>
-            else %made a response
-                blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
-            end
-        end
-        
-
-         % *************
-
-        %load rtfeedback values once per TR
-        if rtfeedback
-            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
-                %number of odd trials - paired with TRs
-                iTrialOdd = ceil(iTrial/2);
-                
-                %preset the file load to 0 and the timeout
-                blockData(iBlock).classOutputFileLoad(iTrial) = 0; %#ok<AGROW>
-                tClassOutputFileTimeout = GetSecs + deltat;
-                
-                %check for classifier output file
-                while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
-                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1); %#ok<AGROW>
-                end
-                
-                %load classifier output file
-                if blockData(iBlock).classOutputFileLoad(iTrial)
-                    tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
-                    blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
-                else
-                    blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
-                end
-                
-                %constrain the proportion of attended image
-                if isnan(blockData(iBlock).categsep(iTrial)) %attImgProp for that trial for some reason was NaN
-                    tempLastClassOutput = find(~isnan(blockData(iBlock).categsep),1,'last');
-                    if ~isempty(tempLastClassOutput)
-                        blockData(iBlock).attImgProp(iTrial+1) = blockData(iBlock).attImgProp(tempLastClassOutput); %#ok<AGROW>
-                    else
-                        blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-                    end
-                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
-                    vals = linspace(0,.8,25);
-                    blockData(iBlock).attImgProp(iTrial+1) = vals(iTrialOdd);
-                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
-                else
-                    blockData(iBlock).attImgProp(iTrial+1) = steepness./(1+exp(-gain*(blockData(iBlock).categsep(iTrial)-x_shift)))+y_shift; %#ok<AGROW>
-                    
-                end
-                
-                %set for next trial
-                if ((iTrial+2)<blockData(iBlock).trialsPerBlock)
-                    blockData(iBlock).attImgProp(iTrial+2) = blockData(iBlock).attImgProp(iTrial+1); %#ok<AGROW>
-                end
-                
-                %smooth the trials
-                if iTrialOdd == 2
-                    blockData(iBlock).smoothAttImgProp(2,iTrialOdd) = .5*blockData(iBlock).attImgProp(2,iTrialOdd-1)+.5*blockData(iBlock).attImgProp(2,iTrialOdd); %#ok<AGROW>
-                else
-                    blockData(iBlock).smoothAttImgProp(2,iTrialOdd) = (1/3)*blockData(iBlock).attImgProp(2,iTrialOdd-2)+(1/3)*blockData(iBlock).attImgProp(2,iTrialOdd-1)+(1/3)*blockData(iBlock).attImgProp(2,iTrialOdd); %#ok<AGROW>
-                end
-                
-                %set for next trial
-                if ((iTrial+2)<=blockData(iBlock).trialsPerBlock)
-                    blockData(iBlock).smoothAttImgProp(iTrial+2) = blockData(iBlock).smoothAttImgProp(iTrial+1); %#ok<AGROW>
-                end
-            else
-                blockData(iBlock).classOutputFile{iTrial} = '12orev'; %#ok<AGROW>
-            end
-        else
-            if ((iTrial+1)<=blockData(iBlock).trialsPerBlock)
-                blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
-                blockData(iBlock).smoothAttImgProp(iTrial+1)= attImgPropPhase2; %#ok<AGROW>
-            end
-            if ((iTrial+2)<=blockData(iBlock).trialsPerBlock-2)
-                blockData(iBlock).attImgProp(iTrial+2) = attImgPropPhase2; %#ok<AGROW>
-                blockData(iBlock).smoothAttImgProp(iTrial+2)= attImgPropPhase2; %#ok<AGROW>
-            end
-          
-            blockData(iBlock).classOutputFile{iTrial} = 'notrt'; %#ok<AGROW>
-            blockData(iBlock).classOutputFile{iTrial} = NaN; %#ok<AGROW>
-        end
-            
-        % print trial results
-        fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
-        fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
-
-    end % trial loop
-    
-    volCounter = volCounter+2;
-    
-    while ((GetSecs-blockData(iBlock).actualtrialonsets(iTrial) < stimDur))
-        1;
-    end
+% start trial sequence
+for iTrial=1:config.nTrials
+    %present ISI
+    timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
+    timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
+    fprintf('Flip time error = %.4f\n', timing.actualOnsets.preITI(iTrial) - timing.plannedOnsets.preITI(iTrial));
     
     Screen('FillRect',mainWindow,backColor);
-    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow);
+    % generate images
+    for im = 1:4
+        categ = stim.position(iTrial,im);
+        stim.image{iTrial,im} = images{categ,stim.order(iTrial,categ)};
+        % make textures
+        imageTex = Screen('MakeTexture',mainWindow,stim.image{iTrial,im});
+        Screen('PreloadTextures',mainWindow,imageTex);
+        Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
+    end
     
-end % phase 2 block loop
+    
+    timespec = timing.plannedOnsets.pic(iTrial) - SLACK;
+    timing.actualOnsets.pic(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>
+    fprintf('Flip time error = %.4f\n', timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial));
+end % trial loop
 
-WaitSecs(2);
+timespec = timing.plannedOnsets.lastITI - SLACK;
+timing.actualOnsets.lastITI = isi_specific(mainWindow,fixColor,timespec);
+fprintf('Flip time error = %.4f\n', timing.actualOnsets.lastITI - timing.plannedOnsets.lastITI);
 
+Screen('FillRect',mainWindow,backColor);
+Screen('Flip',mainWindow);
 %% save
 
-save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart');
+%save([dataHeader '/blockdata' '_' datestr(now,30)],'blockData','runStart');
 
 % clean up and go home
 sca;

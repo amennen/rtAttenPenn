@@ -89,7 +89,7 @@ if rtData
     imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
 else
     %imgDir = ['/Volumes/ntb/projects/punisher01/subjects/' subjectName '/data/dicom/']; 
-    imgDir = ['/Volumes/KINGSTON/dicomdata/20121025.1025121_punisher02.1025121_punisher02/'];
+    %imgDir = ['/Volumes/KINGSTON/dicomdata/20121025.1025121_punisher02.1025121_punisher02/'];
 end
 
 %check that the files exist
