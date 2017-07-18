@@ -75,7 +75,7 @@ instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
 
 % trial timing
-stim.picDuration = 30;        % secs
+stim.picDuration = 5 %change for debugging;        % secs
 stim.isiDuration = 1; %ITI
 
 % display parameters
@@ -83,10 +83,10 @@ textColor = 0;
 textFont = 'Arial';
 textSize = 25;
 textSpacing = 25;
-fixColor = 0;
+fixColor = 255;
 respColor = 255;
-backColor = 127;
-imageSize = [600 800]; % assumed square %MdB check image size
+backColor = 0;
+imageSize = [800 600]; % X AND Y NOT NROWS NCOLS
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -174,13 +174,13 @@ Screen(mainWindow,'TextSize',textSize);
 
 % placeholder for images
 imageRect = [0,0,imageSize(1),imageSize(2)];
-destDims = imageSize/round(screenX/imageSize(1));
-BorderX = screenX/10;
-BorderY = screenX/10;
+destDims = imageSize/2;
+BorderX = screenX/20;
+BorderY = screenY/20;
 
 % position of each image
 % position of images
-imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderX+destDims(2)];
+imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderY+destDims(2)];
 imPos(2,:) = [screenX-BorderX-destDims(1),BorderY,screenX-BorderX,BorderY+destDims(2)];
 imPos(3,:) = [BorderX,screenY-BorderY-destDims(2),BorderX+destDims(1),screenY-BorderY];
 imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-BorderX,screenY-BorderY];
@@ -356,6 +356,7 @@ timing.plannedOnsets.lastITI = timing.plannedOnsets.pic(end) + config.nTRs.pic*c
 % show fixation
 
 % start trial sequence
+vCount = 0;
 for iTrial=1:config.nTrials
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
@@ -364,15 +365,17 @@ for iTrial=1:config.nTrials
     
     Screen('FillRect',mainWindow,backColor);
     % generate images
-    for im = 1:4
-        categ = stim.position(iTrial,im);
-        stim.image{iTrial,im} = images{categ,stim.order(iTrial,categ)};
-        % make textures
-        imageTex = Screen('MakeTexture',mainWindow,stim.image{iTrial,im});
-        Screen('PreloadTextures',mainWindow,imageTex);
-        Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
+    if stim.trialType == 1
+        for im = 1:4
+            vCount = vCount + 1;
+            categ = stim.position(vCount,im);
+            stim.image{iTrial,im} = images{categ,stim.order(vCount,categ)};
+            % make textures
+            imageTex = Screen('MakeTexture',mainWindow,stim.image{vCount,im});
+            Screen('PreloadTextures',mainWindow,imageTex);
+            Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(vCount,:));
+        end
     end
-    
     
     timespec = timing.plannedOnsets.pic(iTrial) - SLACK;
     timing.actualOnsets.pic(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>

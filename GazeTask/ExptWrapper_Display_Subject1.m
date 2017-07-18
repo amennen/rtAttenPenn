@@ -14,7 +14,6 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 %%
 runNum=1;
-useButtonBox = 0;
 RealTimeGazeDisplay(subjectNum,matchNum,useTobii,debug)
 
 
