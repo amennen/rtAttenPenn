@@ -107,6 +107,7 @@ DEVICE = -1;
 % 12 regular trials
 % each stimulus category must occur in each of the spots 3 times
 nImages = 12;
+nFillerImages = 16;
 nTrialsReg = 12;
 nFillers = 8;
 nTrials = nTrialsReg + nFillers;
@@ -121,7 +122,6 @@ stim.order(:,THREAT) = randperm(nImages);
 stim.order(:,NEUTRAL) = randperm(nImages);
 stim.order(:,POSITIVE) = randperm(nImages);
 nCategories = 4;
-
 % now for the positioning
 done = 0;
 while ~done
@@ -130,12 +130,42 @@ while ~done
     end
     % make sure there 3x repeats in each cateogry
     if length(find(stim.position(:,1)==1)) == 3 && length(find(stim.position(:,2)==1)) ==3 && length(find(stim.position(:,3)==1))==3 && length(find(stim.position(:,4)==1))==3 && length(find(stim.position(:,1)==2)) == 3 && length(find(stim.position(:,2)==2)) ==3 && length(find(stim.position(:,3)==2))==3 && length(find(stim.position(:,4)==2))==3 && length(find(stim.position(:,1)==3)) == 3 && length(find(stim.position(:,2)==3)) ==3 && length(find(stim.position(:,3)==3))==3 && length(find(stim.position(:,4)==3))==3 && length(find(stim.position(:,1)==4)) == 3 && length(find(stim.position(:,2)==4)) ==3 && length(find(stim.position(:,3)==4))==3 && length(find(stim.position(:,4)==4))==3
-        done = 1;
+        % now make sure none repeat in the same position for two trials in
+        % row
+        %if ~any(any(diff(stim.position)==0))
+            done = 1;
+        %end
     end
 end
 
-% now counterbalance types of trials
-stim.trialType = Shuffle([ones(1,nTrialsReg) 2*ones(1,nFillers)]);
+% NOW FILLERS
+% they need to appear twice so maybe have it so they don't appear in the
+% same location?
+% there are  8 filler trials so choose 8 rounds of 4 images
+done = 0;
+while ~done
+    for t=1:nFillers
+        % for each trial choose four images
+        stim.fillerPosition(t,:) = randperm(nFillerImages,4);
+    end
+    % now make sure each filler appears twice
+    for i = 1:nFillers
+        nR(i) =  length(find(stim.fillerPosition==i));
+    end
+    if all(nR>1) && all(nR<4)
+        done = 1;
+    end
+end
+% now counterbalance types of trials: make sure that neutral fillers don't
+% appear for more than 2 in a row
+done = 0;
+while ~done
+    stim.trialType = Shuffle([ones(1,nTrialsReg) 2*ones(1,nFillers)]);
+    neutrals = find(stim.trialType==2);
+    if ~any(diff(neutrals)==1)
+        done=1;
+    end
+end
 % so 1 = regular trial and 2 = filler
 %% Initialize Screens
 
