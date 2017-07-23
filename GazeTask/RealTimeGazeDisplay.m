@@ -79,7 +79,7 @@ stim.picDuration = 5 %change for debugging;        % secs
 stim.isiDuration = 1; %ITI
 
 % display parameters
-textColor = 0;
+textColor = 255;
 textFont = 'Arial';
 textSize = 25;
 textSpacing = 25;
@@ -144,17 +144,24 @@ end
 % there are  8 filler trials so choose 8 rounds of 4 images
 done = 0;
 while ~done
+    fillerVec = Shuffle([1:nFillerImages 1:nFillerImages]);
     for t=1:nFillers
         % for each trial choose four images
-        stim.fillerPosition(t,:) = randperm(nFillerImages,4);
+        chosen = randperm(length(fillerVec),4);
+        stim.fillerPosition(t,:) = fillerVec(chosen);
+        fillerVec(chosen) = [];
+    end
+    for t=1:nFillers
+        nU(t) = length(unique(stim.fillerPosition(t,:)));
     end
     % now make sure each filler appears twice
-    for i = 1:nFillers
-        nR(i) =  length(find(stim.fillerPosition==i));
+    if all(nU==4)
+        done =1;
     end
-    if all(nR>1) && all(nR<4)
-        done = 1;
-    end
+end
+% check 2x per image
+for t = 1:nFillerImages
+    nR(t) = length(find(stim.fillerPosition==t));
 end
 % now counterbalance types of trials: make sure that neutral fillers don't
 % appear for more than 2 in a row
@@ -386,7 +393,8 @@ timing.plannedOnsets.lastITI = timing.plannedOnsets.pic(end) + config.nTRs.pic*c
 % show fixation
 
 % start trial sequence
-vCount = 0;
+vCount = 0; % for exp images
+fCount = 0; % for neutral fillers
 for iTrial=1:config.nTrials
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
@@ -395,15 +403,24 @@ for iTrial=1:config.nTrials
     
     Screen('FillRect',mainWindow,backColor);
     % generate images
-    if stim.trialType == 1
+    if stim.trialType(iTrial) == 1
+        vCount = vCount + 1;
         for im = 1:4
-            vCount = vCount + 1;
             categ = stim.position(vCount,im);
-            stim.image{iTrial,im} = images{categ,stim.order(vCount,categ)};
+            stim.image{vCount,im} = images{categ,stim.order(vCount,categ)};
             % make textures
             imageTex = Screen('MakeTexture',mainWindow,stim.image{vCount,im});
             Screen('PreloadTextures',mainWindow,imageTex);
-            Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(vCount,:));
+            Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
+        end
+    else
+        fCount = fCount + 1;
+        for im = 1:4
+            stim.neutralFillerImage{fCount,im} = images{NEUTRALFILLER,stim.fillerPosition(fCount,im)};
+            % make textures
+            imageTex = Screen('MakeTexture',mainWindow,stim.neutralFillerImage{fCount,im});
+            Screen('PreloadTextures',mainWindow,imageTex);
+            Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
         end
     end
     
