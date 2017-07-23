@@ -154,7 +154,7 @@ while ~done
     for t=1:nFillers
         nU(t) = length(unique(stim.fillerPosition(t,:)));
     end
-    % now make sure each filler appears twice
+    % now make sure none of the filllers repeat
     if all(nU==4)
         done =1;
     end
@@ -320,11 +320,21 @@ fprintf(dataFile,'* Gaze Experiment v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(dataFile,['* Seed: ' num2str(seed) '\n']);
 fprintf(dataFile,['* Subject Number: ' num2str(subjectNum) '\n']);
+fprintf(dataFile,['* Tobii: ' num2str(eyeTrack) '\n']);
 fprintf(dataFile,['* debug: ' num2str(debug) '\n']);
 fprintf(dataFile,'*********************************************\n\n');
 
+fprintf('\n*********************************************\n');
+fprintf('* Gaze Experiment v.1.0\n');
+fprintf(['* Date/Time: ' datestr(now,0) '\n']);
+fprintf(['* Seed: ' num2str(seed) '\n']);
+fprintf(['* Subject Number: ' num2str(subjectNum) '\n']);
+fprintf(['* Tobii: ' num2str(eyeTrack) '\n']);
+fprintf(['* debug: ' num2str(debug) '\n']);
+fprintf('*********************************************\n\n');
 
 
+     
 %% Show Instructions
 instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
 
@@ -367,7 +377,7 @@ Screen('Flip',mainWindow);
 % wait for initial trigger
 Priority(MaxPriority(screenNum));
 Screen(mainWindow,'FillRect',backColor);
-runStart = GetSecs;
+timing.runStart = GetSecs;
 Screen('Flip',mainWindow);
 Priority(0);
 
@@ -381,11 +391,14 @@ config.nTrials = nTrials;
 config.nTRs.perTrial = config.nTRs.ISI + config.nTRs.pic;
 config.nTRS.perBlock = (config.nTRs.perTrial)*config.nTrials + config.nTRs.ISI; % includes last ISI at the end
 
-timing.plannedOnsets.preITI(1:config.nTrials) = runStart + ((0:config.nTrials-1)*config.nTRs.perTrial)*config.TR;
+timing.plannedOnsets.preITI(1:config.nTrials) = timing.runStart + ((0:config.nTrials-1)*config.nTRs.perTrial)*config.TR;
 timing.plannedOnsets.pic(1:config.nTrials) = timing.plannedOnsets.preITI + config.nTRs.ISI*config.TR;
 timing.plannedOnsets.lastITI = timing.plannedOnsets.pic(end) + config.nTRs.pic*config.TR;
 %% Begin experiment
 
+% prepare for trial sequence
+fprintf(dataFile,'trial\ttype\tEflip\ttype1\ttype2\ttype3\ttype4\tid1\tid2\tid3\tid4\n');
+fprintf('trial\ttype\tEflip\ttype1\ttype2\ttype3\ttype4\tid1\tid2\tid3\tid4\n');
 % instructions
 
 % show instructions
@@ -399,7 +412,7 @@ for iTrial=1:config.nTrials
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
     timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
-    fprintf('Flip time error = %.4f\n', timing.actualOnsets.preITI(iTrial) - timing.plannedOnsets.preITI(iTrial));
+    %fprintf('Flip time error = %.4f\n', timing.actualOnsets.preITI(iTrial) - timing.plannedOnsets.preITI(iTrial));
     
     Screen('FillRect',mainWindow,backColor);
     % generate images
@@ -415,8 +428,9 @@ for iTrial=1:config.nTrials
         end
     else
         fCount = fCount + 1;
+        categ=NEUTRALFILLER;
         for im = 1:4
-            stim.neutralFillerImage{fCount,im} = images{NEUTRALFILLER,stim.fillerPosition(fCount,im)};
+            stim.neutralFillerImage{fCount,im} = images{categ,stim.fillerPosition(fCount,im)};
             % make textures
             imageTex = Screen('MakeTexture',mainWindow,stim.neutralFillerImage{fCount,im});
             Screen('PreloadTextures',mainWindow,imageTex);
@@ -426,7 +440,15 @@ for iTrial=1:config.nTrials
     
     timespec = timing.plannedOnsets.pic(iTrial) - SLACK;
     timing.actualOnsets.pic(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>
-    fprintf('Flip time error = %.4f\n', timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial));
+    %fprintf('Flip time error = %.4f\n', timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial));
+    if stim.trialType(iTrial)==1
+        % print trial results
+        fprintf(dataFile,'%d\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n',iTrial,stim.trialType(iTrial),timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial),stim.position(vCount,1),stim.position(vCount,2),stim.position(vCount,3),stim.position(vCount,4),stim.order(vCount,stim.position(vCount,1)),stim.order(vCount,stim.position(vCount,2)),stim.order(vCount,stim.position(vCount,3)),stim.order(vCount,stim.position(vCount,4)));
+        fprintf('%d\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n',iTrial,stim.trialType(iTrial),timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial),stim.position(vCount,1),stim.position(vCount,2),stim.position(vCount,3),stim.position(vCount,4),stim.order(vCount,stim.position(vCount,1)),stim.order(vCount,stim.position(vCount,2)),stim.order(vCount,stim.position(vCount,3)),stim.order(vCount,stim.position(vCount,4)));
+    else
+        fprintf(dataFile,'%d\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n',iTrial,stim.trialType(iTrial),timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial),categ,categ,categ,categ,stim.fillerPosition(fCount,1),stim.fillerPosition(fCount,2),stim.fillerPosition(fCount,3),stim.fillerPosition(fCount,4));
+        fprintf('%d\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n',iTrial,stim.trialType(iTrial),timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial),categ,categ,categ,categ,stim.fillerPosition(fCount,1),stim.fillerPosition(fCount,2),stim.fillerPosition(fCount,3),stim.fillerPosition(fCount,4));
+    end
 end % trial loop
 
 timespec = timing.plannedOnsets.lastITI - SLACK;
@@ -437,7 +459,7 @@ Screen('FillRect',mainWindow,backColor);
 Screen('Flip',mainWindow);
 %% save
 
-%save([dataHeader '/blockdata' '_' datestr(now,30)],'blockData','runStart');
+save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing');
 
 % clean up and go home
 sca;
