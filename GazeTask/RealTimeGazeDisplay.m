@@ -409,10 +409,19 @@ fprintf('trial\ttype\tEflip\ttype1\ttype2\ttype3\ttype4\tid1\tid2\tid3\tid4\n');
 vCount = 0; % for exp images
 fCount = 0; % for neutral fillers
 for iTrial=1:config.nTrials
+    
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
     timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
-    %fprintf('Flip time error = %.4f\n', timing.actualOnsets.preITI(iTrial) - timing.plannedOnsets.preITI(iTrial));
+    % now close previous trial's data
+    if eyeTrack
+        if iTrial > 0
+            Temp = tetio_localTimeNow;
+            timing.gaze.preITI(iTrial) = tetio_localToRemoteTime(Temp);
+            tetio_stopTracking;
+            [GazeData.Left{iTrial-1}, GazeData.Right{iTrial-1}, GazeData.Timing.Remote{iTrial-1}] = tetio_readGazeData;
+        end
+    end
     
     Screen('FillRect',mainWindow,backColor);
     % generate images
@@ -437,9 +446,15 @@ for iTrial=1:config.nTrials
             Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
         end
     end
-    
+    if eyeTrack
+        tetio_startTracking;
+    end
     timespec = timing.plannedOnsets.pic(iTrial) - SLACK;
     timing.actualOnsets.pic(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>
+    if eyeTrack
+        Temp = tetio_localTimeNow;
+        timing.gaze.pic(iTrial) = tetio_localToRemoteTime(Temp);
+    end
     %fprintf('Flip time error = %.4f\n', timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial));
     if stim.trialType(iTrial)==1
         % print trial results
@@ -453,14 +468,26 @@ end % trial loop
 
 timespec = timing.plannedOnsets.lastITI - SLACK;
 timing.actualOnsets.lastITI = isi_specific(mainWindow,fixColor,timespec);
+
+% now end eye tracking for last trial
+if eyeTrack
+    tetio_stopTracking;
+    [GazeData.Left{iTrial}, GazeData.Right{iTrial}, GazeData.Timing.Remote{iTrial}] = tetio_readGazeData;
+end
+
 fprintf('Flip time error = %.4f\n', timing.actualOnsets.lastITI - timing.plannedOnsets.lastITI);
+
+tetio_disconnectTracker;
+tetio_cleanUp;
 
 Screen('FillRect',mainWindow,backColor);
 Screen('Flip',mainWindow);
 %% save
-
-save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing');
-
+if ~eyeTrack
+    save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing');
+else
+    save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing', 'GazeData');
+end
 % clean up and go home
 sca;
 ListenChar(1);

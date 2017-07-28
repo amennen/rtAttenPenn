@@ -13,6 +13,27 @@ KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
 
 %%
+if useTobii
+     try
+        Tobii_Initialize;
+        isEyeTracking=1;
+    catch
+        warning('EYE TRACKER NOT FOUND');
+        isEyeTracking=0;
+    end
+    
+    %Calibrate the eye tracker
+    if isEyeTracking==1
+        
+        Continue=0;
+        while Continue==0
+            Calib=Tobii_Calibration;
+            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
+        end
+    end
+end
+
+%%
 runNum=1;
 RealTimeGazeDisplay(subjectNum,matchNum,useTobii,debug)
 
