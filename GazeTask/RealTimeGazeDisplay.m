@@ -174,6 +174,32 @@ while ~done
     end
 end
 % so 1 = regular trial and 2 = filler
+%% CALIBRATION WOO!
+if eyeTrack
+     try
+        Tobii_Initialize;
+        isEyeTracking=1;
+    catch
+        warning('EYE TRACKER NOT FOUND');
+        isEyeTracking=0;
+    end
+    
+    %Calibrate the eye tracker
+    if isEyeTracking==1
+        
+        Continue=0;
+        while Continue==0
+            Calib=Tobii_Calibration;
+            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
+        end
+    end
+end
+
+
+
+
+
+
 %% Initialize Screens
 
 screenNumbers = Screen('Screens');
@@ -415,9 +441,9 @@ for iTrial=1:config.nTrials
     timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
     % now close previous trial's data
     if eyeTrack
-        if iTrial > 0
+        if iTrial > 1
             Temp = tetio_localTimeNow;
-            timing.gaze.preITI(iTrial) = tetio_localToRemoteTime(Temp);
+            timing.gaze.off(iTrial-1) = tetio_localToRemoteTime(Temp);
             tetio_stopTracking;
             [GazeData.Left{iTrial-1}, GazeData.Right{iTrial-1}, GazeData.Timing.Remote{iTrial-1}] = tetio_readGazeData;
         end
@@ -448,6 +474,7 @@ for iTrial=1:config.nTrials
     end
     if eyeTrack
         tetio_startTracking;
+        timing.startEye(iTrial) = GetSecs;
     end
     timespec = timing.plannedOnsets.pic(iTrial) - SLACK;
     timing.actualOnsets.pic(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>
@@ -471,6 +498,8 @@ timing.actualOnsets.lastITI = isi_specific(mainWindow,fixColor,timespec);
 
 % now end eye tracking for last trial
 if eyeTrack
+    Temp = tetio_localTimeNow;
+    timing.gaze.off(iTrial) = tetio_localToRemoteTime(Temp);
     tetio_stopTracking;
     [GazeData.Left{iTrial}, GazeData.Right{iTrial}, GazeData.Timing.Remote{iTrial}] = tetio_readGazeData;
 end

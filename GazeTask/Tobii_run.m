@@ -35,16 +35,20 @@ tetio_stopTracking;
 [GazeData.Left, GazeData.Right, GazeData.Timing.Remote] = tetio_readGazeData; %Pull data off the eyetracker
 
 
-GazeX.Left = GazeData.Left(:,7);
-GazeY.Left = GazeData.Left(:,8);
-GazeX.Right = GazeData.Right(:,7);
-GazeY.Right = GazeData.Right(:,8);
-GazeStatus.Left = GazeData.Left(:,13);
-GazeStatus.Right = GazeData.Left(:,13);
-nPts = size(GazeData.Left,1);
 
-DisplayData(GazeData.Left,GazeData.Right );
-
+% now look for indiividual trial
+GazeX.Left = GazeData.Left{trial}(:,7);
+GazeY.Left = GazeData.Left{trial}(:,8);
+GazeX.Right = GazeData.Right{trial}(:,7);
+GazeY.Right = GazeData.Right{trial}(:,8);
+GazeStatus.Left = GazeData.Left{trial}(:,13);
+GazeStatus.Right = GazeData.Left{trial}(:,13);
+nPts = size(GazeData.Left{trial},1);
+deltaTime = nPts/120
+nTrial=20;
+for trial = 1:nTrial
+    DisplayData(GazeData.Left{trial},GazeData.Right{trial} );
+end
 % 120 samples/s so nPts/120 gives time
 tetio_disconnectTracker;
 tetio_cleanUp;

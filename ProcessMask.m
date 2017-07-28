@@ -1,4 +1,8 @@
-function ProcessMask(subjNum,funcScan,runNum)
+% ProcessMask: made into script so can check registration
+
+subjNum = 100;
+funcScan = 5;
+runNum = 1;
 
 startProcess = GetSecs;
 img_mat = 64; %image matrix size
@@ -14,7 +18,7 @@ brainExtractFunctional = processNew;
 createMaskFileForRTDicoms = 1;
 
 if IsLinux
-    biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
+    biac_dir = '/Users/amennen/code/BIAC_Matlab_R2014a/';
     bxhpath='/opt/BXH/1.11.1/bin/';
     fslpath='/opt/fsl/5.0.9/bin/';
 end
@@ -269,4 +273,3 @@ save(fullfile(process_dir, 'timing'), 't');
 fprintf('Standard2highres time = %7.2f \nStandard2func time = %7.2f \nMask time = %7.2f \n Total time = %7.2f\n', t.standard2highres, t.standard2func,t.mask,t.total);
 % if cd into the directory, cd out of it back to the general exp folder
 cd ../
-end
