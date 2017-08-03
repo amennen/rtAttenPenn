@@ -1,28 +1,27 @@
-% ProcessMask: made into script so can check registration
+% ProcessMask
+% Written by ACM April 2017
 
+% Collect:
+% - t1-weighted mp-rage
+% - example functional scan
+% Complete:
+% 1. Register t1 to standard space
+% 3. Register epi example to t1, including field map corrections
+% 4. Calculate inverse transformation matrices
+% 5. Apply to anatomical mask
 subjNum = 100;
-funcScan = 5;
 runNum = 1;
-
+projectName = 'rtAttenPenn';
+highresScan = 3;
+functionalScan=5;
+%%
 startProcess = GetSecs;
 img_mat = 64; %image matrix size
 ROI = -1;
-processNew = 1;
-makeMprageNifti = processNew;
-extractBrain = processNew;
-registerToStandard = processNew;
-makeTestFuncRun = processNew;
-registerMprageToNifti =processNew;
-registerAnatMaskToNifti = processNew;
-brainExtractFunctional = processNew;
-createMaskFileForRTDicoms = 1;
 
-if IsLinux
-    biac_dir = '/Users/amennen/code/BIAC_Matlab_R2014a/';
-    bxhpath='/opt/BXH/1.11.1/bin/';
-    fslpath='/opt/fsl/5.0.9/bin/';
-end
-
+biac_dir = '/home/amennen/code/BIAC_Matlab_R2014a/';
+bxhpath='/opt/BXH/1.11.1/bin/';
+fslpath='/opt/fsl/5.0.9/bin/';
 %add necessary package
 if ~exist('readmr','file')
     addpath(genpath(biac_dir));
@@ -31,100 +30,52 @@ if ~exist('readmr','file')
 end
 
 setenv('FSLOUTPUTTYPE','NIFTI_GZ');
+
 if matchNum == 0
     save_dir = ['./data/' num2str(subjectNum)];
     %save(['./data/' num2str(subjectNum) '/mask_' num2str(subjectNum)],'mask');
 else
     %save(['./data/' num2str(subjectNum) '_match/mask_' num2str(subjectNum)],'mask');
 end
-
+subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+dicom_dir = ['/mnt/rtexport/RTexport_Current/' datestr(subjDate,10) datestr(subjDate,5) datestr(subjDate,7) '.' subjectName '.' subjectName '/'];
 process_dir = [save_dir 'reg' '/'];
-roi_name = 'standard_brain';
-roi_dir = fullfile(fslpath, 'data/standard/MNI152_T1_2mm_brain.nii.gz'); % change this path name to wherever you put it on the penn computer!
+roi_name = 'wholebrain_mask';
+roi_dir = pwd; % change this path name to wherever you put it on the penn computer!
+code_dir = pwd;
+addpath(genpath(code_dir));
+
 if ~exist(process_dir)
     mkdir(process_dir)
 end
 cd(process_dir)
+%% Process t1-weighted MPRAGE and check brain extraction!
+highresFN = 'highres';
+highresFN_RE = 'highres_re';
+highresfiles_genstr = sprintf('%s001_0000%s_0*',dicom_dir,num2str(highresScan,'%2.2i')); %general string for ALL mprage files**
+unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,highresfiles_genstr,highresFN));
+unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,highresFN,highresFN_RE));
+unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --2niftihdr -s %s.bxh %s',bxhpath,highresFN_RE,highresFN_RE))
+unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,highresFN_RE,highresFN_RE)) 
+%unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -r 90 -R',fslpath,highresFN_RE,highresFN_RE)) 
 
-
-%scan numbers: mprage is 5, epis are 9:2:19
-scanNum = 3;
-highres_scanstr = num2str(scanNum, '%2.2i');
-
-%fileStr = num2str(fileNum, '%3.3i');
-%specificFile = ['001_0000' scanStr '_000' fileStr '.dcm'];
-
-%first let's try loading in the mprage file
-
-%taken from: registrationHighRes
-highres_test_file = fullfile(dicom_dir,['001_0000' highres_scanstr '_000001.dcm']);
-
-while ~exist(highres_test_file,'file')
-    %error('the test file for the high resolution scan does not exist: %s',highres_test_file);
-end
-fprintf('Found highres file!\n')
-%% make mprage nifti file
-
-highres_fn = 'highres_old_orientation';
-highres_reorient_fn = 'highres_new_orientation';
-
-highresfiles_genstr = sprintf('%s001_0000%s_0*',dicom_dir,highres_scanstr); %general string for ALL mprage files**
-
-if makeMprageNifti
-    
-    %convert mprage dicom files to a bxh wrapper
-    unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,highresfiles_genstr,highres_fn));
-    
-    %reorient bxh wrapper
-    unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,highres_fn,highres_reorient_fn));
-    
-    %convert the reoriented bxh wrapper to a nifti file
-    unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,highres_reorient_fn,highres_reorient_fn))
-    
-end
-
-%% brain extract (skull strip) mprage
-
-%bet_param = .4; %need to check parameter for BET if using a different mprage
-
-%brain extract mprage
-if extractBrain
-    unix(sprintf('%sbet %s.nii.gz %s_brain -R -m',fslpath,highres_reorient_fn,highres_reorient_fn));
-end
-%this works too!! again, saves in whatever directory you're in
-%% register everything to standard
-
-exFuncScanNum = funcScan;
-exFunc_scanstr = num2str(exFuncScanNum, '%2.2i');
-exFunc_test_file = fullfile(dicom_dir,['001_0000' exFunc_scanstr '_000008.dcm']);
-exfunc_fn = 'example_func_old_orientation';
-exfunc_reorient_fn = 'example_func_new_orientation';
-highres_reorient_fn = 'highres_new_orientation';
-exfunc2highres_mat='example_func2highres';
-highres2exfunc_mat='highres2example_func';
-
-StartReg= GetSecs;
-if registerToStandard
-    %register high resolution mprage (bet-extracted) to standard
-    % if strncmp(computer,'MACI',4)
-    unix(sprintf('%sflirt -in %s_brain.nii.gz -ref $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -out highres2standard -omat highres2standard.mat -cost corratio -dof 12 -searchrx -30 30 -searchry -30 30 -searchrz -30 30 -interp trilinear',fslpath,highres_reorient_fn));
-    unix(sprintf('%sfnirt --iout=highres2standard_head --in=%s.nii.gz --aff=highres2standard.mat --cout=highres2standard_warp --iout=highres2standard --jout=highres2highres_jac --config=T1_2_MNI152_2mm --ref=$FSLDIR/data/standard/MNI152_T1_2mm.nii.gz --refmask=$FSLDIR/data/standard/MNI152_T1_2mm_brain_mask_dil --warpres=10,10,10', fslpath,highres_reorient_fn));
-    unix(sprintf('%sapplywarp -i %s_brain.nii.gz -r $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -o highres2standard -w highres2standard_warp',fslpath,highres_reorient_fn));
-    
-    %compute inverse transform (standard to highres)
-    unix(sprintf('%sconvert_xfm -inverse -omat standard2highres.mat highres2standard.mat', fslpath));
-    %unix(sprintf('%sflirt -in %s_brain.nii.gz -ref $FSLDIR/data/standard/mni152_t1_2mm_brain.nii.gz -out highres2standard -omat highres2standard.mat -cost corratio -dof 12 -searchrx -30 30 -searchry -30 30 -searchrz -30 30 -interp trilinear',fslpath,highres_reorient_fn));
-    %make inverse for the warped image
-    unix(sprintf('%sinvwarp -w highres2standard_warp -o standard2highres_warp -r %s_brain.nii.gz',fslpath,highres_reorient_fn));
-    
-end
+% for dcm2niix the command would be 'dcm2niix dicomdir -f test -o dicomdir -s y dicomdir/001_000007_000008.dcm'
+fprintf('%sfslview %s.nii.gz\n',fslpath,highresFN_RE)
+fprintf('%sfslview %s_brain.nii.gz', fslpath,highresFN_RE)
+%% Register standard to nifti
+unix(sprintf('%sflirt -in %s_brain.nii.gz -ref $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -out highres2standard -omat highres2standard.mat -cost corratio -dof 12 -searchrx -30 30 -searchry -30 30 -searchrz -30 30 -interp trilinear',fslpath,highresFN_RE));
+unix(sprintf('%sfnirt --iout=highres2standard_head --in=%s.nii.gz --aff=highres2standard.mat --cout=highres2standard_warp --iout=highres2standard --jout=highres2highres_jac --config=T1_2_MNI152_2mm --ref=$FSLDIR/data/standard/MNI152_T1_2mm.nii.gz --refmask=$FSLDIR/data/standard/MNI152_T1_2mm_brain_mask_dil --warpres=10,10,10', fslpath,highresFN_RE));
+unix(sprintf('%sapplywarp -i %s_brain.nii.gz -r $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -o highres2standard -w highres2standard_warp',fslpath,highresFN_RE));
+%compute inverse transform (standard to highres)
+unix(sprintf('%sconvert_xfm -inverse -omat standard2highres.mat highres2standard.mat', fslpath));
+unix(sprintf('%sinvwarp -w highres2standard_warp -o standard2highres_warp -r %s_brain.nii.gz',fslpath,highresFN_RE));
 t.standard2highres = GetSecs - StartReg;
 fprintf('Done with standard2highres registration. Time = %6.2f \n',t.standard2highres);
 
 %% now use this to create functional mask once you have functional data
 % 
 %k = batch('Reg_func2highres', 'Profile', 'local');
-exFuncScanNum = funcScan;
+exFuncScanNum = functionalScan;
 exFunc_scanstr = num2str(exFuncScanNum, '%2.2i');
 exFunc_test_file = fullfile(dicom_dir,['001_0000' exFunc_scanstr '_000008.dcm']);
 while ~exist(exFunc_test_file,'file')
@@ -140,82 +91,45 @@ mask = BrainMask(vol,0,0);
 imagesc(mask(:,:,10)); %checks that the dicom files are properly aligned
 save([process_dir 'mask_wholeBrain' '.mat'], 'mask');
 
-%% make test functional run
+%% Process example epi file
 startFunctional = GetSecs;
-exfunc_fn = 'example_func_old_orientation';
-exfunc_reorient_fn = 'example_func_new_orientation';
-if makeTestFuncRun
-    %convert test EPI dicom file to a bxh wrapper
-    unix(sprintf('%sdicom2bxh %s001_0000%s_0* %s.bxh',bxhpath,dicom_dir,exFunc_scanstr,exfunc_fn));
-    
-    %reorient bxh wrapper
-    unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,exfunc_fn,exfunc_reorient_fn));
-    
-    %convert the reoriented bxh wrapper to a nifti file
-    unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,exfunc_reorient_fn,exfunc_reorient_fn))
-end
 
-%% register mprage to nifti file
+fileN = 6; % we can choose 10 later2
+functionalFN = 'exfunc';
+functionalFN_RE = 'exfunc_re';
+exfunc_str = sprintf('%s001_0000%s_0000%s.dcm',dicom_dir,num2str(functionalScan,'%2.2i'),num2str(fileN,'%2.2i')); %general string for ALL mprage files**
+unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,exfunc_str,functionalFN));
+unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,functionalFN,functionalFN_RE));
+unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,functionalFN_RE,functionalFN_RE))
 
-highres_reorient_fn = 'highres_new_orientation';
-
+% now register to highres!
+t1 = GetSecs;
 exfunc2highres_mat='example_func2highres';
 highres2exfunc_mat='highres2example_func';
+unix(sprintf('%sepi_reg --epi=%s --t1=%s --t1brain=%s_brain --out=%s',fslpath,functionalFN_RE,highresFN_RE,highresFN_RE,exfunc2highres_mat))
+timefunc2highres = GetSecs-t1;
+unix(sprintf('%sconvert_xfm -inverse -omat %s.mat %s.mat',fslpath,highres2exfunc_mat,exfunc2highres_mat));
 
-
-if registerMprageToNifti
-    
-    %use FSL's BBR function to register example functional image to high resolution mprage
-    regFunction = 'epi_reg'; %epi_reg, flirt
-    if strcmp(regFunction,'epi_reg')
-        unix(sprintf('%sepi_reg --epi=%s --t1=%s --t1brain=%s_brain --out=%s',fslpath,exfunc_reorient_fn,highres_reorient_fn,highres_reorient_fn,exfunc2highres_mat))
-    elseif strcmp(regFunction,'flirt')
-        unix(sprintf('%sflirt -in %s -ref %s_brain -out %s -omat %s -searchrx -30 30 -searchry -30 30 -searchrz -30 30 -interp nearestneighbour',fslpath,exfunc_reorient_fn,highres_reorient_fn,exfunc2highres_mat,[exfunc2highres_mat '.mat']));
-    end
-    
-    %compute inverse transform
-    unix(sprintf('%sconvert_xfm -inverse -omat %s.mat %s.mat',fslpath,highres2exfunc_mat,exfunc2highres_mat));
+% now register mask to all data
+unix(sprintf('%sapplywarp -i %s%s.nii.gz -r %s.nii.gz -o %s_exfunc.nii.gz -w standard2highres_warp.nii.gz --postmat=%s.mat',fslpath,roi_dir,roi_name,functionalFN_RE,roi_name,highres2exfunc_mat));
+% check after here that the applied warp is binary and in the right
+% orientation so we could just apply to nifti files afterwards
+if exist(sprintf('%s_exfunc.nii.gz',roi_name),'file')
+    unix(sprintf('gunzip %s_exfunc.nii.gz',roi_name));
 end
+
+% brain extract functional scan to make sure we stay inside the brain of
+% the subject!
+unix(sprintf('%sbet %s.nii.gz %s_brain -R',fslpath,functionalFN_RE,functionalFN_RE)); % check that this is okay!
+%CHECK OKAY
+fprintf('%sfslview %s_brain.nii.gz', fslpath,functionalFN_RE)
 
 t.standard2func = GetSecs - startFunctional;
 fprintf('Done with standard2func registration, time = %6.2f', t.standard2func);
 
-%% register anatomical mask to nifti file
-if registerAnatMaskToNifti
-    unix(sprintf('%sapplywarp -i %s%s.nii.gz -r %s.nii.gz -o %s_exfunc.nii.gz -w standard2highres_warp.nii.gz --postmat=%s.mat',fslpath,roi_dir,roi_name,exfunc_reorient_fn,roi_name,highres2exfunc_mat));
-    
-    %register the anatomical ROI to the example func dimensions
-    % unix(sprintf('%sflirt -in %s%s.nii.gz -ref %s.nii.gz -applyxfm -init standard2example_func.mat -out %s_exfunc -searchrx -60 60 -searchry -60 60 -searchrz -60 60',fslpath,roi_dir,roi_name,exfunc_reorient_fn,roi_name)
-    %threshold the registered mask (.1 is arbitrary)
-    
-    %unix(sprintf('%sfslmaths %s_exfunc.nii.gz -thr .1 -bin
-    %%s_exfunc_bin',fslpath,roi_name,roi_name)) something here is why its
-    %%bin
-    
-    %unzip, if necessary
-    if exist(sprintf('%s_exfunc.nii.gz',roi_name),'file')
-        unix(sprintf('gunzip %s_exfunc.nii.gz',roi_name));
-    end
-    
-    %make bxh wrapper: do this to use for dicom files?
-    unix(sprintf('%sbxhabsorb %s_exfunc.nii %s_exfunc.bxh',bxhpath,roi_name,roi_name));
-end
 
-%% brain extract functional scan
-if brainExtractFunctional
-    % first take average
-    unix(sprintf('%sfslmaths %s.nii.gz -Tmean %s_mean.nii.gz',fslpath,exfunc_reorient_fn,exfunc_reorient_fn));
-    % then brain extract
-    unix(sprintf('%sbet %s_mean.nii.gz %s_mean_brain -R -m',fslpath,exfunc_reorient_fn,exfunc_reorient_fn));
-    % now unzip and convert to load into matlab
-    %unzip, if necessary
-    if exist(sprintf('%s_mean_brain.nii.gz',exfunc_reorient_fn),'file')
-        unix(sprintf('gunzip %s_mean_brain.nii.gz',exfunc_reorient_fn));
-    end
-    
-    %make bxh wrapper: do this to use for dicom files?
-    unix(sprintf('%sbxhabsorb %s_mean_brain.nii %s_mean_brain.bxh',bxhpath,exfunc_reorient_fn,exfunc_reorient_fn));
-end
+
+
 %% create mask file for real-time dicom files
 % this is where you would make the mask bigger
 startMask = GetSecs;
@@ -223,7 +137,7 @@ if createMaskFileForRTDicoms
     %load registered anatomical ROI
     maskStruct = readmr([roi_name '_exfunc.bxh'],'BXH',{[],[],[]});
     
-    brainExtFunc = readmr([exfunc_reorient_fn '_mean_brain.bxh'], 'BXH',{[],[],[]});
+    brainExtFunc = readmr([functionalFN_RE '_brain.bxh'], 'BXH',{[],[],[]});
     
     %load whole-brain mask-actual whole brain mask from example epi file:
     %see if masks are in the same space or not
@@ -248,16 +162,6 @@ if createMaskFileForRTDicoms
     for j=1:length(mask_indices)
         mask_brain(gX(j),gY(j),gZ(j)) = 1;
     end
-  
-    % now check that the new mask isn't outside the brain
-    i_stretched = find(stretchedMask);
-    new_indices = i_stretched(find(ismember(i_stretched,allinBrainExt)));
-    [gX gY gZ] = ind2sub(size(mask),new_indices);
-    stretched_brain = zeros(size(mask,1),size(mask,2),size(mask,3));
-    for j=1:length(new_indices)
-        stretched_brain(gX(j),gY(j),gZ(j)) = 1;
-    end
-    
 
     %save anatomical mask
     if matchNum == 0
@@ -272,4 +176,4 @@ t.total = GetSecs - startProcess;
 save(fullfile(process_dir, 'timing'), 't');
 fprintf('Standard2highres time = %7.2f \nStandard2func time = %7.2f \nMask time = %7.2f \n Total time = %7.2f\n', t.standard2highres, t.standard2func,t.mask,t.total);
 % if cd into the directory, cd out of it back to the general exp folder
-cd ../
+cd(code_dir)
