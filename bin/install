@@ -9,6 +9,7 @@ sudo mount.cifs //files.princeton.edu/Licensed /mnt/MATLAB -o username=dsuo,doma
 
 # Run from EC2
 # scp data from [PRINCETON]:/mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX /mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX
+sudo apt-get install -y default-jre default-jdk
 sudo /mnt/MATLAB/Products/Matlab/R2016b/Unix_macOSX/install -inputFile ./conf/matlab/installer_input.txt
 sudo /usr/local/MATLAB/R2017a/bin/activate_matlab.sh -propertiesFile ./conf/matlab/activate.ini
 
