@@ -16,8 +16,6 @@ highresScan = 3;
 functionalScan=5;
 %%
 startProcess = GetSecs;
-img_mat = 64; %image matrix size
-ROI = -1;
 
 biac_dir = '/home/amennen/code/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
@@ -35,7 +33,7 @@ if matchNum == 0
     save_dir = ['./data/' num2str(subjectNum)];
     %save(['./data/' num2str(subjectNum) '/mask_' num2str(subjectNum)],'mask');
 else
-    %save(['./data/' num2str(subjectNum) '_match/mask_' num2str(subjectNum)],'mask');
+    save_dir = ['./data/' num2str(matchNum) '_match'];
 end
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 dicom_dir = ['/mnt/rtexport/RTexport_Current/' datestr(subjDate,10) datestr(subjDate,5) datestr(subjDate,7) '.' subjectName '.' subjectName '/'];
@@ -117,59 +115,70 @@ unix(sprintf('%sapplywarp -i %s%s.nii.gz -r %s.nii.gz -o %s_exfunc.nii.gz -w sta
 if exist(sprintf('%s_exfunc.nii.gz',roi_name),'file')
     unix(sprintf('gunzip %s_exfunc.nii.gz',roi_name));
 end
+unix(sprintf('%sbxhabsorb %s_exfunc.nii %s_exfunc.bxh',bxhpath,roi_name,roi_name));
 
 % brain extract functional scan to make sure we stay inside the brain of
 % the subject!
-unix(sprintf('%sbet %s.nii.gz %s_brain -R',fslpath,functionalFN_RE,functionalFN_RE)); % check that this is okay!
+unix(sprintf('%sbet %s.nii.gz %s_brain -R -m',fslpath,functionalFN_RE,functionalFN_RE)); % check that this is okay!
 %CHECK OKAY
-fprintf('%sfslview %s_brain.nii.gz', fslpath,functionalFN_RE)
+fprintf('%sfslview %s_brain_mask.nii.gz', fslpath,functionalFN_RE)
 
 t.standard2func = GetSecs - startFunctional;
 fprintf('Done with standard2func registration, time = %6.2f', t.standard2func);
+%% if okay then unzip and make bxh wrapper
 
-
+if exist(sprintf('%s_brain.nii.gz',functionalFN_RE),'file')
+    unix(sprintf('gunzip %s_brain.nii.gz',functionalFN_RE));
+end
+unix(sprintf('%sbxhabsorb %s_brain.nii %s_brain.bxh',bxhpath,functionalFN_RE,functionalFN_RE));
 
 
 %% create mask file for real-time dicom files
 % this is where you would make the mask bigger
 startMask = GetSecs;
-if createMaskFileForRTDicoms
-    %load registered anatomical ROI
-    maskStruct = readmr([roi_name '_exfunc.bxh'],'BXH',{[],[],[]});
-    
-    brainExtFunc = readmr([functionalFN_RE '_brain.bxh'], 'BXH',{[],[],[]});
-    
-    %load whole-brain mask-actual whole brain mask from example epi file:
-    %see if masks are in the same space or not
-    load(fullfile(process_dir,['mask_wholeBrain' '.mat']));
-    
-    %rotate anatomical ROI to be in the same space as the mask - check that this works for different scans/ROIs
-    anatMaskRot = zeros(size(mask));
-    brainExtRot = zeros(size(mask));
-    for i = 1:size(maskStruct.data,3)
-        anatMaskRot(:,:,i) = rot90(maskStruct.data(:,:,i)); %rotates entire slice by 90 degrees
-        brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
-    end
-    
-    %overwrite whole-brain mask
-    mask = logical(anatMaskRot); %make it so it's just 1's and 0's
-    brainExt = logical(brainExtRot);
-    allinMask = find(anatMaskRot);
-    allinBrainExt = find(brainExt);
-    mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
-    [gX gY gZ] = ind2sub(size(mask),mask_indices);
-    mask_brain = zeros(size(mask,1),size(mask,2),size(mask,3));
-    for j=1:length(mask_indices)
-        mask_brain(gX(j),gY(j),gZ(j)) = 1;
-    end
+%load registered anatomical ROI
+maskStruct = readmr([roi_name '_exfunc.bxh'],'BXH',{[],[],[]});
+brainExtFunc = readmr([functionalFN_RE '_brain.bxh'], 'BXH',{[],[],[]});
 
-    %save anatomical mask
-    if matchNum == 0
-        save(['./data/' num2str(subjectNum) '/mask_' num2str(subjectNum)],'mask');
-    else
-        save(['./data/' num2str(subjectNum) '_match/mask_' num2str(subjectNum)],'mask');
-    end
+%load whole-brain mask-actual whole brain mask from example epi file:
+%see if masks are in the same space or not
+load(fullfile(process_dir,['mask_wholeBrain' '.mat']));
+
+%rotate anatomical ROI to be in the same space as the mask - check that this works for different scans/ROIs
+anatMaskRot = zeros(size(mask));
+brainExtRot = zeros(size(mask));
+for i = 1:size(maskStruct.data,3)
+    anatMaskRot(:,:,i) = rot90(maskStruct.data(:,:,i)); %rotates entire slice by 90 degrees
+    brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
 end
+
+%overwrite whole-brain mask
+mask = logical(anatMaskRot); %make it so it's just 1's and 0's
+brainExt = logical(brainExtRot);
+allinMask = find(anatMaskRot);
+allinBrainExt = find(brainExt);
+mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
+[gX gY gZ] = ind2sub(size(mask),mask_indices);
+mask_brain = zeros(size(mask,1),size(mask,2),size(mask,3));
+for j=1:length(mask_indices)
+    mask_brain(gX(j),gY(j),gZ(j)) = 1;
+end
+
+checkMask = 1;
+if checkMask
+    plot3Dbrain(mask,[], 'mask')    
+    plot3Dbrain(mask_brain, [], 'mask_brain')
+end
+% use the mask that has been checked there's nothing outside the functional
+% brain
+mask=mask_brain;
+%save anatomical mask
+if matchNum == 0
+    save(['./data/' num2str(subjectNum) '/mask_' num2str(subjectNum)],'mask');
+else
+    save(['./data/' num2str(matchNum) '_match/mask_' num2str(subjectNum)],'mask');
+end
+
 fprintf('Done with mask creation\n');
 t.mask = GetSecs - startMask;
 t.total = GetSecs - startProcess;

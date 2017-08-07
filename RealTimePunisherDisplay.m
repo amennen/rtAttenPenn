@@ -262,7 +262,8 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 if matchNum == 0
     dataHeader = ['data/' num2str(subjectNum)];
 else
-    dataHeader = ['data/' num2str(subjectNum) '_match'];
+    dataHeader = ['data/' num2str(matchNum) '_match'];
+    % shouldn't this be matchNum??
 end
 runHeader = [dataHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
@@ -799,10 +800,10 @@ for iBlock=indBlocksPhase2
                     else
                         blockData(iBlock).attImgProp(iTrial+1) = attImgPropPhase2; %#ok<AGROW>
                     end
-                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
-                    vals = linspace(0,.8,25);
-                    blockData(iBlock).attImgProp(iTrial+1) = vals(iTrialOdd);
-                     %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
+%                      %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
+%                     vals = linspace(0,.8,25);
+%                     blockData(iBlock).attImgProp(iTrial+1) = vals(iTrialOdd);
+%                      %******* SET DEMO AMOUNTS--DELETE THIS AFTERWARDS!!! ****
                 else
                     blockData(iBlock).attImgProp(iTrial+1) = steepness./(1+exp(-gain*(blockData(iBlock).categsep(iTrial)-x_shift)))+y_shift; %#ok<AGROW>
                     

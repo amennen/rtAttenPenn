@@ -73,7 +73,7 @@ if matchNum == 0
     matchRunHeader = [matchDataHeader '/run' num2str(runNum)]; 
     matchClassOutputDir = [matchRunHeader '/classoutput'];
 else
-    dataHeader = ['data/' num2str(subjectNum) '_match'];
+    dataHeader = ['data/' num2str(matchNum) '_match'];
     runHeader = [dataHeader '/run' num2str(runNum)];
     classOutputDir = [runHeader '/controlneverseenclassoutput'];
 end
@@ -269,7 +269,7 @@ for iTrialTraining = (nVolsPhase1+1):(firstVolPhase2-1)
     fprintf('%d...\t',patterns.fileNum(fileCounter));
     
     %if desired file is recognized, pause for 100ms to complete transfer
-    pause(.1);
+    pause(.2);
     
     % if file available, load it
     if (patterns.fileAvail(fileCounter))
