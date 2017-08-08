@@ -144,9 +144,12 @@ roiInds = find(roi);
 
 %pre-processing parameters
 FWHM = 5;
+cutoff = 112;
 %timeOut = TR/2+.25;
 
-
+zscoreNew = 1;
+useHistory = 1;
+firstBlockTRs = 64; %total number of TRs to take for standard deviation of last run
 %% Block Sequence
 
 firstVolPhase1 = find(patterns.block==1,1,'first'); %#ok<NODEF>
@@ -163,6 +166,7 @@ patterns.timeRead = cell(1,nTRs);
 patterns.fileload = NaN(1,nTRs);
 patterns.raw = nan(nTRs,numel(roiInds));
 patterns.raw_sm = nan(nTRs,numel(roiInds));
+patterns.raw_sm_filt = nan(nTRs,numel(roiInds));
 patterns.raw_sm_z = nan(nTRs,numel(roiInds));
 patterns.categoryseparation = NaN(1,nTRs);
 
@@ -171,7 +175,7 @@ patterns.categoryseparation = NaN(1,nTRs);
 % open and set-up output file
 dataFile = fopen([dataHeader '/fileprocessing.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
-fprintf(dataFile,'* Punisher Experiment v.2.0\n');
+fprintf(dataFile,'* rtAttenPenn v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(dataFile,['* Seed: ' num2str(seed) '\n']);
 fprintf(dataFile,['* Subject Number: ' num2str(subjectNum) '\n']);
@@ -182,7 +186,7 @@ fprintf(dataFile,'*********************************************\n\n');
     
 % print header to command window
 fprintf('\n*********************************************\n');
-fprintf('* Punisher Experiment v.2.0\n');
+fprintf('* rtAttenPenn v.1.0\n');
 fprintf(['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(['* Seed: ' num2str(seed) '\n']);
 fprintf(['* Subject Number: ' num2str(subjectNum) '\n']);
@@ -219,7 +223,7 @@ for iTrialPhase1 = 1:nVolsPhase1
         [patterns.fileAvail(iTrialPhase1) patterns.newFile{iTrialPhase1}] = GetSpecificFMRIFile(imgDir,fMRI,patterns.fileNum(iTrialPhase1));
     end
     
-    %if desired file is recognized, pause for 100ms to complete transfer
+    %if desired file is recognized, pause for 200ms to complete transfer
     pause(.2);
     
     % if file available, load it
@@ -239,6 +243,58 @@ for iTrialPhase1 = 1:nVolsPhase1
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
+     if iTrial == (patterns.firstTestTR-1)
+        
+        patterns.raw_sm_filt(1:iTrial,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrial,:),TR,cutoff);
+        patterns.btwnrunsfiltered(1:iTrial) = 1;
+        
+        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:),1);
+        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:).^2,1);
+        %make sure to use population standard deviation, divide by N
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrial,:),1,1);
+        
+        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
+    end
+    
+    if iTrial > (patterns.firstTestTR - 1)
+        
+        %filter, then calculate mean and standard deviation
+        patterns.raw_sm_filt(iTrial,:) = HighPassRealTime(patterns.raw_sm(1:iTrial,:),TR,cutoff);
+        
+        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:),1);
+        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:).^2,1);
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrial,:),1,1); %flad to use N instead of N-1
+        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
+        
+        %now zscore
+        
+        %record last history
+        patterns.realtimeLastMean(1,:) = patterns.realtimeMean(1,:);
+        patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
+        patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
+        %update mean
+        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrial,:)).*zscoreConst;
+        %update y = E(X^2)
+        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrial,:).^2).*zscoreConst;
+        %update var
+        if useHistory
+            patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
+                + patterns.realtimeLastMean(1,:).^2 - patterns.realtimeMean(1,:).^2 ...
+                + patterns.realtimeY(1,:) - patterns.realtimeLastY(1,:);
+        else
+            % update var
+            patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
+                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrial,:)).*zscoreConst1).^2 ...
+                + (patterns.raw_sm_filt(iTrial,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
+        end
+        if iTrial > firstBlockTRs
+            patterns.raw_sm_filt_z(iTrial,:) = (patterns.raw_sm_filt(iTrial,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
+        else
+            patterns.raw_sm_filt_z(iTrial,:) = (patterns.raw_sm_filt(iTrial,:) - patterns.realtimeMean(1,:))./patterns.lastStd(1,:);
+        end
+        % LEFT OF HERE--GOING TO FIGURE OUT SAVING PREVIOUS OR LOADING
+        % PREVIOUS STANDARD DEVIATION INTO SCRIPTS
+    end
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
