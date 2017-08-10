@@ -209,6 +209,10 @@ fileCounter = firstVolPhase1-1; %file number = # of TR pulses
 
 for iTrialPhase1 = 1:nVolsPhase1
     
+    zscoreLen = double(iTrialPhase1);
+    zscoreLen1 = double(iTrialPhase1 - 1);
+    zscoreConst = 1.0/zscoreLen;
+    zscoreConst1 = 1.0/zscoreLen1;
     %increase the count of TR pulses
     fileCounter = fileCounter+1;
     
@@ -243,27 +247,27 @@ for iTrialPhase1 = 1:nVolsPhase1
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
-     if iTrial == (patterns.firstTestTR-1)
+     if iTrialPhase1 == (patterns.firstTestTR-1)
         
-        patterns.raw_sm_filt(1:iTrial,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrial,:),TR,cutoff);
-        patterns.btwnrunsfiltered(1:iTrial) = 1;
+        patterns.raw_sm_filt(1:iTrialPhase1,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
+        patterns.btwnrunsfiltered(1:iTrialPhase1) = 1;
         
-        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:),1);
-        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:).^2,1);
+        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:),1);
+        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:).^2,1);
         %make sure to use population standard deviation, divide by N
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrial,:),1,1);
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase1,:),1,1);
         
         patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
     end
     
-    if iTrial > (patterns.firstTestTR - 1)
+    if iTrialPhase1 > (patterns.firstTestTR - 1)
         
         %filter, then calculate mean and standard deviation
-        patterns.raw_sm_filt(iTrial,:) = HighPassRealTime(patterns.raw_sm(1:iTrial,:),TR,cutoff);
+        patterns.raw_sm_filt(iTrialPhase1,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
         
-        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:),1);
-        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrial,:).^2,1);
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrial,:),1,1); %flad to use N instead of N-1
+        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:),1);
+        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:).^2,1);
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase1,:),1,1); %flad to use N instead of N-1
         patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
         
         %now zscore
@@ -273,9 +277,9 @@ for iTrialPhase1 = 1:nVolsPhase1
         patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
         patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
         %update mean
-        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrial,:)).*zscoreConst;
+        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst;
         %update y = E(X^2)
-        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrial,:).^2).*zscoreConst;
+        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrialPhase1,:).^2).*zscoreConst;
         %update var
         if useHistory
             patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
@@ -284,13 +288,13 @@ for iTrialPhase1 = 1:nVolsPhase1
         else
             % update var
             patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
-                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrial,:)).*zscoreConst1).^2 ...
-                + (patterns.raw_sm_filt(iTrial,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
+                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst1).^2 ...
+                + (patterns.raw_sm_filt(iTrialPhase1,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
         end
-        if iTrial > firstBlockTRs
-            patterns.raw_sm_filt_z(iTrial,:) = (patterns.raw_sm_filt(iTrial,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
+        if iTrialPhase1 > firstBlockTRs
+            patterns.raw_sm_filt_z(iTrialPhase1,:) = (patterns.raw_sm_filt(iTrialPhase1,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
         else
-            patterns.raw_sm_filt_z(iTrial,:) = (patterns.raw_sm_filt(iTrial,:) - patterns.realtimeMean(1,:))./patterns.lastStd(1,:);
+            patterns.raw_sm_filt_z(iTrialPhase1,:) = (patterns.raw_sm_filt(iTrialPhase1,:) - patterns.realtimeMean(1,:))./patterns.lastStd(1,:);
         end
         % LEFT OF HERE--GOING TO FIGURE OUT SAVING PREVIOUS OR LOADING
         % PREVIOUS STANDARD DEVIATION INTO SCRIPTS
@@ -454,7 +458,7 @@ if runNum == 1
     
     trainIdx2 = find(any(patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
     trainLabels2 = patterns.regressor(:,firstVolPhase2+trainIdx2)'; %find the labels of those indices
-    trainPats2_notz = patterns.raw_sm(firstVolPhase2+trainIdx2,:); %retrieve the patterns of those indices
+    trainPats2_notz = patterns.raw_sm(firstVolPhase2+trainIdx2,:); %retrieve the patterns of those indices-should this just be trainIdx2?? seems like it
     trainPats2mean = mean(trainPats2_notz,1);
     trainPats2std = std(trainPats2_notz,[],1);
     trainPats2 = (trainPats2_notz - repmat(trainPats2mean,numel(trainIdx2),1))./repmat(trainPats2std,numel(trainIdx2),1);
