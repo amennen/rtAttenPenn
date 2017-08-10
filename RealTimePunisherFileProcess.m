@@ -82,20 +82,15 @@ fname = findNewestFile(runHeader, fullfile(runHeader, ['patternsdesign_' num2str
 %fn = ls([runHeader '/patternsdesign_' num2str(runNum) '_*']);
 load(fname);
     
-if rtData
-    %imgDir = ['/rt_test/20120604.' subjectName '.' subjectName '/'];
-    imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
-else
-    %dataHeader = ['data/' num2str(subjectNum)];
-    imgDir = ['/Volumes/ntb/projects/punisher02/subjects/' subjectName '/data/dicom/'];
-    %imgDir = ['/Volumes/KINGSTON/dicomdata/20121025.1025121_punisher02.1025121_punisher02/'];
-end
+imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
+
 
     
 %check that the fMRI file directory exists
+if rtData
 assert(logical(exist(imgDir,'dir')));
 fprintf('fMRI files being read from: %s\n',imgDir);
-    
+end
 %check that the fMRI dicom files do NOT exist
 if rtData
     %2 digit scan string
@@ -169,6 +164,7 @@ patterns.raw_sm = nan(nTRs,numel(roiInds));
 patterns.raw_sm_filt = nan(nTRs,numel(roiInds));
 patterns.raw_sm_z = nan(nTRs,numel(roiInds));
 patterns.categoryseparation = NaN(1,nTRs);
+patterns.firstTestTR = find(patterns.regressor(1,:)+patterns.regressor(2,:),1,'first') ; %(because took out first 10)
 
 %% Output Files Setup
 
@@ -206,8 +202,8 @@ fprintf('run\tblock\ttrial\tbltyp\tblcat\tstim\tfilenum\tloaded\toutput\tavg\n')
 %% acquiring files
 
 fileCounter = firstVolPhase1-1; %file number = # of TR pulses
-
-for iTrialPhase1 = 1:nVolsPhase1
+goodInd = [];
+for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this going past the break-no need to break it into separate steps)
     
     zscoreLen = double(iTrialPhase1);
     zscoreLen1 = double(iTrialPhase1 - 1);
@@ -237,9 +233,11 @@ for iTrialPhase1 = 1:nVolsPhase1
         
         if (any(isnan(patterns.raw(iTrialPhase1,:)))) && (iTrialPhase1>1)
             patterns.fileload(iTrialPhase1) = 0; %mark that load failed
-            patterns.raw(iTrialPhase1,:) = patterns.raw(iTrialPhase1-1,:); %replicate last complete pattern
+            indLastValidPattern = find(patterns.fileload,1,'last');
+            patterns.raw(fileCounter,:) = patterns.raw(indLastValidPattern,:); %replicate last complete pattern
         else
             patterns.fileload(iTrialPhase1) = 1;
+            goodInd = [goodInd iTrialPhase1]; % so we don't include other parts in bad data
         end
         
     end
@@ -247,129 +245,68 @@ for iTrialPhase1 = 1:nVolsPhase1
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
-     if iTrialPhase1 == (patterns.firstTestTR-1)
-        
-        patterns.raw_sm_filt(1:iTrialPhase1,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
-        patterns.btwnrunsfiltered(1:iTrialPhase1) = 1;
-        
-        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:),1);
-        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:).^2,1);
-        %make sure to use population standard deviation, divide by N
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase1,:),1,1);
-        
-        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
-    end
+     % detrend
     
-    if iTrialPhase1 > (patterns.firstTestTR - 1)
-        
-        %filter, then calculate mean and standard deviation
-        patterns.raw_sm_filt(iTrialPhase1,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
-        
-        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:),1);
-        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase1,:).^2,1);
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase1,:),1,1); %flad to use N instead of N-1
-        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
-        
-        %now zscore
-        
-        %record last history
-        patterns.realtimeLastMean(1,:) = patterns.realtimeMean(1,:);
-        patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
-        patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
-        %update mean
-        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst;
-        %update y = E(X^2)
-        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrialPhase1,:).^2).*zscoreConst;
-        %update var
-        if useHistory
-            patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
-                + patterns.realtimeLastMean(1,:).^2 - patterns.realtimeMean(1,:).^2 ...
-                + patterns.realtimeY(1,:) - patterns.realtimeLastY(1,:);
-        else
-            % update var
-            patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
-                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst1).^2 ...
-                + (patterns.raw_sm_filt(iTrialPhase1,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
+    % only update if the latest file wasn't nan
+        if iTrialPhase1 == (patterns.firstTestTR-1)
+            patterns.raw_sm_filt(1:iTrialPhase1,:) = HighPassBetweenRuns(patterns.raw_sm(goodInd,:),TR,cutoff);
+            patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(goodInd,:),1);
+            patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(goodInd,:).^2,1);
+            %make sure to use population standard deviation, divide by N
+            patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(goodInd,:),1,1);
+            patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
         end
+        
+        if iTrialPhase1 > (patterns.firstTestTR - 1)
+            patterns.raw_sm_filt(iTrialPhase1,:) = HighPassRealTime(patterns.raw_sm(goodInd,:),TR,cutoff);
+            patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(goodInd,:),1);
+            patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(goodInd,:).^2,1);
+            patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(goodInd,:),1,1); %flad to use N instead of N-1
+            patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
+            
+            
+            %record last history
+            patterns.realtimeLastMean(1,:) = patterns.realtimeMean(1,:);
+            patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
+            patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
+            %update mean
+            patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst;
+            %update y = E(X^2)
+            patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrialPhase1,:).^2).*zscoreConst;
+            %update var
+            if useHistory
+                patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
+                    + patterns.realtimeLastMean(1,:).^2 - patterns.realtimeMean(1,:).^2 ...
+                    + patterns.realtimeY(1,:) - patterns.realtimeLastY(1,:);
+            else
+                % update var
+                patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
+                    + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrialPhase1,:)).*zscoreConst1).^2 ...
+                    + (patterns.raw_sm_filt(iTrialPhase1,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
+            end
+        end
+    
         if iTrialPhase1 > firstBlockTRs
             patterns.raw_sm_filt_z(iTrialPhase1,:) = (patterns.raw_sm_filt(iTrialPhase1,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
         else
-            patterns.raw_sm_filt_z(iTrialPhase1,:) = (patterns.raw_sm_filt(iTrialPhase1,:) - patterns.realtimeMean(1,:))./patterns.lastStd(1,:);
+            patterns.raw_sm_filt_z(iTrialPhase1,:) = (patterns.raw_sm_filt(iTrialPhase1,:) - patterns.realtimeMean(1,:))./oldpats.patterns.runStd(1,:);
         end
-        % LEFT OF HERE--GOING TO FIGURE OUT SAVING PREVIOUS OR LOADING
-        % PREVIOUS STANDARD DEVIATION INTO SCRIPTS
-    end
+    
+    
+    
+end
+   
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     
 end % Phase1 loop
 
-%% pre-process the files that were obtained during training
-
-%print pre-processing results
-fprintf(dataFile,'loading patterns that were acquired during model training...\n');
-fprintf('loading patterns that were acquired during model training...\n');
-
-fprintf(dataFile,'files:\t%d\t%d\n',patterns.fileNum(nVolsPhase1)+1,patterns.fileNum(firstVolPhase2)-1);
-fprintf('files:\t%d\t%d\n',patterns.fileNum(nVolsPhase1)+1,patterns.fileNum(firstVolPhase2)-1);
-
-for iTrialTraining = (nVolsPhase1+1):(firstVolPhase2-1)
-    
-    fileCounter = fileCounter+1;
-    
-    patterns.fileNum(fileCounter) = fileCounter+disdaqs/TR;
-    
-    %check for new files from the scanner
-    while (patterns.fileAvail(fileCounter)==0)
-        [patterns.fileAvail(fileCounter) patterns.newFile{fileCounter}] = GetSpecificFMRIFile(imgDir,fMRI,patterns.fileNum(fileCounter));
-    end
-    
-    fprintf(dataFile,'%d...\t',patterns.fileNum(fileCounter));
-    fprintf('%d...\t',patterns.fileNum(fileCounter));
-    
-    %if desired file is recognized, pause for 100ms to complete transfer
-    pause(.2);
-    
-    % if file available, load it
-    if (patterns.fileAvail(fileCounter))
-        [newVol patterns.timeRead{fileCounter}] = ReadFile([imgDir patterns.newFile{fileCounter}],imgmat,roi); % NTB: only reads top file
-        patterns.raw(fileCounter,:) = newVol;  % keep patterns for later training
-        
-        if (any(isnan(patterns.raw(fileCounter,:))))
-            patterns.fileload(fileCounter) = 0; %mark that load failed
-            patterns.raw(fileCounter,:) = patterns.raw(fileCounter-1,:); %replicate last complete pattern
-        else
-            patterns.fileload(fileCounter) = 1;
-        end
-        
-    end
-    
-    %smooth files
-    patterns.raw_sm(fileCounter,:) = SmoothRealTime(patterns.raw(fileCounter,:),roiDims,roiInds,FWHM);
-end
-
-fprintf(dataFile,'\n');
-fprintf('\n');
-
-%z-score
-patterns.trainingAndFixDataMean = mean(patterns.raw_sm(1:fileCounter,:),1);  %mean across all volumes per voxel
-patterns.trainingAndFixDataStd = std(patterns.raw_sm(1:fileCounter,:),[],1); %std dev across all volumes per voxel
-
-patterns.raw_sm_z(1:fileCounter,:) = (patterns.raw_sm(1:fileCounter,:) - repmat(patterns.trainingAndFixDataMean,fileCounter,1))./repmat(patterns.trainingAndFixDataStd,fileCounter,1);
-
-if rtData
-    save([classOutputDir '/trainingcomplete.mat'],'firstVolPhase2');
-end
-
+%% testing
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'beginning model testing...\n');
 fprintf('\n*********************************************\n');
 fprintf('beginning model testing...\n');
-
-%% testing
-
-%% testing
 
 % prepare for trial sequence
 fprintf(dataFile,'run\tblock\ttrial\tbltyp\tblcat\tstim\tfilenum\tloaded\toutput\tavg\n');
@@ -390,31 +327,66 @@ for iTrialPhase2=1:(nVolsPhase2+1)
     % if file available, perform preprocessing and test classifier
     if (patterns.fileAvail(fileCounter))
         
-        pause(.1);
+        pause(.2);
         
         [newVol patterns.timeRead{fileCounter}] = ReadFile([imgDir patterns.newFile{fileCounter}],imgmat,roi);
         patterns.raw(fileCounter,:) = newVol;  % keep patterns for later training
         
         if (any(isnan(patterns.raw(fileCounter,:))))
             patterns.fileload(fileCounter) = 0;
-            patterns.raw(fileCounter,:) = patterns.raw(fileCounter-1,:); %replicate last complete pattern
+            indLastValidPatterns = find(patterns.fileload,1,'last');
+            patterns.raw(fileCounter,:) = patterns.raw(indLastValidPattern,:); %replicate last complete pattern
         else
             patterns.fileload(fileCounter) = 1;
+            goodInd = [goodInd iTrialPhase2];
         end
         
         %smooth
         patterns.raw_sm(fileCounter,:) = SmoothRealTime(patterns.raw(fileCounter,:),roiDims,roiInds,FWHM);
         
         %z-score
-        patterns.raw_sm_z(fileCounter,:) = (patterns.raw_sm(fileCounter,:) - patterns.trainingAndFixDataMean)./patterns.trainingAndFixDataStd;
     else
-        indLastValidPatterns = find(~isnan(patterns.raw_sm_z(:,1)),1,'last');
-        patterns.raw_sm_z(fileCounter,:) = patterns.raw_sm_z(indLastValidPatterns,:);
+        indLastValidPatterns = find(patterns.fileload,1,'last');
+        patterns.raw_sm_filt(fileCounter,:) = patterns.raw_sm_filt(indLastValidPatterns,:);
     end
     
+    
+    % detrend
+    patterns.raw_sm_filt(iTrialPhase2,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase2,:),TR,cutoff);
+    
+    % only update if the latest file wasn't nan
+    if patterns.fileload(fileCounter)
+        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(goodInd,:),1);
+        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(goodInd,:).^2,1);
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(goodInd,:),1,1); %flad to use N instead of N-1
+        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
+        
+        
+        %record last history
+        patterns.realtimeLastMean(1,:) = patterns.realtimeMean(1,:);
+        patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
+        patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
+        %update mean
+        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrialPhase2,:)).*zscoreConst;
+        %update y = E(X^2)
+        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrialPhase2,:).^2).*zscoreConst;
+        %update var
+        if useHistory
+            patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
+                + patterns.realtimeLastMean(1,:).^2 - patterns.realtimeMean(1,:).^2 ...
+                + patterns.realtimeY(1,:) - patterns.realtimeLastY(1,:);
+        else
+            % update var
+            patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
+                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrialPhase2,:)).*zscoreConst1).^2 ...
+                + (patterns.raw_sm_filt(iTrialPhase2,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
+        end
+    end
+    patterns.raw_sm_filt_z(iTrialPhase2,:) = (patterns.raw_sm_filt(iTrialPhase2,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
+
     if rtfeedback
         if any(patterns.regressor(:,fileCounter))
-            [patterns.predict(fileCounter),~,~,patterns.activations(:,fileCounter)] = Test_L2_RLR_realtime(trainedModel,patterns.raw_sm_z(fileCounter,:),patterns.regressor(:,fileCounter)); %#ok<NODEF>
+            [patterns.predict(fileCounter),~,~,patterns.activations(:,fileCounter)] = Test_L2_RLR_realtime(trainedModel,patterns.raw_sm_filt_z(fileCounter,:),patterns.regressor(:,fileCounter)); %#ok<NODEF>
             
             categ = find(patterns.regressor(:,fileCounter));
             otherCateg = mod(categ,2)+1;
@@ -440,6 +412,8 @@ for iTrialPhase2=1:(nVolsPhase2+1)
     
 end % Phase 2 loop
 
+patterns.runStd = std(patterns.raw_sm_filt,[],1); %std dev across all volumes per voxel
+
 %% training
 
 trainStart = tic; %start timing 
@@ -454,33 +428,27 @@ fprintf('beginning model training...\n');
 if runNum == 1
     trainIdx1 = any(patterns.regressor(:,1:lastVolPhase1),1);
     trainLabels1 = patterns.regressor(:,trainIdx1)'; %find the labels of those indices
-    trainPats1 = patterns.raw_sm_z(trainIdx1,:); %retrieve the patterns of those indices
+    trainPats1 = patterns.raw_sm_filt_z(trainIdx1,:); %retrieve the patterns of those indices
     
     trainIdx2 = find(any(patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
     trainLabels2 = patterns.regressor(:,firstVolPhase2+trainIdx2)'; %find the labels of those indices
-    trainPats2_notz = patterns.raw_sm(firstVolPhase2+trainIdx2,:); %retrieve the patterns of those indices-should this just be trainIdx2?? seems like it
-    trainPats2mean = mean(trainPats2_notz,1);
-    trainPats2std = std(trainPats2_notz,[],1);
-    trainPats2 = (trainPats2_notz - repmat(trainPats2mean,numel(trainIdx2),1))./repmat(trainPats2std,numel(trainIdx2),1);
+    trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:);
 elseif runNum == 2
     trainIdx1 = find(any(oldpats.patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
     trainLabels1 = oldpats.patterns.regressor(:,firstVolPhase2+trainIdx1)'; %find the labels of those indices
-    trainPats1_notz = oldpats.patterns.raw_sm(firstVolPhase2+trainIdx1,:); %retrieve the patterns of those indices
-    trainPats1mean = mean(trainPats1_notz,1);
-    trainPats1std = std(trainPats1_notz,[],1);
-    trainPats1 = (trainPats1_notz - repmat(trainPats1mean,numel(trainIdx1),1))./repmat(trainPats1std,numel(trainIdx1),1);
+    trainPats1 = oldpats.patterns.raw_sm_filt_z(trainIdx1,:);
     
     trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1,1));
     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
-    trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
+    trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:); %retrieve the patterns of those indices
 else
     trainIdx1 = any(oldpats.patterns.regressor(:,1:lastVolPhase1),1);
     trainLabels1 = oldpats.patterns.regressor(:,trainIdx1)'; %find the labels of those indices
-    trainPats1 = oldpats.patterns.raw_sm_z(trainIdx1,:); %retrieve the patterns of those indices
+    trainPats1 = oldpats.patterns.raw_sm_filt_z(trainIdx1,:); %retrieve the patterns of those indices
     
     trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1),1);
     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
-    trainPats2 = patterns.raw_sm_z(trainIdx2,:); %retrieve the patterns of those indices
+    trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:); %retrieve the patterns of those indices
 end
 
 trainPats = [trainPats1;trainPats2];
@@ -498,9 +466,6 @@ if isfield(trainedModel,'biases')
     fprintf(dataFile,'model biases: \t%.3f\t%.3f\n',trainedModel.biases(1),trainedModel.biases(2));
     fprintf('model biases: \t%.3f\t%.3f\n',trainedModel.biases(1),trainedModel.biases(2));
 end
-
-
-
 
 %%
 

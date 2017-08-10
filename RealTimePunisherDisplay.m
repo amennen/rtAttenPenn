@@ -66,8 +66,8 @@ if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
     
     
-   % ListenChar(2);  %prevent command window output
-   % HideCursor;     %hide mouse cursor    
+   ListenChar(2);  %prevent command window output
+   HideCursor;     %hide mouse cursor    
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end
@@ -85,12 +85,7 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 %     error('this code is only written to run on macs, not %s\n',computer);
 % end
 
-if rtData
-    imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
-else
-    %imgDir = ['/Volumes/ntb/projects/punisher01/subjects/' subjectName '/data/dicom/']; 
-    %imgDir = ['/Volumes/KINGSTON/dicomdata/20121025.1025121_punisher02.1025121_punisher02/'];
-end
+imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
 
 %check that the files exist
 if fMRI
@@ -351,7 +346,7 @@ Screen('Flip',mainWindow);
 % open and set-up output file
 dataFile = fopen([dataHeader '/behavior.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
-fprintf(dataFile,'* Punisher Experiment v.2.0\n');
+fprintf(dataFile,'* rtAttenPenn v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(dataFile,['* Seed: ' num2str(seed) '\n']);
 fprintf(dataFile,['* Subject Number: ' num2str(subjectNum) '\n']);
@@ -364,7 +359,7 @@ fprintf(dataFile,'*********************************************\n\n');
 
 % print header to command window
 fprintf('\n*********************************************\n');
-fprintf('* Punisher Experiment v.2.0\n');
+fprintf('* rtAttenPenn v.1.0\n');
 fprintf(['* Date/Time: ' datestr(now,0) '\n']);
 fprintf(['* Seed: ' num2str(seed) '\n']);
 fprintf(['* Subject Number: ' num2str(subjectNum) '\n']);

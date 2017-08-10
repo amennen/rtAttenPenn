@@ -14,7 +14,6 @@ SAD = 2;
 HAPPY = 3;
 % *******************************************************
 typeNum = HAPPY;
-subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
@@ -64,7 +63,6 @@ if matchNum == 0
 else
     save(['./data/' num2str(subjectNum) '_match/mask_' num2str(subjectNum)],'mask');
 end
-ProcessMask(subjectNum,funcScan,subjectRun);
 %% Run 1 file process
 
 runNum = 1;
