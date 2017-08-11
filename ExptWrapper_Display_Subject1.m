@@ -15,7 +15,7 @@ subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun)
 matchNum = 0;
 useButtonBox=1;
 realtimeData = 1;
-debug=0;
+debug=1;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
 
@@ -29,6 +29,7 @@ realtimeData = 0;
 fMRI = 0;
 debug = 1
 useButtonBox = 0
+rtData =0;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 

@@ -383,8 +383,8 @@ for iBlock=1:numBlocks
         patterns.type(TRsFix) = zeros(1,nTRsFix);
         patterns.attCateg(TRsFix) = zeros(1,nTRsFix);
         patterns.stim(TRsFix) = zeros(1,nTRsFix);
-        patterns.regressor(1:2,TRsFix) = zeros(2,nTRsFix);
-        TRCounter = TRCounter+nTRsFix-1;
+        patterns.regressor(1:2,TRsFix+labelsShift) = zeros(2,nTRsFix); % ACM added 8/11-labelshift not there before
+        TRCounter = TRCounter+nTRsFix;
     end
     
     %account for instruction TRs
