@@ -294,7 +294,6 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     
     
     
-end
    
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
