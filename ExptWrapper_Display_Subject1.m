@@ -3,7 +3,7 @@
 subjectNum = 100;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
-runNum = 1;
+subjectRun = 1;
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
@@ -11,7 +11,7 @@ HAPPY = 3;
 % *******************************************************
 typeNum = HAPPY;
 
-subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
 matchNum = 0;
 useButtonBox=1;
 realtimeData = 1;
