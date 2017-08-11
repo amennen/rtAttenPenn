@@ -231,9 +231,10 @@ end
 %if (useButtonBox)%scanner display monitor has error with inputs of screen size
 %    mainWindow = Screen(screenNum,'OpenWindow',backColor);
 %else
-    mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
 %end
-
+ifi = Screen('GetFlipInterval', mainWindow);
+slack  = ifi/2;
 % details of main window
 centerX = screenX/2; centerY = screenY/2;
 Screen(mainWindow,'TextFont',textFont);
@@ -445,6 +446,7 @@ for iBlock = 1:numel(blockData)
     blockDur(iBlock+1) = TR*(instructLen+blockData(iBlock).trialsPerBlock/nTrialsPerTR+IBI); %#ok<AGROW>
     blockOnsets(iBlock) = disdaqs + sum(blockDur(1:iBlock)); %#ok<AGROW>
 end
+blockOnsets((numel(blockOnsets)/2+1):end) = blockOnsets((numel(blockOnsets)/2+1):end)+IBI;
 
 typeOrder = [blockData.type];
 indBlocksPhase1 = 1:(numel(typeOrder)/2);
@@ -459,17 +461,20 @@ for iBlock=1:numel(indBlocksPhase1)
     % timing
     blockData(iBlock).actualblockonset = GetSecs; %#ok<AGROW>
     blockData(iBlock).plannedinstructonset = blockOnsets(iBlock)+runStart; %#ok<AGROW>
+    blockData(iBlock).plannedinstructoffset = blockOnsets(iBlock).plannedinstructonset + instructDur;
     blockData(iBlock).plannedtrialonsets = blockData(iBlock).plannedinstructonset + TR*instructTRnum + [0 cumsum(repmat(TR/nTrialsPerTR,1,blockData(iBlock).trialsPerBlock))]; %#ok<AGROW>
-    
+    blockData(iBlock).plannedendflip = blockData(iBlock).plannedtrialonsets(end) + TR/nTrialsPerTR;
     % show instructions
     tempBounds = Screen('TextBounds',mainWindow,blockInstruct{blockData(iBlock).attCateg});
     Screen('drawtext',mainWindow,blockInstruct{blockData(iBlock).attCateg},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
     clear tempBounds;
-    blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,blockData(iBlock).plannedinstructonset+instructOn); %#ok<AGROW> % turn on
+    timespec = blockData(iBlock).plannedinstructonset - slack;
+    blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
     
     % show fixation
+    timespec = blockData(iBlock).plannedinstructoffset - slack;
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow,blockData(iBlock).actualinstructonset+instructOn+instructDur); %turn off
+    blockData(iBlock).actualinstructoffset = Screen('Flip',mainWindow,timespec); %turn off
     
     % start trial sequence
     for iTrial=1:(blockData(iBlock).trialsPerBlock)
@@ -506,10 +511,12 @@ for iBlock=1:numel(indBlocksPhase1)
         if (rtData) && mod(iTrial,nTrialsPerTR)==1
             %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
             [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW> % turn on
+            timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
+            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
         else
             blockData(iBlock).pulses(iTrial) = 0; %#ok<AGROW>
-            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,blockData(iBlock).plannedtrialonsets(iTrial)); %#ok<AGROW>
+            timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
+            blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW>
         end
         stimOn = 1;
         FlushEvents('keyDown');
@@ -563,13 +570,14 @@ for iBlock=1:numel(indBlocksPhase1)
         
     end % trial loop
     
-    while ((GetSecs-blockData(iBlock).actualtrialonsets(iTrial) < stimDur))
-        1;
-    end
-    
+%     while ((GetSecs-blockData(iBlock).actualtrialonsets(iTrial) < stimDur))
+%         1;
+%     end
+
     Screen('FillRect',mainWindow,backColor);
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-    Screen('Flip',mainWindow);
+    timespec = blockData(iBlock).plannedendflip - slack;
+    timing.actualOnsets.endflip = Screen('Flip',mainWindow,timespec);
     
 end % end phase 1 block loop
 
@@ -577,7 +585,8 @@ end % end phase 1 block loop
 %% pause & wait for model to be trained
 
 
-% show instructions
+% show instructions-wait for first trigger
+[~,blockData(iBlock).pulseBreak] = WaitTRPulse(TRIGGER_keycode,DEVICE);
 tempBounds = Screen('TextBounds',mainWindow,restInstruct);
 Screen('drawtext',mainWindow,restInstruct,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
 clear tempBounds;
@@ -587,42 +596,42 @@ save([runHeader '/blockdata_training'],'blockData');
 
 % show fixation
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-Screen('Flip',mainWindow,restOnset+restDur); %turn off
+[~,blockData(iBlock).pulserest] = WaitTRPulse(TRIGGER_keycode,DEVICE,restOnset+restDur);
+timespec = restOnset + restDur - slack;
+Screen('Flip',mainWindow,timespec); %turn off
 
 % check for model training to be complete
-trainedModelComplete = 0;
-filePrevFirstVolPhase2 = firstVolPhase2 + (disdaqs/TR) - 2;
+% trainedModelComplete = 0;
+% filePrevFirstVolPhase2 = firstVolPhase2 + (disdaqs/TR) - 2;
 
-if rtData
-    while (trainedModelComplete==0)
-        [trainedModelComplete tempFileTrainingComplete] = GetSpecificFMRIFile(imgDir,fMRI,filePrevFirstVolPhase2); %#ok<NASGU>
-        %     else
-        %         if exist(fullfile(classOutputDir,trainedModelFile),'file')
-        %             trainedModelComplete = 1;
-        %         end
-    end
-end
+% if rtData
+%     while (trainedModelComplete==0)
+%         [trainedModelComplete tempFileTrainingComplete] = GetSpecificFMRIFile(imgDir,fMRI,filePrevFirstVolPhase2); %#ok<NASGU>
+%         %     else
+%         %         if exist(fullfile(classOutputDir,trainedModelFile),'file')
+%         %             trainedModelComplete = 1;
+%         %         end
+%     end
+% end
 
 % wait for pulse
-if rtData
-    %[phase2Start,~] = WaitTRPulsePTB3_skyra(1);
-    [phase2Start,~] = WaitTRPulse(TRIGGER_keycode,DEVICE);
-    if phase2Start == -1
-        phase2Start = GetSecs;
-    end
-    
-    phase2Start= phase2Start+TR;
-    
-else
-    FlushEvents('keyDown');
-
-    WaitSecs(IBI*2);
-    phase2Start = GetSecs+TR;
-
-end
+% if rtData
+%     %[phase2Start,~] = WaitTRPulsePTB3_skyra(1);
+%     [phase2Start,~] = WaitTRPulse(TRIGGER_keycode,DEVICE);
+%     if phase2Start == -1
+%         phase2Start = GetSecs;
+%     end
+%     
+%     phase2Start= phase2Start+TR;
+%     
+% else
+%     FlushEvents('keyDown');
+%     WaitSecs(IBI*2);
+%     phase2Start = GetSecs+TR;
+% end
 
 iBlockPhase2 = 0;
-for iBlock = indBlocksPhase2 %Megan Check this!!!
+for iBlock = indBlocksPhase2 
     iBlockPhase2 = iBlockPhase2+1;
     blockDurPhase2(iBlockPhase2+1) = TR*(instructLen+blockData(iBlock).trialsPerBlock/nTrialsPerTR+IBI); %#ok<AGROW>
     blockOnsetsPhase2(iBlockPhase2) = phase2Start + sum(blockDurPhase2(1:iBlockPhase2)); %#ok<AGROW>
