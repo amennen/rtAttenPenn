@@ -2,8 +2,10 @@
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
+conf = loadjson('conf/example.json');
 subjectNum = 100;
 projectName = 'rtAttenPenn';
+imgDirHeader = conf.imgDirHeader;
 subjectRun = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
@@ -18,6 +20,7 @@ matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
+addpath(genpath('jsonlab-1.5'))
 %% Generate expt sequence
 
 if matchNum ==0
@@ -72,57 +75,57 @@ fMRI = 12;
 realtimeData = 1;
 debug = 0
 % put this in to test:fMRI = 2;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 14;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+fMRI = 16;
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%
 
 runNum = 3;
 fMRI = 14;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
 runNum = 4;
 fMRI = 16;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
 runNum = 5;
 fMRI = 18;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
 runNum = 6;
 fMRI = 20;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
 runNum = 7;
 fMRI = 20;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 
 %%
 
 runNum = 8;
 fMRI = 22;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%
 
 runNum = 9;
 fMRI = 24;
-[patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
+[patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)

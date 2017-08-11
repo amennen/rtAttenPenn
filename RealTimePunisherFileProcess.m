@@ -1,4 +1,4 @@
-function [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,rtData)
+function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,rtData)
 % function [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,runNum,fMRI,rtData)
 %
 % this function describes the file processing procedure for the realtime 
@@ -78,12 +78,14 @@ else
 end
 fname = findNewestFile(runHeader, fullfile(runHeader, ['patternsdesign_' num2str(runNum) '*.mat']));
 load(fname);
-imgDir = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
+imgDir = [imgDirHeader datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
     
 %check that the fMRI file directory exists
 if rtData
-assert(logical(exist(imgDir,'dir')));
-fprintf('fMRI files being read from: %s\n',imgDir);
+    if ~exist(imgDir,'dir')
+        mkdir(imgDir)
+    assert(logical(exist(imgDir,'dir')));
+    fprintf('fMRI files being read from: %s\n',imgDir);
 end
 %check that the fMRI dicom files do NOT exist
 if rtData
