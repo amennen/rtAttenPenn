@@ -85,14 +85,6 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 %     error('this code is only written to run on macs, not %s\n',computer);
 % end
 
-imgDir = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
-
-%check that the files exist
-if fMRI
-    assert(logical(exist(imgDir,'dir')));
-    fprintf('fMRI files being read from: %s\n',imgDir);
-end
-
 
 %initialize system time calls
 GetSecs;
@@ -470,7 +462,7 @@ for iBlock=1:numel(indBlocksPhase1)
     clear tempBounds;
     timespec = blockData(iBlock).plannedinstructonset - slack;
     if rtData
-        [~,blockData(iBlock).instructpulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
+        [~,blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
     end
     blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualinstructonset-blockData(iBlock).plannedinstructonset)
@@ -568,7 +560,7 @@ for iBlock=1:numel(indBlocksPhase1)
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
     % the IBI goes here!
     if rtData
-        [~,blockData(iBlock).IBIpulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
+        [~,blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
     end
     timespec = blockData(iBlock).plannedIBI -slack;
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);
@@ -582,7 +574,7 @@ timing.plannedrestoff = timing.plannedreston + restDur;
 
 % show instructions-wait for first trigger
 if rtData
-[~,timing.pulsereston] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedreston);
+[~,timing.pulsereston] = WaitTRPulse(TRIGGER_keycode,DEVICE,timing.plannedreston);
 end
 tempBounds = Screen('TextBounds',mainWindow,restInstruct);
 Screen('drawtext',mainWindow,restInstruct,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
@@ -627,7 +619,7 @@ for iBlock=indBlocksPhase2
     clear tempBounds;
     timespec = blockData(iBlock).plannedinstructonset - slack;
     if rtData
-        [~,blockData(iBlock).instructpulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
+        [~,blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
     end
     blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualinstructonset-blockData(iBlock).plannedinstructonset)
@@ -816,7 +808,7 @@ for iBlock=indBlocksPhase2
     Screen('FillRect',mainWindow,backColor);
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
     if rtData
-        [~,blockData(iBlock).IBIpulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
+        [~,blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
     end
     timespec = blockData(iBlock).plannedIBI -slack;
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);

@@ -1,5 +1,4 @@
-
-function [outputLastPat] = HighPassRealTime(inputAllPats,TR,cutoffTime)
+function [outputAllPats] = HighPassBetweenRuns(inputAllPats,TR,cutoffTime)
 % function [outputLastPat] = HighPassRealTIme(inputAllPats,TR)
 %
 % this function high pass filters the realtime data
@@ -19,6 +18,6 @@ function [outputLastPat] = HighPassRealTime(inputAllPats,TR,cutoffTime)
 hp_sigma = cutoffTime/(2*TR); %fsl's approximation to calculationg standard deviation
 
 %call mex function to high pass according to fslmaths
-[outputAllPats]=highpass_gaussian_realtime(inputAllPats,hp_sigma); 
+[outputAllPats]=highpass_gaussian_betweenruns(inputAllPats,hp_sigma); 
 
-outputLastPat = outputAllPats(end,:);
+%outputLastPat = outputAllPats(end,:);

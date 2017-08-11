@@ -66,20 +66,18 @@ end
 %% Run 1 file process
 
 runNum = 1;
-fMRI = 5;
+fMRI = 12;
 %today's testing 3/7
-fMRI = 10
 %testing file processing
-realtimeData = 0;
-fMRI = 0;
-debug = 1
+realtimeData = 1;
+debug = 0
 % put this in to test:fMRI = 2;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 12;
+fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%
