@@ -110,7 +110,7 @@ nTrialsPerBlock = 50; % [trials]#trials per block
 nBlocksPerPhase = 4;  % [blocks]#blocks per phase
 
 %fixation
-nTRsFix = IBI*2;       % [TRs]  # TRs to dedicate to training the model
+nTRsFix = 3;       % [TRs]  # TRs to dedicate to training the model
 
 STABLE = 1;         % numerical designation of the block type stable
 RTFEED = 2;         % numerical designation of the block type feedback
