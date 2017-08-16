@@ -264,8 +264,8 @@ if any([blockData.type]==2) %#ok<NODEF>
 else
     restInstruct = 'The next blocks will start soon';
 end
-restDur = 4; % seconds to keep that display on
-stimFix = 8; % seconds to keep the middle on before starting the block 5
+restDur = 3; % seconds to keep that display on
+stimFix = 6; % seconds to keep the middle on before starting the block 5
 %% Load Images
 
 cd images;
