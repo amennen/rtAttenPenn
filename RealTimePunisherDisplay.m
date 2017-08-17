@@ -96,7 +96,6 @@ categStr = {'sc','fa'};
 typeStr = {'stab','rtfd'};
 
 % block timing
-instructOn = 0;     % secs
 instructDur = 1;    % secs
 instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
@@ -163,7 +162,7 @@ switch (respMap)
         sceneInstruct = 'Places: respond if it is an indoor place. DO NOT respond if it is an outdoor place';
         faceInstruct = 'Faces: respond if it is a male face. DO NOT respond if it is a female face';
         sceneShorterInstruct = 'indoor places';
-        faceShorterInstruct = 'male faces';
+        faceShorter = 'male faces';
     case 2
         sceneInstruct = 'Places: respond if it is an outdoor place. DO NOT respond if it is an indoor place';
         faceInstruct = 'Faces: respond if it is a female face. DO NOT respond if it is a male face';
