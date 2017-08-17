@@ -815,8 +815,8 @@ for iBlock=indBlocksPhase2
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualIBI-blockData(iBlock).plannedIBI)
 end % phase 2 block loop
-
-WaitSecs(2);
+% want to wait 7 TRS
+WaitSecs(14);
 
 %% save
 
