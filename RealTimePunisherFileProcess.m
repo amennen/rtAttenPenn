@@ -1,7 +1,7 @@
 function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,rtData)
 % function [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,runNum,fMRI,rtData)
 %
-% this function describes the file processing procedure for the realtime 
+% this function describes the file processing procedure for the realtime
 % fMRI attentional training experiment
 %
 %
@@ -29,7 +29,7 @@ if nargin < 6
 end
 
 if ~isnumeric(subjectNum)
-   error('subjectNum must be a number'); 
+    error('subjectNum must be a number');
 end
 
 if ~ischar(subjectName)
@@ -37,7 +37,7 @@ if ~ischar(subjectName)
 end
 
 if ~isnumeric(matchNum)
-   error('matchNum must be a number'); 
+    error('matchNum must be a number');
 end
 
 if ~isnumeric(runNum)
@@ -69,7 +69,7 @@ if matchNum == 0
     runHeader = [dataHeader '/run' num2str(runNum)];
     classOutputDir = [runHeader '/classoutput'];
     matchDataHeader = ['data/' num2str(subjectNum) '_match'];
-    matchRunHeader = [matchDataHeader '/run' num2str(runNum)]; 
+    matchRunHeader = [matchDataHeader '/run' num2str(runNum)];
     matchClassOutputDir = [matchRunHeader '/classoutput'];
 else
     dataHeader = ['data/' num2str(matchNum) '_match'];
@@ -80,7 +80,7 @@ fname = findNewestFile(runHeader, fullfile(runHeader, ['patternsdesign_' num2str
 load(fname);
 imgDir = [imgDirHeader datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
 
-%%%%%%%% 
+%%%%%%%%
 %DELETE AFTER
 %\subjDate = '8-11-17';
 %imgDir = [imgDirHeader datestr(subjDate,10) datestr(subjDate,5) datestr(subjDate,7) '.' subjectName '.' subjectName '/'];
@@ -91,8 +91,9 @@ imgDir = [imgDirHeader datestr(now,10) datestr(now,5) datestr(now,7) '.' subject
 if rtData
     if ~exist(imgDir,'dir')
         mkdir(imgDir)
-    assert(logical(exist(imgDir,'dir')));
-    fprintf('fMRI files being read from: %s\n',imgDir);
+        assert(logical(exist(imgDir,'dir')));
+        fprintf('fMRI files being read from: %s\n',imgDir);
+    end
 end
 %check that the fMRI dicom files do NOT exist
 if rtData
@@ -119,7 +120,7 @@ if rtData
         end
     end
 end
-    
+
 %load previous patterns
 if runNum>1
     patsfn = ls([dataHeader '/patternsdata_' num2str(runNum-1) '_*']);
@@ -151,10 +152,10 @@ firstBlockTRs = 64; %total number of TRs to take for standard deviation of last 
 %% Block Sequence
 
 firstVolPhase1 = find(patterns.block==1,1,'first'); %#ok<NODEF>
-lastVolPhase1 = find(patterns.block==nBlocksPerPhase,1,'last'); 
+lastVolPhase1 = find(patterns.block==nBlocksPerPhase,1,'last');
 nVolsPhase1 = lastVolPhase1 - firstVolPhase1+1;
 
-lastVolPhase2 = find(patterns.type~=0,1,'last'); 
+lastVolPhase2 = find(patterns.type~=0,1,'last');
 nVolsPhase2 = lastVolPhase2 - firstVolPhase2;
 
 patterns.fileAvail = zeros(1,nTRs);
@@ -182,7 +183,7 @@ fprintf(dataFile,['* Subject Name: ' subjectName '\n']);
 fprintf(dataFile,['* Run Number: ' num2str(runNum) '\n']);
 fprintf(dataFile,['* Real-Time Data: ' num2str(rtData) '\n']);
 fprintf(dataFile,'*********************************************\n\n');
-    
+
 % print header to command window
 fprintf('\n*********************************************\n');
 fprintf('* rtAttenPenn v.1.0\n');
@@ -227,7 +228,7 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     end
     
     %if desired file is recognized, pause for 200ms to complete transfer
-   pause(.2);
+    pause(.2);
     
     % if file available, load it
     if (patterns.fileAvail(iTrialPhase1))
@@ -247,7 +248,7 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
-   
+    
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
@@ -287,17 +288,17 @@ for iTrialPhase2=1:(nVolsPhase2+1)
     fileCounter = fileCounter+1;
     
     patterns.fileNum(fileCounter) = fileCounter+disdaqs/TR;
-     
+    
     %check for new files from the scanner
     patterns.fileAvail(fileCounter) = 0;
     while (patterns.fileAvail(fileCounter)==0)
-            [patterns.fileAvail(fileCounter) patterns.newFile{fileCounter}] = GetSpecificFMRIFile(imgDir,fMRI,patterns.fileNum(fileCounter));          
+        [patterns.fileAvail(fileCounter) patterns.newFile{fileCounter}] = GetSpecificFMRIFile(imgDir,fMRI,patterns.fileNum(fileCounter));
     end
     
     % if file available, perform preprocessing and test classifier
     if (patterns.fileAvail(fileCounter))
         
-       pause(.2);
+        pause(.2);
         
         [newVol patterns.timeRead{fileCounter}] = ReadFile([imgDir patterns.newFile{fileCounter}],imgmat,roi);
         patterns.raw(fileCounter,:) = newVol;  % keep patterns for later training
@@ -353,7 +354,7 @@ for iTrialPhase2=1:(nVolsPhase2+1)
         end
     end
     patterns.raw_sm_filt_z(fileCounter,:) = (patterns.raw_sm_filt(fileCounter,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
-
+    
     if rtfeedback
         if any(patterns.regressor(:,fileCounter))
             [patterns.predict(fileCounter),~,~,patterns.activations(:,fileCounter)] = Test_L2_RLR_realtime(trainedModel,patterns.raw_sm_filt_z(fileCounter,:),patterns.regressor(:,fileCounter)); %#ok<NODEF>
@@ -378,21 +379,21 @@ for iTrialPhase2=1:(nVolsPhase2+1)
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(fileCounter),iTrialPhase2,patterns.type(fileCounter),patterns.attCateg(fileCounter),patterns.stim(fileCounter),patterns.fileNum(fileCounter),patterns.fileAvail(fileCounter),patterns.categoryseparation(fileCounter),nanmean(patterns.categoryseparation(firstVolPhase2:fileCounter)));
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(fileCounter),iTrialPhase2,patterns.type(fileCounter),patterns.attCateg(fileCounter),patterns.stim(fileCounter),patterns.fileNum(fileCounter),patterns.fileAvail(fileCounter),patterns.categoryseparation(fileCounter),nanmean(patterns.categoryseparation(firstVolPhase2:fileCounter)));
-
+    
     
 end % Phase 2 loop
 
 patterns.runStd = std(patterns.raw_sm_filt,[],1); %std dev across all volumes per voxel
 
 %% training
-trainStart = tic; %start timing 
+trainStart = tic; %start timing
 
 %print training results
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'beginning model training...\n');
 fprintf('\n*********************************************\n');
 fprintf('beginning model training...\n');
-    
+
 %model training
 if runNum == 1
     trainIdx1 = any(patterns.regressor(:,1:lastVolPhase1),1);
@@ -441,7 +442,7 @@ end
 save([dataHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
 save([dataHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
 
-%MdB Check This!!! 
+%MdB Check This!!!
 if rtfeedback && runNum>1 && matchNum == 0
     unix(['cp ' classOutputDir '/vol_* ' matchClassOutputDir]);
 end
