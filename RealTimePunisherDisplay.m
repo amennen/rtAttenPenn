@@ -406,7 +406,7 @@ Screen('Flip',mainWindow);
 Priority(MaxPriority(screenNum));
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-if (rtData )
+if (rtData && ~debug )
    % if strcmp(computer,'MACI') % taking out because we're running on a linux!
         %runStart = WaitTRPulsePTB3_skyra(1);
         runStart = WaitTRPulse(TRIGGER_keycode,DEVICE);
@@ -631,6 +631,7 @@ for iBlock=indBlocksPhase2
     % start trial sequence
     for iTrial=1:(blockData(iBlock).trialsPerBlock)
         
+        blockData(iBlock).tr1(iTrial) = GetSecs;
         trialCounter = trialCounter+1;
         if (mod(iTrial,nTrialsPerTR)==1) 
             volCounter = volCounter+1;
@@ -668,11 +669,11 @@ for iBlock=indBlocksPhase2
         Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
         Screen(mainWindow,'FillOval',fixColor,fixDotRect);
         
-        
+        blockData(iBlock).tprep(iTrial) = GetSecs;
         tRespTimeout = blockData(iBlock).plannedtrialonsets(iTrial)+respWindow;
         
         %wait for pulse
-        if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1)) % this will be true for every other then
+        if (rtData) && mod(iTrial,nTrialsPerTR) % this will be true for every other then
             %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
             [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
@@ -719,11 +720,12 @@ for iBlock=indBlocksPhase2
                 blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
             end
         end
-        
+        blockData(iBlock).tr2(iTrial) = GetSecs;
 
          % *************
 
         %load rtfeedback values once per TR
+        blockData(iBlock).RT1(iTrial) = GetSecs;
         if rtfeedback
             if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
                 %number of odd trials - paired with TRs
@@ -795,7 +797,7 @@ for iBlock=indBlocksPhase2
             blockData(iBlock).classOutputFile{iTrial} = 'notrt'; %#ok<AGROW>
             blockData(iBlock).classOutputFile{iTrial} = NaN; %#ok<AGROW>
         end
-            
+        blockData(iBlock).RT2(iTrial) = GetSecs;  
         % print trial results
         fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
         fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));

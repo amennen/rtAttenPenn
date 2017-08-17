@@ -2,14 +2,14 @@
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
-addpath(genpath('/opt/psychtoolbox/'))
-addpath(genpath('jsonlab-1.5'))
+%addpath(genpath('/opt/psychtoolbox/'))
+%addpath(genpath('jsonlab-1.5'))
 
 %%
-conf = loadjson('conf/example.json');
+%conf = loadjson('conf/example.json');
 subjectNum = 100;
 projectName = 'rtAttenPenn';
-imgDirHeader = conf.imgDirHeader;
+%imgDirHeader = conf.imgDirHeader;
 subjectRun = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
@@ -25,7 +25,7 @@ matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
-
+imgDirHeader = '/Data1/subjects/'
 %% Generate expt sequence
 
 if matchNum ==0
@@ -73,8 +73,8 @@ else
 end
 %% Run 1 file process
 
-runNum = 2;
-fMRI = 12;
+runNum = 1;
+fMRI = 8;
 %today's testing 3/7
 %testing file processing
 realtimeData = 1;
