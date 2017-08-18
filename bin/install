@@ -16,7 +16,10 @@ sudo /usr/local/MATLAB/R2017a/bin/activate_matlab.sh -propertiesFile ./conf/matl
 # Apt
 sudo apt update
 sudo apt install -y \
-  unzip
+  unzip \
+  libdc1394-22 \
+  git \
+  subversion
 
 # Install MATLAB
 # TODO: get MATLAB
@@ -46,3 +49,7 @@ tar zxvf biac.tgz
 
 rm *.tgz
 
+# Install psychtoolbox
+# cd bin
+# sudo ./matlab
+# DownloadPsychtooblox('opt/psychtoolbox')
