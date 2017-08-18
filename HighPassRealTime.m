@@ -1,3 +1,4 @@
+
 function [outputLastPat] = HighPassRealTime(inputAllPats,TR,cutoffTime)
 % function [outputLastPat] = HighPassRealTIme(inputAllPats,TR)
 %
