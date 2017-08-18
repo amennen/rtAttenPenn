@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# Run from Princeton-connected machine
+sudo mkdir -p /mnt/MATLAB
+sudo chmod 755 /mnt/MATLAB
+
+sudo apt install -y cifs-utils
+sudo mount.cifs //files.princeton.edu/Licensed /mnt/MATLAB -o username=dsuo,domain=princeton,sec=ntlmv2
+
+# Run from EC2
+# scp data from [PRINCETON]:/mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX /mnt/MATLAB/Products/Matlab/R2017a/Unix_macOSX
+sudo apt-get install -y default-jre default-jdk
+sudo /mnt/MATLAB/Products/Matlab/R2016b/Unix_macOSX/install -inputFile ./conf/matlab/installer_input.txt
+sudo /usr/local/MATLAB/R2017a/bin/activate_matlab.sh -propertiesFile ./conf/matlab/activate.ini
+
+# Apt
+sudo apt update
+sudo apt install -y \
+  unzip \
+  libdc1394-22 \
+  git \
+  subversion
+
+# Install MATLAB
+# TODO: get MATLAB
+mkdir matlab
+# unzip matlab_R2017a_glnxa64.zip -d matlab
+
+
+# Install MATLAB Runtime
+wget https://www.mathworks.com/supportfiles/downloads/R2017a/deployment_files/R2017a/installers/glnxa64/MCR_R2017a_glnxa64_installer.zip
+
+
+rm *.zip
+
+# Install fsl-core
+wget -O- http://neuro.debian.net/lists/yakkety.us-nh.full | sudo tee /etc/apt/sources.list.d/neurodebian.sources.list
+sudo apt-key adv --recv-keys --keyserver hkp://pgp.mit.edu:80 0xA5D32F012649A5A9
+sudo apt-get update
+sudo apt-get install fsl-core -y
+
+# Install bxh/xcede tools from biac
+# wget http://www.nitrc.org/frs/download.php/7384/bxh_xcede_tools-1.11.1-lsb30.x86_64.tgz
+# tar zxvf *.tgz
+
+# Install BIAC Matlab Tools
+wget https://wiki.biac.duke.edu/_media/biac:biac_matlab_06172014.tgz -O biac.tgz
+tar zxvf biac.tgz
+
+rm *.tgz
+
+# Install psychtoolbox
+# cd bin
+# sudo ./matlab
+# DownloadPsychtooblox('opt/psychtoolbox')
