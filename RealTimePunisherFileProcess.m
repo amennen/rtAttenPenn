@@ -6,6 +6,7 @@ function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjec
 %
 %
 % REQUIRED INPUTS:
+% - imgDirHeader: where to look for the dicom images (the header only)
 % - subjectNum:  participant number [any integer]
 %                if subjectNum = 0, no information will be saved
 % - subjectName: ntblab subject naming convention [MMDDYY#_REALTIME02]

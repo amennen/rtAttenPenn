@@ -53,7 +53,7 @@ if (~debug) %so that when debugging you can do other things
     % ListenChar(2);  %prevent command window output
     % HideCursor;     %hide mouse cursor
 else
-    Screen('Preference', 'SkipSyncTests', 1);
+   % Screen('Preference', 'SkipSyncTests', 1);
 end
 
 seed = sum(100*clock); %get random seed
@@ -174,30 +174,6 @@ while ~done
     end
 end
 % so 1 = regular trial and 2 = filler
-%% CALIBRATION WOO!
-if eyeTrack
-     try
-        Tobii_Initialize;
-        isEyeTracking=1;
-    catch
-        warning('EYE TRACKER NOT FOUND');
-        isEyeTracking=0;
-    end
-    
-    %Calibrate the eye tracker
-    if isEyeTracking==1
-        
-        Continue=0;
-        while Continue==0
-            Calib=Tobii_Calibration;
-            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
-        end
-    end
-end
-
-
-
-
 
 
 %% Initialize Screens
@@ -207,14 +183,15 @@ screenNumbers = Screen('Screens');
 % show full screen if real, otherwise part of screen
 if debug
     screenNum = 0;
+    screenNum = screenNumbers(end);
 else
     screenNum = screenNumbers(end);
 end
 
 %retrieve the size of the display screen
 if debug
-    screenX = 1000;
-    screenY = 800;
+    screenX = 500;
+    screenY = 500;
 else
     % first just make the screen tiny
     
@@ -250,6 +227,27 @@ imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-Bo
 
 % image loading progress bar
 progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
+%%
+%% CALIBRATION WOO! - have to have the screen 
+if eyeTrack
+     try
+        Tobii_Initialize;
+        isEyeTracking=1;
+    catch
+        warning('EYE TRACKER NOT FOUND');
+        isEyeTracking=0;
+    end
+    
+    %Calibrate the eye tracker
+    if isEyeTracking==1
+        
+        Continue=0;
+        while Continue==0
+            Calib=Tobii_Calibration(1,mainWindow); % is psychtoolbox and use monitor
+            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
+        end
+    end
+end
 
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
@@ -505,10 +503,10 @@ if eyeTrack
 end
 
 fprintf('Flip time error = %.4f\n', timing.actualOnsets.lastITI - timing.plannedOnsets.lastITI);
-
-tetio_disconnectTracker;
-tetio_cleanUp;
-
+if eyeTrack
+    tetio_disconnectTracker;
+    tetio_cleanUp;
+end
 Screen('FillRect',mainWindow,backColor);
 Screen('Flip',mainWindow);
 %% save

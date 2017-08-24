@@ -1,10 +1,11 @@
-function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
-% function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
+function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
+% function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
 %
 %
 % REQUIRED INPUTS:
+% - dataDirHeader: where the volume files are being sent to
 % - subjectNum:  participant number [any integer]
 %                if subjectNum = 0, no information will be saved
 % - subjectName: ntblab subject naming convention [MMDDYY#_REALTIME02]
@@ -64,8 +65,6 @@ end
 
 if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
-    
-    
    ListenChar(2);  %prevent command window output
    HideCursor;     %hide mouse cursor    
 else
@@ -74,17 +73,6 @@ end
 
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
-
-% if strcmp(computer,'MACI');
-%     %dataHeader = ['data/' num2str(subjectNum)];
-% elseif strcmp(computer,'PCWIN')
-%     %dataHeader = ['data/' num2str(subjectNum)];
-% elseif findstr(computer,'64')
-%     error('psychtoolbox requires 64-bit OS, you are on: %s\n',computer);
-% else
-%     error('this code is only written to run on macs, not %s\n',computer);
-% end
-
 
 %initialize system time calls
 GetSecs;
@@ -124,6 +112,7 @@ attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
 
 % function mapping classifier output to attended image proportion
+% this has the constraints built in
 gain = 3;
 x_shift = .2;
 y_shift = .15;
@@ -131,8 +120,6 @@ steepness = .9;
 
 ScreenResX = 1280;
 ScreenResY = 720;
-
-%trainedModelFile = 'trainingcomplete.mat';
 
 
 %% Response Mapping and Counterbalancing
@@ -247,9 +234,9 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
 if matchNum == 0
-    dataHeader = ['data/' num2str(subjectNum)];
+    dataHeader = [dataDirHeader 'data/' num2str(subjectNum)];
 else
-    dataHeader = ['data/' num2str(matchNum) '_match'];
+    dataHeader = [dataDirHeader 'data/' num2str(matchNum) '_match'];
     % shouldn't this be matchNum??
 end
 runHeader = [dataHeader '/run' num2str(runNum)];
@@ -378,7 +365,7 @@ else
     runInstruct{1} = faceInstruct;
     runInstruct{2} = sceneInstruct;
 end
-
+%runInstruct{3} = 'Please press to begin task.';
 for instruct=1:length(runInstruct)
     tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
@@ -388,12 +375,7 @@ Screen('Flip',mainWindow);
 
 % wait for experimenter to advance with 'q' key
 FlushEvents('keyDown');
-while(1)
-    temp = GetChar;
-    if (temp == 'q')
-        break;
-    end
-end
+pause;
 Screen(mainWindow,'FillRect',backColor);
 Screen('Flip',mainWindow);
 
@@ -819,7 +801,8 @@ end % phase 2 block loop
 WaitSecs(14);
 
 %% save
-
+% question: do you want to save it to this computer's data or where you
+% save the data folder???
 save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart');
 
 % clean up and go home
