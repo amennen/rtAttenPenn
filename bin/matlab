@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+if [[ $# -gt 0 ]]; then
+  matlab -timing -c /usr/local/MATLAB/R2017a/licenses/license_296492_R2017a.lic -nojvm -nodisplay -nosplash -nodesktop < $1
+else
+  matlab -timing -c /usr/local/MATLAB/R2017a/licenses/license_296492_R2017a.lic -nojvm -nodisplay -nosplash -nodesktop
+fi
