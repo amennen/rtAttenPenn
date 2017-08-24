@@ -227,7 +227,7 @@ else
     screenY = windowSize.pixels(2);
 end
 
-mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+mainWindow = Screen(screenNum,'OpenWindow',backColor);
 ifi = Screen('GetFlipInterval', mainWindow);
 SLACK  = ifi/2;
 % details of main window

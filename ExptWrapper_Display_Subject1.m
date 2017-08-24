@@ -9,7 +9,7 @@ NEUTRAL = 1;
 SAD = 2;
 HAPPY = 3;
 % *******************************************************
-typeNum = HAPPY;
+typeNum = SAD;
 
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
 matchNum = 0;
@@ -20,13 +20,13 @@ KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
 
 %%
-runNum=1;
+runNum=2;
 fMRI = 12;
-
+fMRI = 0;
 % today's scanning number
-realtimeData = 1;
+realtimeData = 0
 debug = 0
-useButtonBox = 1
+useButtonBox = 0
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 

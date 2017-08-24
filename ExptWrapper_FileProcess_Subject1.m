@@ -1,4 +1,6 @@
 %ExptWrapper_FileProcess_Subject9
+addpath(genpath('jsonlab-1.5'))
+addpath(genpath('/opt/psychtoolbox/'))
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
@@ -15,12 +17,10 @@ NEUTRAL = 1;
 SAD = 2;
 HAPPY = 3;
 % *******************************************************
-typeNum = HAPPY;
+typeNum = SAD;
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
-addpath(genpath('/opt/psychtoolbox/'))
-addpath(genpath('jsonlab-1.5'))
 %% Generate expt sequence
 
 if matchNum ==0

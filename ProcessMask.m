@@ -12,6 +12,8 @@
 subjNum = 100;
 runNum = 1;
 projectName = 'rtAttenPenn';
+
+% CHANGE HIGH RES SCAN AND FUNCTIONAL SCAN!!
 highresScan = 3;
 functionalScan=5;
 %%
@@ -31,7 +33,6 @@ setenv('FSLOUTPUTTYPE','NIFTI_GZ');
 
 if matchNum == 0
     save_dir = ['./data/' num2str(subjectNum)];
-    %save(['./data/' num2str(subjectNum) '/mask_' num2str(subjectNum)],'mask');
 else
     save_dir = ['./data/' num2str(matchNum) '_match'];
 end
@@ -76,9 +77,7 @@ fprintf('Done with standard2highres registration. Time = %6.2f \n',t.standard2hi
 exFuncScanNum = functionalScan;
 exFunc_scanstr = num2str(exFuncScanNum, '%2.2i');
 exFunc_test_file = fullfile(dicom_dir,['001_0000' exFunc_scanstr '_000008.dcm']);
-while ~exist(exFunc_test_file,'file')
-    %error('the test file for the functional scan does not exist: %s',exFunc_test_file);
-end
+
 pause(0.2) %pause when the file appears for complete transfer
 fprintf('Found example functional file!\n')
 % now taken from GenerateMask: does k-means cluster-more generous than
@@ -92,7 +91,7 @@ save([process_dir 'mask_wholeBrain' '.mat'], 'mask');
 %% Process example epi file
 startFunctional = GetSecs;
 
-fileN = 6; % we can choose 10 later2
+fileN = 8; % we can choose 10 later2
 functionalFN = 'exfunc';
 functionalFN_RE = 'exfunc_re';
 exfunc_str = sprintf('%s001_0000%s_0000%s.dcm',dicom_dir,num2str(functionalScan,'%2.2i'),num2str(fileN,'%2.2i')); %general string for ALL mprage files**
