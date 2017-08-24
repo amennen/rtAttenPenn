@@ -4,14 +4,19 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
-conf = loadjson('conf/example.json');
+%addpath(genpath('/opt/psychtoolbox/'))
+%addpath(genpath('jsonlab-1.5'))
+
+%%
+%conf = loadjson('conf/example.json');
 subjectNum = 100;
 projectName = 'rtAttenPenn';
-imgDirHeader = conf.imgDirHeader;
+%imgDirHeader = conf.imgDirHeader;
 subjectRun = 1;
 %subjectName = 'rtAttenPenn1';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
-runNum = 1;
+%subjDate = '8-11-17';
+%subjectName = [datestr(subjDate,5) datestr(subjDate,7) datestr(subjDate,11) num2str(subjectRun) '_' projectName];
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
@@ -21,6 +26,9 @@ typeNum = SAD;
 matchNum = 0;
 realtimeData = 1;
 KbName('UnifyKeyNames')
+
+addpath(genpath('/opt/psychtoolbox/'))
+imgDirHeader = '/Data1/subjects/'
 %% Generate expt sequence
 
 if matchNum ==0
@@ -69,7 +77,7 @@ end
 %% Run 1 file process
 
 runNum = 1;
-fMRI = 12;
+fMRI = 8;
 %today's testing 3/7
 %testing file processing
 realtimeData = 1;
@@ -81,6 +89,7 @@ debug = 0
 
 runNum = 2;
 fMRI = 16;
+
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData)
 
 %%

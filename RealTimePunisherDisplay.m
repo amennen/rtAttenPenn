@@ -1,10 +1,11 @@
-function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
-% function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
+function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
+% function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
 %
 %
 % REQUIRED INPUTS:
+% - dataDirHeader: where the volume files are being sent to
 % - subjectNum:  participant number [any integer]
 %                if subjectNum = 0, no information will be saved
 % - subjectName: ntblab subject naming convention [MMDDYY#_REALTIME02]
@@ -64,8 +65,6 @@ end
 
 if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
-    
-    
    ListenChar(2);  %prevent command window output
    HideCursor;     %hide mouse cursor    
 else
@@ -74,17 +73,6 @@ end
 
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
-
-% if strcmp(computer,'MACI');
-%     %dataHeader = ['data/' num2str(subjectNum)];
-% elseif strcmp(computer,'PCWIN')
-%     %dataHeader = ['data/' num2str(subjectNum)];
-% elseif findstr(computer,'64')
-%     error('psychtoolbox requires 64-bit OS, you are on: %s\n',computer);
-% else
-%     error('this code is only written to run on macs, not %s\n',computer);
-% end
-
 
 %initialize system time calls
 GetSecs;
@@ -96,7 +84,6 @@ categStr = {'sc','fa'};
 typeStr = {'stab','rtfd'};
 
 % block timing
-instructOn = 0;     % secs
 instructDur = 1;    % secs
 instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
@@ -125,6 +112,7 @@ attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
 
 % function mapping classifier output to attended image proportion
+% this has the constraints built in
 gain = 3;
 x_shift = .2;
 y_shift = .15;
@@ -132,8 +120,6 @@ steepness = .9;
 
 ScreenResX = 1280;
 ScreenResY = 720;
-
-%trainedModelFile = 'trainingcomplete.mat';
 
 
 %% Response Mapping and Counterbalancing
@@ -163,7 +149,7 @@ switch (respMap)
         sceneInstruct = 'Places: respond if it is an indoor place. DO NOT respond if it is an outdoor place';
         faceInstruct = 'Faces: respond if it is a male face. DO NOT respond if it is a female face';
         sceneShorterInstruct = 'indoor places';
-        faceShorterInstruct = 'male faces';
+        faceShorter = 'male faces';
     case 2
         sceneInstruct = 'Places: respond if it is an outdoor place. DO NOT respond if it is an indoor place';
         faceInstruct = 'Faces: respond if it is a female face. DO NOT respond if it is a male face';
@@ -248,9 +234,9 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
 if matchNum == 0
-    dataHeader = ['data/' num2str(subjectNum)];
+    dataHeader = [dataDirHeader 'data/' num2str(subjectNum)];
 else
-    dataHeader = ['data/' num2str(matchNum) '_match'];
+    dataHeader = [dataDirHeader 'data/' num2str(matchNum) '_match'];
     % shouldn't this be matchNum??
 end
 runHeader = [dataHeader '/run' num2str(runNum)];
@@ -264,8 +250,8 @@ if any([blockData.type]==2) %#ok<NODEF>
 else
     restInstruct = 'The next blocks will start soon';
 end
-restDur = 4; % seconds to keep that display on
-stimFix = 8; % seconds to keep the middle on before starting the block 5
+restDur = 3; % seconds to keep that display on
+stimFix = 6; % seconds to keep the middle on before starting the block 5
 %% Load Images
 
 cd images;
@@ -379,7 +365,7 @@ else
     runInstruct{1} = faceInstruct;
     runInstruct{2} = sceneInstruct;
 end
-
+%runInstruct{3} = 'Please press to begin task.';
 for instruct=1:length(runInstruct)
     tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
@@ -389,12 +375,7 @@ Screen('Flip',mainWindow);
 
 % wait for experimenter to advance with 'q' key
 FlushEvents('keyDown');
-while(1)
-    temp = GetChar;
-    if (temp == 'q')
-        break;
-    end
-end
+pause;
 Screen(mainWindow,'FillRect',backColor);
 Screen('Flip',mainWindow);
 
@@ -406,7 +387,7 @@ Screen('Flip',mainWindow);
 Priority(MaxPriority(screenNum));
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
-if (rtData )
+if (rtData && ~debug )
    % if strcmp(computer,'MACI') % taking out because we're running on a linux!
         %runStart = WaitTRPulsePTB3_skyra(1);
         runStart = WaitTRPulse(TRIGGER_keycode,DEVICE);
@@ -631,6 +612,7 @@ for iBlock=indBlocksPhase2
     % start trial sequence
     for iTrial=1:(blockData(iBlock).trialsPerBlock)
         
+        blockData(iBlock).tr1(iTrial) = GetSecs;
         trialCounter = trialCounter+1;
         if (mod(iTrial,nTrialsPerTR)==1) 
             volCounter = volCounter+1;
@@ -668,11 +650,11 @@ for iBlock=indBlocksPhase2
         Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
         Screen(mainWindow,'FillOval',fixColor,fixDotRect);
         
-        
+        blockData(iBlock).tprep(iTrial) = GetSecs;
         tRespTimeout = blockData(iBlock).plannedtrialonsets(iTrial)+respWindow;
         
         %wait for pulse
-        if (rtData) && (mod(blockData(iBlock).trial(iTrial),nTrialsPerTR==1)) % this will be true for every other then
+        if (rtData) && mod(iTrial,nTrialsPerTR) % this will be true for every other then
             %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
             [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
@@ -719,11 +701,12 @@ for iBlock=indBlocksPhase2
                 blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
             end
         end
-        
+        blockData(iBlock).tr2(iTrial) = GetSecs;
 
          % *************
 
         %load rtfeedback values once per TR
+        blockData(iBlock).RT1(iTrial) = GetSecs;
         if rtfeedback
             if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
                 %number of odd trials - paired with TRs
@@ -795,7 +778,7 @@ for iBlock=indBlocksPhase2
             blockData(iBlock).classOutputFile{iTrial} = 'notrt'; %#ok<AGROW>
             blockData(iBlock).classOutputFile{iTrial} = NaN; %#ok<AGROW>
         end
-            
+        blockData(iBlock).RT2(iTrial) = GetSecs;  
         % print trial results
         fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
         fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
@@ -814,11 +797,12 @@ for iBlock=indBlocksPhase2
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualIBI-blockData(iBlock).plannedIBI)
 end % phase 2 block loop
-
-WaitSecs(2);
+% want to wait 7 TRS
+WaitSecs(14);
 
 %% save
-
+% question: do you want to save it to this computer's data or where you
+% save the data folder???
 save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart');
 
 % clean up and go home
