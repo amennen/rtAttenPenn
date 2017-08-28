@@ -252,6 +252,7 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
     
 end % Phase1 loop
+% fileCounter will be at 115 here
 
 % quick highpass filter!
 fprintf(dataFile,'\n*********************************************\n');
@@ -264,7 +265,7 @@ i2 = firstVolPhase2-1;
 patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
 patterns.phase1Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
 patterns.phase1Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
-patterns.phase1Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),1,1);
+patterns.phase1Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
 patterns.phase1Var(1,:) = patterns.phase1Std(1,:).^2;
 patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase1Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase1Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
 p2 = GetSecs;
@@ -318,6 +319,7 @@ for iTrialPhase2=firstVolPhase2:nVols
         
         %z-score
     else
+        patterns.fileload(iTrialPhase2) = 0;
         indLastValidPatterns = find(patterns.fileload,1,'last');
         patterns.raw_sm_filt(iTrialPhase2,:) = patterns.raw_sm_filt(indLastValidPatterns,:);
     end
@@ -331,7 +333,7 @@ for iTrialPhase2=firstVolPhase2:nVols
         
         patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase2,:),1);
         patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase2,:).^2,1);
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase2,:),1,1); %flad to use N instead of N-1
+        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase2,:),1,1); %flag to use N instead of N-1
         patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
         
         
@@ -397,28 +399,38 @@ fprintf('\n*********************************************\n');
 fprintf('beginning model training...\n');
 
 %model training
+% we have to specify which TR's are correct for first 4 blocks and second
+% four blocks
+% last volPhase1 and first volPhase1/2 are NOT shifted though!!
+i_phase1 = 1:lastVolPhase1+2;
+i_phase2 = firstVolPhase2:nVols;
+%any(patterns.regressor(:,i_phase2),1)
 if runNum == 1
-    trainIdx1 = any(patterns.regressor(:,1:lastVolPhase1),1);
+    % for the first run, we're going to train on first and second part of
+    % run 1
+    trainIdx1 = find(any(patterns.regressor(:,i_phase1),1));
     trainLabels1 = patterns.regressor(:,trainIdx1)'; %find the labels of those indices
     trainPats1 = patterns.raw_sm_filt_z(trainIdx1,:); %retrieve the patterns of those indices
     
-    trainIdx2 = find(any(patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
-    trainLabels2 = patterns.regressor(:,firstVolPhase2+trainIdx2)'; %find the labels of those indices %%CHECK THIS!
-    trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:);
+    trainIdx2 = find(any(patterns.regressor(:,i_phase2),1));
+    trainLabels2 = patterns.regressor(:,(firstVolPhase2-1)+trainIdx2)'; %find the labels of those indices 
+    trainPats2 = patterns.raw_sm_filt_z((firstVolPhase2-1)+trainIdx2,:);
 elseif runNum == 2
-    trainIdx1 = find(any(oldpats.patterns.regressor(:,(firstVolPhase2+1):lastVolPhase2),1));
-    trainLabels1 = oldpats.patterns.regressor(:,firstVolPhase2+trainIdx1)'; %find the labels of those indices
-    trainPats1 = oldpats.patterns.raw_sm_filt_z(trainIdx1,:);
+    % take last run from run 1 and first run from run 2
+    trainIdx1 = find(any(oldpats.patterns.regressor(:,i_phase2),1));
+    trainLabels1 = oldpats.patterns.regressor(:,(firstVolPhase2-1)+trainIdx1)'; %find the labels of those indices
+    trainPats1 = oldpats.patterns.raw_sm_filt_z((firstVolPhase2-1)+trainIdx1,:);
     
-    trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1,1));
+    trainIdx2 = find(any(patterns.regressor(:,i_phase1),1));
     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
     trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:); %retrieve the patterns of those indices
 else
-    trainIdx1 = any(oldpats.patterns.regressor(:,1:lastVolPhase1),1);
+    % take previous 2 first parts
+    trainIdx1 = find(any(oldpats.patterns.regressor(:,i_phase1),1));
     trainLabels1 = oldpats.patterns.regressor(:,trainIdx1)'; %find the labels of those indices
     trainPats1 = oldpats.patterns.raw_sm_filt_z(trainIdx1,:); %retrieve the patterns of those indices
     
-    trainIdx2 = any(patterns.regressor(:,1:lastVolPhase1),1);
+    trainIdx2 = any(patterns.regressor(:,i_phase1),1);
     trainLabels2 = patterns.regressor(:,trainIdx2)'; %find the labels of those indices
     trainPats2 = patterns.raw_sm_filt_z(trainIdx2,:); %retrieve the patterns of those indices
 end
@@ -444,7 +456,6 @@ end
 save([dataHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
 save([dataHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
 
-%MdB Check This!!!
 if rtfeedback && runNum>1 && matchNum == 0
     unix(['cp ' classOutputDir '/vol_* ' matchClassOutputDir]);
 end
