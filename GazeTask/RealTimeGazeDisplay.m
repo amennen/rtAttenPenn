@@ -204,7 +204,13 @@ else
     screenY = windowSize.pixels(2);
 end
 
-mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+%mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+% for some reason you can't do the rectangle thing on a mac
+if debug
+    mainWindow = Screen(screenNum, 'OpenWindow', backColor,[0 0 screenX screenY]);
+else
+    mainWindow = Screen(screenNum, 'OpenWindow', backColor);
+end
 ifi = Screen('GetFlipInterval', mainWindow);
 SLACK  = ifi/2;
 % details of main window
