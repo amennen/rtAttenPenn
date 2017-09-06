@@ -15,7 +15,6 @@ addpath(genpath('~/Tobii/'))
 
 %%
 runNum=1;
-useTobii=0;
 RealTimeGazeDisplay(subjectNum,matchNum,useTobii,debug)
-
+Screen('CloseAll')
 
