@@ -183,7 +183,7 @@ screenNumbers = Screen('Screens');
 % show full screen if real, otherwise part of screen
 if debug
     screenNum = 0;
-    screenNum = screenNumbers(end);
+    %screenNum = screenNumbers(end);
 else
     screenNum = screenNumbers(end);
 end
@@ -194,7 +194,7 @@ if debug
     screenY = 500;
 else
     % first just make the screen tiny
-    
+    %screenNum = 0; % I'm not sure it's coming up as screen 0
     [screenX screenY] = Screen('WindowSize',screenNum);
     % put this back in!!!
     windowSize.degrees = [51 30];
@@ -203,18 +203,40 @@ else
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
 end
+%% CALIBRATION WOO! - have to have the screen 
+if eyeTrack
+     try
+        Tobii_Initialize;
+        isEyeTracking=1;
+    catch
+        warning('EYE TRACKER NOT FOUND');
+        isEyeTracking=0;
+    end
+    
+    %Calibrate the eye tracker
+    if isEyeTracking==1
+        Continue=0;
+        while Continue==0
+            % to do: figure out how to get matlab figures to open on whole
+            % screen ***
+            Calib=Tobii_Calibration(0); % is psychtoolbox and use monitor
+            %Calib = Tobii_Calibration(1,window);
+            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
+        end
+    end
+    
+    % return to normal screen
+end
+%%
 
-<<<<<<< HEAD
-%mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
-% for some reason you can't do the rectangle thing on a mac
 if debug
     mainWindow = Screen(screenNum, 'OpenWindow', backColor,[0 0 screenX screenY]);
 else
     mainWindow = Screen(screenNum, 'OpenWindow', backColor);
 end
-=======
-mainWindow = Screen(screenNum,'OpenWindow',backColor);
->>>>>>> 93ab579cf6efc5cee2be531de0426ecfb03ac066
+
+% make transparent window
+
 ifi = Screen('GetFlipInterval', mainWindow);
 SLACK  = ifi/2;
 % details of main window
@@ -237,28 +259,6 @@ imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-Bo
 
 % image loading progress bar
 progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
-%%
-%% CALIBRATION WOO! - have to have the screen 
-if eyeTrack
-     try
-        Tobii_Initialize;
-        isEyeTracking=1;
-    catch
-        warning('EYE TRACKER NOT FOUND');
-        isEyeTracking=0;
-    end
-    
-    %Calibrate the eye tracker
-    if isEyeTracking==1
-        
-        Continue=0;
-        while Continue==0
-            Calib=Tobii_Calibration(1,mainWindow); % is psychtoolbox and use monitor
-            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
-        end
-    end
-end
-
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 

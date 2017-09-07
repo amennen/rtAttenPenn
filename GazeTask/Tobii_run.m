@@ -47,7 +47,7 @@ nPts = size(GazeData.Left{trial},1);
 deltaTime = nPts/120
 nTrial=20;
 for trial = 1:nTrial
-    DisplayData(GazeData.Left{trial},GazeData.Right{trial} );
+    DisplayData(z.GazeData.Left{trial},z.GazeData.Right{trial} );
 end
 % 120 samples/s so nPts/120 gives time
 tetio_disconnectTracker;
