@@ -244,21 +244,69 @@ centerX = screenX/2; centerY = screenY/2;
 Screen(mainWindow,'TextFont',textFont);
 Screen(mainWindow,'TextSize',textSize);
 
+% original dimensions
+quarterSize = [centerX centerY];
+areaRatio = 2/3;
+imageSize2 = [quarterSize(1)*areaRatio quarterSize(1)*areaRatio*(3/4)];
+quarterHalf = quarterSize/2;
+
+% calculate centers of quadrant
+% center(1,:) = [quarterSize(1)+quarterHalf(1) quarterHalf(2)];
+% center(2,:) = [quarterHalf(1) quarterHalf(2)];
+% center(3,:) = [quarterHalf(1) quarterSize(2)+quarterHalf(2)];
+% center(4,:) = [quarterSize(1)+quarterHalf(1) quarterSize(2)+quarterHalf(2)];
+
 % placeholder for images
 imageRect = [0,0,imageSize(1),imageSize(2)];
-destDims = imageSize/2;
-BorderX = screenX/20;
-BorderY = screenY/20;
+destDims = imageSize2/2;
+%BorderX = screenX/20;
+%BorderY = screenY/20;
+
+border = screenX/5;
+borderH = border/2;
+
+% for upper right
+X1 = centerX + borderH;
+X2 = X1 + imageSize2(1);
+Y2 = centerY - borderH;
+Y1 = Y2 - imageSize2(2);
+imPos(1,:) = [X1,Y1,X2,Y2];
+
+% for upper left
+X2 = centerX - borderH;
+X1 = X2 - imageSize2(1);
+Y2 = centerY - borderH;
+Y1 = Y2 - imageSize2(2);
+imPos(2,:) = [X1,Y1,X2,Y2];
+
+% for lower left
+X2 = centerX - borderH;
+X1 = X2 - imageSize2(1);
+Y1 = centerY + borderH;
+Y2 = Y1 + imageSize2(2);
+imPos(3,:) = [X1,Y1,X2,Y2];
+
+% for lower right
+X1 = centerX + borderH;
+X2 = X1 + imageSize2(1);
+Y1 = centerY + borderH;
+Y2 = Y1 + imageSize2(2);
+imPos(4,:) = [X1,Y1,X2,Y2];
 
 % position of each image
 % position of images
-imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderY+destDims(2)];
-imPos(2,:) = [screenX-BorderX-destDims(1),BorderY,screenX-BorderX,BorderY+destDims(2)];
-imPos(3,:) = [BorderX,screenY-BorderY-destDims(2),BorderX+destDims(1),screenY-BorderY];
-imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-BorderX,screenY-BorderY];
+% imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderY+destDims(2)];
+% imPos(2,:) = [screenX-BorderX-destDims(1),BorderY,screenX-BorderX,BorderY+destDims(2)];
+% imPos(3,:) = [BorderX,screenY-BorderY-destDims(2),BorderX+destDims(1),screenY-BorderY];
+% imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-BorderX,screenY-BorderY];
+
+% imPos(1,:) = [center(1,1)-destDims(1),center(1,2)-destDims(2),center(1,1)+destDims(1),center(1,2)+destDims(2)];
+% imPos(2,:) = [center(2,1)-destDims(1),center(2,2)-destDims(2),center(2,1)+destDims(1),center(2,2)+destDims(2)];
+% imPos(3,:) = [center(3,1)-destDims(1),center(3,2)-destDims(2),center(3,1)+destDims(1),center(3,2)+destDims(2)];
+% imPos(4,:) = [center(4,1)-destDims(1),center(4,2)-destDims(2),center(4,1)+destDims(1),center(4,2)+destDims(2)];
 
 % image loading progress bar
-progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
+%progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 

@@ -19,4 +19,3 @@ runNum=1;
 RealTimeGazeDisplay(subjectNum,matchNum,useTobii,debug)
 close all;
 Screen('CloseAll')
-

@@ -292,6 +292,5 @@ event.waitKeys(keyList=['0',
  'escape'])
 win.close()
 core.quit()
-+++ okay decompyling /Users/amennen/Documents/Norman/rtAttenPenn/FaceMatching_BANDA.pyc 
 # decompiled 1 files: 1 okay, 0 failed, 0 verify failed
 # 2017.09.06 17:33:31 EDT
