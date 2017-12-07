@@ -28,7 +28,7 @@ if os.path.exists(configFile):
                 output = row[1]
 
 else:
-    output = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'tfMRI_output'))
+    output = os.path.abspath(os.path.join(os.path.dirname(__file__), '../..', 'amennen'))
 _thisDir = os.path.dirname(os.path.abspath(__file__))
 os.chdir(_thisDir)
 expName = 'Resting'
@@ -36,17 +36,14 @@ expInfo = {}
 dlg1 = gui.Dlg(title='Participant ID')
 dlg1.addField('Participant')
 dlg1.addField('Mode', choices=['Scanner', 'Practice'])
-dlg1.addField('Group', choices=['HC', 'MDD'])
-dlg1.addField('Session', choices=['ABCD', 'IPAT2', 'CMRR'])
-dlg1.addField('Run', choices=['AB'])
+dlg1.addField('Day', choices=['A', 'B', 'C'])
+dlg1.addField('Run', choices=['1', '2', '3', '4', '5', '6','7', '8', '9', '10', '11', '12', '13', '14', '15' ])
 dlg1.show()
 if dlg1.OK:
     expInfo['participant'] = dlg1.data[0]
     expInfo['runMode'] = dlg1.data[1]
-    expInfo['group'] = dlg1.data[2]
-    expInfo['session'] = dlg1.data[3]
-    expInfo['run'] = dlg1.data[4]
-    expInfo['CB'] = '1'
+    expInfo['session'] = dlg1.data[2]
+    expInfo['run'] = dlg1.data[3]
     RunMode = expInfo['runMode']
 else:
     core.quit()

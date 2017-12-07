@@ -1,0 +1,4 @@
+top_image,left_image,right_image,corr_ans
+stimuli/neutral/F_rad/neutral_rad_f_02.jpg,stimuli/neutral/F_nim/neutral_nim_f_01.jpg,stimuli/neutral/F_rad/neutral_rad_f_02.jpg,2
+stimuli/neutral/M_rad/neutral_rad_m_15.jpg,stimuli/neutral/M_nim/neutral_nim_m_26.jpg,stimuli/neutral/M_rad/neutral_rad_m_15.jpg,2
+stimuli/neutral/M_nim/neutral_nim_m_27.jpg,stimuli/neutral/M_nim/neutral_nim_m_27.jpg,stimuli/neutral/M_rad/neutral_rad_m_10.jpg,1
