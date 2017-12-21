@@ -272,6 +272,8 @@ p2 = GetSecs;
 fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
 fprintf(sprintf('elapsed time...%.4f seconds\n',p2-p1));
 
+
+
 %% testing
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'beginning model testing...\n');
@@ -329,35 +331,8 @@ for iTrialPhase2=firstVolPhase2:nVols
     patterns.raw_sm_filt(iTrialPhase2,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase2,:),TR,cutoff);
     
     % only update if the latest file wasn't nan
-    if patterns.fileload(iTrialPhase2)
-        
-        patterns.realtimeMean(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase2,:),1);
-        patterns.realtimeY(1,:) = mean(patterns.raw_sm_filt(1:iTrialPhase2,:).^2,1);
-        patterns.realtimeStd(1,:) = std(patterns.raw_sm_filt(1:iTrialPhase2,:),1,1); %flag to use N instead of N-1
-        patterns.realtimeVar(1,:) = patterns.realtimeStd(1,:).^2;
-        
-        
-        %record last history
-        patterns.realtimeLastMean(1,:) = patterns.realtimeMean(1,:);
-        patterns.realtimeLastY(1,:) = patterns.realtimeY(1,:);
-        patterns.realtimeLastVar(1,:) = patterns.realtimeVar(1,:);
-        %update mean
-        patterns.realtimeMean(1,:) = (patterns.realtimeMean(1,:).*zscoreLen1 + patterns.raw_sm_filt(iTrialPhase2,:)).*zscoreConst;
-        %update y = E(X^2)
-        patterns.realtimeY(1,:) = (patterns.realtimeY(1,:).*zscoreLen1+ patterns.raw_sm_filt(iTrialPhase2,:).^2).*zscoreConst;
-        %update var
-        if useHistory
-            patterns.realtimeVar(1,:) = patterns.realtimeLastVar(1,:) ...
-                + patterns.realtimeLastMean(1,:).^2 - patterns.realtimeMean(1,:).^2 ...
-                + patterns.realtimeY(1,:) - patterns.realtimeLastY(1,:);
-        else
-            % update var
-            patterns.realtimeVar(1,:) = patterns.realtimeVar(1,:) - patterns.realtimeMean(1,:).^2 ...
-                + ((patterns.realtimeMean(1,:).*zscoreLen - patterns.raw_sm_filt(iTrialPhase2,:)).*zscoreConst1).^2 ...
-                + (patterns.raw_sm_filt(iTrialPhase2,:).^2 - patterns.realtimeY(1,:)).*zscoreConst1;
-        end
-    end
-    patterns.raw_sm_filt_z(iTrialPhase2,:) = (patterns.raw_sm_filt(iTrialPhase2,:) - patterns.realtimeMean(1,:))./patterns.realtimeStd(1,:);
+    
+    patterns.raw_sm_filt_z(iTrialPhase2,:) = (patterns.raw_sm_filt(iTrialPhase2,:) - patterns.phase1Mean(1,:))./patterns.phase1Std(1,:);
     
     if rtfeedback
         if any(patterns.regressor(:,iTrialPhase2))

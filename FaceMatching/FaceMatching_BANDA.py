@@ -34,7 +34,9 @@ if os.path.exists(configFile):
             if row[0]=="output":
                 output=row[1]
 else:
-    output=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..',"tfMRI_output"))
+    # CHANGED FOR THIS FILE!!
+    outerpath = '/Users/amennen/Dropbox/rtPennBehavData/facematching/'
+    output=os.path.abspath(os.path.join(outerpath,"tfMRI_output"))
 
     
 _thisDir = os.path.dirname(os.path.abspath(__file__))
