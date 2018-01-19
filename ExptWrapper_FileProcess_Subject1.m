@@ -9,7 +9,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 %%
 %conf = loadjson('conf/example.json');
-subjectNum = 100;
+subjectNum = 200;
 projectName = 'rtAttenPenn';
 %imgDirHeader = conf.imgDirHeader;
 subjectRun = 1;
@@ -25,6 +25,7 @@ HAPPY = 3;
 typeNum = SAD;
 matchNum = 0;
 realtimeData = 1;
+expDay = 1; % important to say what day number it is so it counterbalances things right! things will alternate every other
 KbName('UnifyKeyNames')
 
 addpath(genpath('/opt/psychtoolbox/'))
@@ -34,28 +35,28 @@ imgDirHeader = '/Data1/subjects/'
 if matchNum ==0
     runNum = 1;
     rtfeedback = 0;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
     
     runNum = 2;
     % changing it here for behavioral have rtfeedback = 0
     rtfeedback = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
     
     runNum = 3;
     rtfeedback = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
     
     runNum = 4;
     rtfeedback = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
     
     runNum = 5;
     rtfeedback = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
     
     runNum = 6;
     rtfeedback = 1;
-    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
 end
 
 %% Generate mask

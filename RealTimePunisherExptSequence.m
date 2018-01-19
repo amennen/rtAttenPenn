@@ -1,4 +1,4 @@
-function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum)
+function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,expDay)
 % function [testTiming blockData] = RealTimePunisherExptOutline(subjectNum,subjectName,runNum)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -26,7 +26,7 @@ if nargin < 4
 end
 
 if ~isnumeric(subjectNum)
-   error('subjectNum must be a number'); 
+    error('subjectNum must be a number');
 end
 
 if ~ischar(subjectName)
@@ -47,14 +47,14 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 % ACM: took out the if statement on 2/13
 %if strcmp(computer,'MACI');
-    dataHeader = ['data/' num2str(subjectNum)];
-    runHeader = [dataHeader '/run' num2str(runNum)];
-    classOutputDir = [runHeader '/classoutput'];
-    
-    matchDataHeader = ['data/' num2str(subjectNum) '_match'];
-    matchRunHeader = [matchDataHeader '/run' num2str(runNum)];
-    matchClassOutputDir = [matchRunHeader '/classoutput'];
-    matchNeverSeenClassOutputDir = [matchRunHeader '/controlneverseenclassoutput'];
+dataHeader = ['data/' num2str(subjectNum)];
+runHeader = [dataHeader '/run' num2str(runNum)];
+classOutputDir = [runHeader '/classoutput'];
+
+matchDataHeader = ['data/' num2str(subjectNum) '_match'];
+matchRunHeader = [matchDataHeader '/run' num2str(runNum)];
+matchClassOutputDir = [matchRunHeader '/classoutput'];
+matchNeverSeenClassOutputDir = [matchRunHeader '/controlneverseenclassoutput'];
 %else
 %    error('this code is only written to run on 32 bit macs, not %s\n',computer);
 %end
@@ -75,7 +75,7 @@ end
 if (~isdir(classOutputDir))
     mkdir(classOutputDir);
 end
-    
+
 if (~isdir(matchDataHeader))
     mkdir(matchDataHeader);
 end
@@ -95,7 +95,7 @@ end
 %% Experimental Parameters
 
 %scanning parameters
-disdaqs = 6;        %#ok<NASGU> % [secs] # seconds to drop at the beginning of run
+disdaqs = 20;        %#ok<NASGU> % [secs] # seconds to drop at the beginning of run
 TR = 2;             %#ok<NASGU> % [secs] # seconds per volume
 nTrialsPerTR = 2;   % [trials]#trials per TR
 labelsShift = 2;    % [TRs]  # volumes to shift label
@@ -103,7 +103,7 @@ labelsShift = 2;    % [TRs]  # volumes to shift label
 %experimental design
 instructLen = 1;    % [TRs]  # TRs to dedicate to instructions
 IBI = 2;            % [TRs]  # TRs to dedicate to rest between blocks
-nTRs = 230;         % [TRs]  # TRs per epi sequence 
+nTRs = 230;         % [TRs]  # TRs per epi sequence
 
 %trial phases (phase 1 & 2)
 nTrialsPerBlock = 50; % [trials]#trials per block
@@ -124,11 +124,11 @@ elseif (rtfeedback == 0)
 end
 
 %numerically designate the block categories
-nCategs = 2;      
+nCategs = 2;
 SCENE = 1;
 FACE = 2;
 
-%numerically designate the subcategories 
+%numerically designate the subcategories
 nSubCategs = 8;     % in total, across all categorires
 INDOOR = 1;         % scenes
 OUTDOOR = 2;        % scenes
@@ -228,7 +228,7 @@ for categ=1:nSubCategs
             
             % get images
             for img=1:numImages(categ)
-               
+                
                 % read images
                 images{categ,img} = imread(dirList{categ}(img).name); %#ok<AGROW>
                 tempFFT = fft2(images{categ,img});
@@ -254,35 +254,67 @@ cd ..;
 % this is fine if type is NEUTRAL--counterbalance across all
 
 if (mod(subjectNum,8) == 1) || (mod(subjectNum,8) == 2) || (mod(subjectNum,8) == 3) || (mod(subjectNum,8) == 4)
-    if (mod(runNum,2)==1)
-        blockSequencePhase1 = [SCENE FACE FACE SCENE];
-        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-
-        blockSequencePhase2 = [FACE SCENE SCENE FACE];
-        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+    if mod(expDay,2)==1
+        if (mod(runNum,2)==1)
+            blockSequencePhase1 = [SCENE FACE FACE SCENE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [FACE SCENE SCENE FACE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        else
+            blockSequencePhase1 = [FACE SCENE SCENE FACE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [SCENE FACE FACE SCENE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        end
     else
-        blockSequencePhase1 = [FACE SCENE SCENE FACE];
-        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-
-        blockSequencePhase2 = [SCENE FACE FACE SCENE];
-        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        if (mod(runNum,2)==1)
+            blockSequencePhase1 = [FACE SCENE SCENE FACE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [SCENE FACE FACE SCENE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        else
+            blockSequencePhase1 = [SCENE FACE FACE SCENE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [FACE SCENE SCENE FACE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        end
     end
 else
-    if (mod(runNum,2)==1)
-        blockSequencePhase1 = [FACE SCENE SCENE FACE];
-        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-
-        blockSequencePhase2 = [SCENE FACE FACE SCENE];
-        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+    if (mod(expDay,2)==1)
+        if (mod(runNum,2)==1)
+            blockSequencePhase1 = [FACE SCENE SCENE FACE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [SCENE FACE FACE SCENE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        else
+            blockSequencePhase1 = [SCENE FACE FACE SCENE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [FACE SCENE SCENE FACE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        end
     else
-        blockSequencePhase1 = [SCENE FACE FACE SCENE];
-        categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
-
-        blockSequencePhase2 = [FACE SCENE SCENE FACE];
-        categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        if (mod(runNum,2)==1)
+            blockSequencePhase1 = [SCENE FACE FACE SCENE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [FACE SCENE SCENE FACE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        else
+            blockSequencePhase1 = [FACE SCENE SCENE FACE];
+            categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
+            
+            blockSequencePhase2 = [SCENE FACE FACE SCENE];
+            categOrderPhase2 = repmat(blockSequencePhase2,1,nBlocksPerPhase/numel(blockSequencePhase2));
+        end
     end
 end
-% now modify based on types 
+% now modify based on types
 
 if rtfeedback % if this is a feedback run
     if typeNum == SAD
@@ -346,7 +378,7 @@ for iBlock=1:numBlocks
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg)); %#ok<NOPRT>
     end
     % if this block is emotional and we're going to attend to scenes and
-    % AWAY from happy 
+    % AWAY from happy
     if emblocks(iBlock) && typeNum==SAD % this says for every trial in block, what category is the unattended stimulus going to be
         blockData(iBlock).categs{blockData(iBlock).inattCateg} = PsychRandSample(randSampInattCategList(blockData(iBlock).inattCateg,:)+2,[1 blockData(iBlock).trialsPerBlock]); %#ok<AGROW>
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).inattCateg}==nogoSubCategs(blockData(iBlock).inattCateg)+2); %#ok<NOPRT>
@@ -466,7 +498,7 @@ for iBlock=1:numBlocks
         patterns.type(TRsExtra) = zeros(1,numel(TRsExtra));
         patterns.attCateg(TRsExtra) = zeros(1,numel(TRsExtra));
         patterns.stim(TRsExtra) = zeros(1,numel(TRsExtra));
-        patterns.regressor(1:2,TRsExtra) = zeros(2,numel(TRsExtra));        
+        patterns.regressor(1:2,TRsExtra) = zeros(2,numel(TRsExtra));
     end
 end
 

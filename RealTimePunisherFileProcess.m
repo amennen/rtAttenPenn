@@ -244,7 +244,7 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     end
     
     %smooth files
-    patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
+    patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime2(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
     
     
     % print trial results
@@ -317,7 +317,7 @@ for iTrialPhase2=firstVolPhase2:nVols
         end
         
         %smooth
-        patterns.raw_sm(iTrialPhase2,:) = SmoothRealTime(patterns.raw(iTrialPhase2,:),roiDims,roiInds,FWHM);
+        patterns.raw_sm(iTrialPhase2,:) = SmoothRealTime2(patterns.raw(iTrialPhase2,:),roiDims,roiInds,FWHM);
         
         %z-score
     else
