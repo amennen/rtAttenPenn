@@ -1,4 +1,4 @@
-function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,rtData)
+function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,rtData,DAYNUM)
 % function [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,runNum,fMRI,rtData)
 %
 % this function describes the file processing procedure for the realtime
@@ -136,7 +136,7 @@ end
 
 %scanning parameters
 imgmat = 64; % the fMRI image matrix size
-temp = load([dataHeader '/mask_' num2str(subjectNum)]);
+temp = load([dataHeader '/mask_' num2str(subjectNum) '_' num2str(DAYNUM)]);
 roi = temp.mask;
 assert(exist('roi','var')==1);
 roiDims = size(roi);

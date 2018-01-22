@@ -1,9 +1,10 @@
 %exptDir = '~/code/rtAttenPenn/';
 %cd(exptDir)
-subjectNum = 500;
+subjectNum = 6;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
 subjectRun = 1;
+subjectDay = 1;
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
@@ -14,26 +15,20 @@ typeNum = SAD;
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
 matchNum = 0;
 useButtonBox=1;
-realtimeData = 0;
-debug=1;
+realtimeData = 1;
+debug=0;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
 
-% well the git is set to ignore the data folder so it would just make sense
-% to save here
-% 
+% SETTING: ALWAYS GOING TO SAVE IN THE FOLDER WHERE IT IS--AFTER CAN COPY
+% TO AN ELSEWHERE LOCATION BUT IT'S SET FOR GIT IGNORE
+%% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
+copyallfilesforsubject(subjectNum,subjectDay)
 %%
-runNum=2;
-fMRI = 0;
-% today's scanning number
-realtimeData = 0
-debug = 0
-useButtonBox = 0
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 runNum=1;
+% today's scanning number
 fMRI = 6;
-fMRI = 0;
-
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 %%
 runNum=6;
