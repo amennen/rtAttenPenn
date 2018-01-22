@@ -382,7 +382,7 @@ Screen('Flip',mainWindow);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 waitMessage = 'Waiting for scanner start, hold tight!';
 tempBounds = Screen('TextBounds', mainWindow, waitMessage);
-Screen('drawtext',mainWindow,waitMessage,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+Screen('drawtext',mainWindow,waitMessage,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
 Screen('Flip', mainWindow);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % now here we're going to say to stay still once the triggers start coming
@@ -403,7 +403,7 @@ if (rtData && ~debug )
         timing.trig.wait = WaitTRPulse(TRIGGER_keycode,DEVICE);
         runStart = timing.trig.wait;
         tempBounds = Screen('TextBounds', mainWindow, STILLREMINDER);
-        Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+        Screen('drawtext',mainWindow,STILLREMINDER,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
         startTime = Screen('Flip',mainWindow);
         elapsedTime = 0;
         while (elapsedTime < STILLDURATION)

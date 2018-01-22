@@ -1,6 +1,6 @@
 %ExptWrapper_FileProcess_Subject9
-addpath(genpath('jsonlab-1.5'))
-addpath(genpath('/opt/psychtoolbox/'))
+%addpath(genpath('jsonlab-1.5'))
+%addpath(genpath('/opt/psychtoolbox/'))
 
 %exptDir = '~/code/punisher02/';
 %cd(exptDir);
@@ -12,8 +12,8 @@ addpath(genpath('/opt/psychtoolbox/'))
 subjectNum = 6;
 projectName = 'rtAttenPenn';
 %imgDirHeader = conf.imgDirHeader;
-subjectRun = 1; % run number for the day
-subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
+subjectRun = 3; % run number for the day
+subjectDay = 2; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
 %subjectName = [datestr(subjDate,5) datestr(subjDate,7) datestr(subjDate,11) num2str(subjectRun) '_' projectName];
 % **** types of stimuli to train/show to subjects *******
@@ -30,7 +30,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 % for testing code at Princeton
 imgDirHeader = '/Data1/subjects/';
 % for Penn
-imgDirHeader = '/mnt/';
+%imgDirHeader = '/mnt/';
 %% Generate expt sequence
 
 if matchNum ==0
@@ -64,7 +64,7 @@ end
 %% Run 1 file process
 % make sure you're putting in the MOCO one!!
 runNum = 1;
-fMRI = 8;
+fMRI = 9;
 %today's testing 3/7
 %testing file processing
 realtimeData = 1;
@@ -75,21 +75,21 @@ debug = 0;
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 16;
+fMRI = 13;
 
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData,subjectDay)
 
 %%
 
 runNum = 3;
-fMRI = 14;
+fMRI = 15;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 4;
-fMRI = 16;
+fMRI = 17;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,realtimeData,subjectDay)
 
 

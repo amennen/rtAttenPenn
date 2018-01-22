@@ -3,13 +3,12 @@
 % THE SUBJECTS REGISTERED FILES WILL BE ALL IN THE SAME FOLDER BUT THEY
 % WILL BE COMING FROM DIFFERENT SCANNER LOCATIONS
 
-subjectNum = 5; % multiday test is subject 5, intel demo is subject 3
+subjectNum = 6; % multiday test is subject 5, intel demo is subject 3, rtPenn pilot is subject 6
 matchNum = 0;
 projectName = 'rtAttenPenn';
 highresScan = 5;
 functionalScan=6;
 flash_hrScan = 7;
-flash_lrScan = 8;
 
 biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
@@ -38,17 +37,19 @@ if ~exist(process_dir)
 end
 cd(process_dir)
 %% 
-subjDate1 = '9-22-17';
-runNum = 1;
-subjectName1 = [datestr(subjDate1,5) datestr(subjDate1,7) datestr(subjDate1,11) num2str(runNum) '_' projectName];
-dicom_dir1 = ['/Data1/subjects/' datestr(subjDate1,10) datestr(subjDate1,5) datestr(subjDate1,7) '.' subjectName1 '.' subjectName1 '/'];
+%subjDate1 = '9-22-17';
+%subjectName1 = [datestr(subjDate1,5) datestr(subjDate1,7) datestr(subjDate1,11) num2str(runNum) '_' projectName];
+startProcess=GetSecs;
+runNum = 2;
+subjectName1 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+dicom_dir1 = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName1 '.' subjectName1 '/'];
 
 %% now do steps registration for first day scans to make the mask
 
 %% Process t1-weighted MPRAGE and check brain extraction!
 highresFN = 'highres';
 highresFN_RE = 'highres_re';
-highresfiles_genstr = sprintf('%s001_0000%s_0*',dicom_dir,num2str(highresScan,'%2.2i')); %general string for ALL mprage files**
+highresfiles_genstr = sprintf('%s001_0000%s_0*',dicom_dir1,num2str(highresScan,'%2.2i')); %general string for ALL mprage files**
 unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,highresfiles_genstr,highresFN));
 unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,highresFN,highresFN_RE));
 unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,highresFN_RE,highresFN_RE))
@@ -58,6 +59,7 @@ unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,highresFN_RE,highre
 % for dcm2niix the command would be 'dcm2niix dicomdir -f test -o dicomdir -s y dicomdir/001_000007_000008.dcm'
 fprintf('%sfslview %s.nii.gz\n',fslpath,highresFN_RE)
 fprintf('%sfslview %s_brain.nii.gz', fslpath,highresFN_RE)
+%%
 % Register standard to nifti
 StartReg = GetSecs;
 unix(sprintf('%sflirt -in %s_brain.nii.gz -ref $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -out highres2standard -omat highres2standard.mat -cost corratio -dof 12 -searchrx -30 30 -searchry -30 30 -searchrz -30 30 -interp trilinear',fslpath,highresFN_RE));
@@ -76,7 +78,7 @@ startFunctional = GetSecs;
 fileN = 6; % we can choose 10 later2
 functionalFN = 'exfunc';
 functionalFN_RE = 'exfunc_re';
-exfunc_str = sprintf('%s001_0000%s_0000%s.dcm',dicom_dir,num2str(functionalScan,'%2.2i'),num2str(fileN,'%2.2i')); %general string for ALL mprage files**
+exfunc_str = sprintf('%s001_0000%s_0000%s.dcm',dicom_dir1,num2str(functionalScan,'%2.2i'),num2str(fileN,'%2.2i')); %general string for ALL mprage files**
 unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,exfunc_str,functionalFN));
 unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,functionalFN,functionalFN_RE));
 unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,functionalFN_RE,functionalFN_RE))

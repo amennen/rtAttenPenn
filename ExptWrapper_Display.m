@@ -3,8 +3,8 @@
 subjectNum = 6;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
-subjectRun = 1;
-subjectDay = 1;
+subjectRun = 3;
+subjectDay = 2;
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
@@ -27,33 +27,30 @@ copyallfilesforsubject(subjectNum,subjectDay)
 %%
 runNum=1;
 % today's scanning number
-fMRI = 6;
+fMRI = 9;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 %%
-runNum=6;
-fMRI = 16;
-useButtonBox = 1
-realtimeData = 1
-debug = 1
+runNum=2;
+fMRI = 13;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum = 3;
-fMRI = 14;
+fMRI = 15;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum = 4;
-fMRI = 16;
+fMRI = 17;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 
 %%
 runNum = 5;
-fMRI = 18;
+fMRI = 19;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,realtimeData,debug)
 
 %%
