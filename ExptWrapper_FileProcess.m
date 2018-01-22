@@ -29,7 +29,10 @@ expDay = 1; % important to say what day number it is so it counterbalances thing
 KbName('UnifyKeyNames')
 
 addpath(genpath('/opt/psychtoolbox/'))
+% for testing code at Princeton
 imgDirHeader = '/Data1/subjects/';
+% for Penn
+imgDirHeader = '/mnt/;
 %% Generate expt sequence
 
 if matchNum ==0
