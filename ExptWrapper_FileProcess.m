@@ -9,7 +9,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 %%
 %conf = loadjson('conf/example.json');
-subjectNum = 200;
+subjectNum = 500;
 projectName = 'rtAttenPenn';
 %imgDirHeader = conf.imgDirHeader;
 subjectRun = 1;
@@ -29,7 +29,7 @@ expDay = 1; % important to say what day number it is so it counterbalances thing
 KbName('UnifyKeyNames')
 
 addpath(genpath('/opt/psychtoolbox/'))
-imgDirHeader = '/Data1/subjects/'
+imgDirHeader = '/Data1/subjects/';
 %% Generate expt sequence
 
 if matchNum ==0

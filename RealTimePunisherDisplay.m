@@ -1,4 +1,4 @@
-function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
+function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
 % function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -106,6 +106,7 @@ imageSize = 256; % assumed square %MdB check image size
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
+minimumDisplay = 0.25;
 
 % how to average the faces and scenes
 attImgPropPhase1 = .5;
@@ -127,6 +128,7 @@ ScreenResY = 720;
 % skyra: use current design button box (keys 1,2,3,4)
 KbName('UnifyKeyNames');
 LEFT = KbName('1!');
+subj_keycode = LEFT;
 DEVICENAME = 'Current Designs, Inc. 932';
 if useButtonBox && (~debug)
     [index devName] = GetKeyboardIndices;
@@ -138,7 +140,6 @@ if useButtonBox && (~debug)
 else
     DEVICE = -1;
 end
-KbName('UnifyKeyNames')
 TRIGGER = '5%';
 TRIGGER_keycode = getKeys(TRIGGER);
 % counterbalancing response mapping based on subject assignment
@@ -232,11 +233,11 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
-
+dataDirHeader = pwd;
 if matchNum == 0
-    dataHeader = [dataDirHeader 'data/' num2str(subjectNum)];
+    dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
 else
-    dataHeader = [dataDirHeader 'data/' num2str(matchNum) '_match'];
+    dataHeader = fullfile(dataDirHeader,['data/' num2str(matchNum) '_match']);
     % shouldn't this be matchNum??
 end
 runHeader = [dataHeader '/run' num2str(runNum)];
@@ -365,39 +366,60 @@ else
     runInstruct{1} = faceInstruct;
     runInstruct{2} = sceneInstruct;
 end
-%runInstruct{3} = 'Please press to begin task.';
+runInstruct{3} = '-- Please press to begin once you understand these instructions. --';
 for instruct=1:length(runInstruct)
     tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+    if instruct==3
+        textSpacing = textSpacing*3;
+    end
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
-
-% wait for experimenter to advance with 'q' key
-FlushEvents('keyDown');
-pause;
-Screen(mainWindow,'FillRect',backColor);
-Screen('Flip',mainWindow);
-
-
+[~,~] = WaitTRPulse(subj_keycode,DEVICE);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% now here we're adding to say waiting for scanner, hold tight!
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+waitMessage = 'Waiting for scanner start, hold tight!';
+tempBounds = Screen('TextBounds', mainWindow, waitMessage);
+Screen('drawtext',mainWindow,waitMessage,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+Screen('Flip', mainWindow);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% now here we're going to say to stay still once the triggers start coming
+% in
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Start Experiment
+STILLREMINDER = ['The scan is now starting.\n\nMoving your head even a little blurs the image, so '...
+    'please try to keep your head totally still until the scanning noise stops.\n\n Do it for science!'];
+STILLDURATION = 6;
 
 % wait for initial trigger
 Priority(MaxPriority(screenNum));
-Screen(mainWindow,'FillRect',backColor);
-Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+
 if (rtData && ~debug )
    % if strcmp(computer,'MACI') % taking out because we're running on a linux!
         %runStart = WaitTRPulsePTB3_skyra(1);
-        runStart = WaitTRPulse(TRIGGER_keycode,DEVICE);
-   % else
+        timing.trig.wait = WaitTRPulse(TRIGGER_keycode,DEVICE);
+        runStart = timing.trig.wait;
+        tempBounds = Screen('TextBounds', mainWindow, STILLREMINDER);
+        Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+        startTime = Screen('Flip',mainWindow);
+        elapsedTime = 0;
+        while (elapsedTime < STILLDURATION)
+            pause(0.005)
+            elapsedTime = GetSecs()-startTime;
+        end
+        % else
    %     WaitSecs(.5);
    %     runStart = KbWait;
    % end
 else
     runStart = GetSecs;
+    timing = -1;
 end
+Screen(mainWindow,'FillRect',backColor);
+Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 Screen('Flip',mainWindow);
 Priority(0);
 
@@ -443,7 +465,7 @@ for iBlock=1:numel(indBlocksPhase1)
     clear tempBounds;
     timespec = blockData(iBlock).plannedinstructonset - slack;
     if rtData
-        [~,blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
+        [timing.trig.instructpulses(iBlock),blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
     end
     blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualinstructonset-blockData(iBlock).plannedinstructonset)
@@ -485,7 +507,7 @@ for iBlock=1:numel(indBlocksPhase1)
         %wait for pulse
         if (rtData) && mod(iTrial,nTrialsPerTR)==1
             %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
+            [timing.trig.pulses(iBlock,iTrial),blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
         else
@@ -541,7 +563,7 @@ for iBlock=1:numel(indBlocksPhase1)
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
     % the IBI goes here!
     if rtData
-        [~,blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
+        [timing.trig.IBIpulses(iBlock),blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
     end
     timespec = blockData(iBlock).plannedIBI -slack;
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);
@@ -555,7 +577,7 @@ timing.plannedrestoff = timing.plannedreston + restDur;
 
 % show instructions-wait for first trigger
 if rtData
-[~,timing.pulsereston] = WaitTRPulse(TRIGGER_keycode,DEVICE,timing.plannedreston);
+[timing.trig.pulserest,timing.pulsereston] = WaitTRPulse(TRIGGER_keycode,DEVICE,timing.plannedreston);
 end
 tempBounds = Screen('TextBounds',mainWindow,restInstruct);
 Screen('drawtext',mainWindow,restInstruct,centerX-tempBounds(3)/2,centerY-tempBounds(4)/5,textColor);
@@ -600,7 +622,7 @@ for iBlock=indBlocksPhase2
     clear tempBounds;
     timespec = blockData(iBlock).plannedinstructonset - slack;
     if rtData
-        [~,blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
+        [timing.trig.instructpulses(iBlock),blockData(iBlock).instructpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedinstructonset);
     end
     blockData(iBlock).actualinstructonset = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualinstructonset-blockData(iBlock).plannedinstructonset)
@@ -656,7 +678,7 @@ for iBlock=indBlocksPhase2
         %wait for pulse
         if (rtData) && mod(iTrial,nTrialsPerTR) % this will be true for every other then
             %[~,blockData(iBlock).pulses(iTrial)] = WaitTRPulsePTB3_skyra(1,blockData(iBlock).plannedtrialonsets(iTrial)+allowance); %#ok<AGROW>
-            [~,blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
+            [timing.trig.pulses(iBlock,iTrial),blockData(iBlock).pulses(iTrial)] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedtrialonsets(iTrial));
             timespec = blockData(iBlock).plannedtrialonsets(iTrial) - slack;
             blockData(iBlock).actualtrialonsets(iTrial) = Screen('Flip',mainWindow,timespec); %#ok<AGROW> % turn on
         else
@@ -791,7 +813,7 @@ for iBlock=indBlocksPhase2
     Screen('FillRect',mainWindow,backColor);
     Screen(mainWindow,'FillOval',fixColor,fixDotRect);
     if rtData
-        [~,blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
+        [timing.trig.IBIpulses(iBlock),blockData(iBlock).IBIpulses] = WaitTRPulse(TRIGGER_keycode,DEVICE,blockData(iBlock).plannedIBI);
     end
     timespec = blockData(iBlock).plannedIBI -slack;
     blockData(iBlock).actualIBI = Screen('Flip',mainWindow,timespec);
@@ -803,7 +825,7 @@ WaitSecs(14);
 %% save
 % question: do you want to save it to this computer's data or where you
 % save the data folder???
-save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart');
+save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
 
 % clean up and go home
 sca;
