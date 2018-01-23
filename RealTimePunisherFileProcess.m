@@ -1,4 +1,4 @@
-function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,matchNum,runNum,fMRI,rtData,DAYNUM)
+function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,rtData,DAYNUM)
 % function [patterns] = RealTimePunisherFileProcess(subjectNum,subjectName,runNum,fMRI,rtData)
 %
 % this function describes the file processing procedure for the realtime
@@ -25,8 +25,8 @@ function [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjec
 %% check inputs
 
 %check that there is a sufficient number of inputs
-if nargin < 6
-    error('6 inputs are required: subjectNum, subjectName, matchNum, runNum, fMRI, rtData');
+if nargin < 5
+    error('5 inputs are required: subjectNum, subjectName, runNum, fMRI, rtData');
 end
 
 if ~isnumeric(subjectNum)
@@ -35,10 +35,6 @@ end
 
 if ~ischar(subjectName)
     error('subjectName must be a string');
-end
-
-if ~isnumeric(matchNum)
-    error('matchNum must be a number');
 end
 
 if ~isnumeric(runNum)
@@ -65,18 +61,12 @@ GetSecs;
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
-if matchNum == 0
-    dataHeader = ['data/' num2str(subjectNum)];
-    runHeader = [dataHeader '/run' num2str(runNum)];
-    classOutputDir = [runHeader '/classoutput'];
-    matchDataHeader = ['data/' num2str(subjectNum) '_match'];
-    matchRunHeader = [matchDataHeader '/run' num2str(runNum)];
-    matchClassOutputDir = [matchRunHeader '/classoutput'];
-else
-    dataHeader = ['data/' num2str(matchNum) '_match'];
-    runHeader = [dataHeader '/run' num2str(runNum)];
-    classOutputDir = [runHeader '/controlneverseenclassoutput'];
-end
+dataHeader = ['data/' num2str(subjectNum)];
+dayHeader = [dataHeader '/day' num2str(DAYNUM)];
+runHeader = [dayHeader '/run' num2str(runNum)];
+classOutputDir = [runHeader '/classoutput'];
+
+
 fname = findNewestFile(runHeader, fullfile(runHeader, ['patternsdesign_' num2str(runNum) '*.mat']));
 load(fname);
 imgDir = [imgDirHeader datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName '.' subjectName '/'];
@@ -430,10 +420,6 @@ end
 
 save([dataHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
 save([dataHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
-
-if rtfeedback && runNum>1 && matchNum == 0
-    unix(['cp ' classOutputDir '/vol_* ' matchClassOutputDir]);
-end
 
 % clean up and go home
 fclose('all');

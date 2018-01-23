@@ -48,17 +48,9 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 % ACM: took out the if statement on 2/13
 %if strcmp(computer,'MACI');
 dataHeader = ['data/' num2str(subjectNum)];
-runHeader = [dataHeader '/run' num2str(runNum)];
+dayHeader = [dataHeader '/day' num2str(expDay)];
+runHeader = [dayHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
-
-matchDataHeader = ['data/' num2str(subjectNum) '_match'];
-matchRunHeader = [matchDataHeader '/run' num2str(runNum)];
-matchClassOutputDir = [matchRunHeader '/classoutput'];
-matchNeverSeenClassOutputDir = [matchRunHeader '/controlneverseenclassoutput'];
-%else
-%    error('this code is only written to run on 32 bit macs, not %s\n',computer);
-%end
-
 
 %% create subject folder
 
@@ -66,6 +58,10 @@ matchNeverSeenClassOutputDir = [matchRunHeader '/controlneverseenclassoutput'];
 
 if (~isdir(dataHeader))
     mkdir(dataHeader);
+end
+
+if (~isdir(dayHeader))
+    mkdir(dayHeader);
 end
 
 if (~isdir(runHeader))
@@ -76,21 +72,6 @@ if (~isdir(classOutputDir))
     mkdir(classOutputDir);
 end
 
-if (~isdir(matchDataHeader))
-    mkdir(matchDataHeader);
-end
-
-if (~isdir(matchRunHeader))
-    mkdir(matchRunHeader);
-end
-
-if (~isdir(matchClassOutputDir))
-    mkdir(matchClassOutputDir);
-end
-
-if (~isdir(matchNeverSeenClassOutputDir))
-    mkdir(matchNeverSeenClassOutputDir);
-end
 
 %% Experimental Parameters
 
@@ -510,11 +491,6 @@ firstVolPhase2 = find(patterns.block==(nBlocksPerPhase+1),1,'first'); %#ok<NASGU
 save([runHeader '/blockdatadesign_' num2str(runNum) '_' datestr(now,30)],'blockData','STABLE','RTFEED','disdaqs','TR','nTrialsPerTR','labelsShift','instructLen',...
     'IBI','SCENE','FACE','nSubCategs','INDOOR','OUTDOOR','MALE','FEMALE','FEMALESAD','MALESAD','MALEHAPPY', 'FEMALEHAPPY', 'firstVolPhase2','rtfeedback');
 save([runHeader '/patternsdesign_' num2str(runNum) '_' datestr(now,30)],'patterns','TR','labelsShift','STABLE','RTFEED','instructLen','disdaqs','nBlocksPerPhase','nTRs','nTRsFix','firstVolPhase2','lastVolPhase1','rtfeedback');
-
-save([matchRunHeader '/blockdatadesign_' num2str(runNum) '_' datestr(now,30)],'blockData','STABLE','RTFEED','disdaqs','TR','nTrialsPerTR','labelsShift','instructLen',...
-    'IBI','SCENE','FACE','nSubCategs','INDOOR','OUTDOOR','MALE','FEMALE','FEMALESAD','MALESAD','MALEHAPPY', 'FEMALEHAPPY','firstVolPhase2','rtfeedback');
-save([matchRunHeader '/patternsdesign_' num2str(runNum) '_' datestr(now,30)],'patterns','TR','labelsShift','STABLE','RTFEED','instructLen','disdaqs','nBlocksPerPhase','nTRs','nTRsFix','firstVolPhase2','lastVolPhase1','rtfeedback');
-
 
 % clean up and go home
 fclose('all');

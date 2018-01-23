@@ -2,11 +2,12 @@
 % MAKE SURE YOU DO THE SAME BET SETTINGS AS WITH DAY 1!
 
 subjectNum = 6; % multiday test is subject 5, intel demo is subject 3
-DAYNUM = 2; % REMEMBER TO SPECIFY WHAT DAY IT IS!!
-matchNum = 0;
-projectName = 'rtAttenPenn';
-functionalScan=6;
+runNum = 3;
+dayNum = 2; % REMEMBER TO SPECIFY WHAT DAY IT IS!!
 flash_hrScan = 5;
+functionalScan=6;
+%%
+projectName = 'rtAttenPenn';
 biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
 fslpath='/opt/fsl/5.0.9/bin/';
@@ -17,17 +18,10 @@ if ~exist('readmr','file')
     addpath([biac_dir '/general/'])
 end
 setenv('FSLOUTPUTTYPE','NIFTI_GZ');
-project_folder = '/Data1/code/rtAttenPenn';
-% going to make separate registration folders of thinngs for each day to
-% keep everything organized
-% all the masks will save in the same places though
-if matchNum == 0
-    save_dir = [project_folder '/data/' num2str(subjectNum)];
-else
-    save_dir = [project_folder '/data/' num2str(matchNum) '_match'];
-end
-process_dir1 = [save_dir '/' 'reg' '/'];
-process_dir_today = [save_dir '/' 'reg' num2str(DAYNUM) '/'];
+dataDirHeader = pwd;
+save_dir = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(dayNum)]);
+process_dir1 = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(1) '/reg' '/']);
+process_dir_today = [save_dir '/' 'reg' '/'];
 roi_name = 'wholebrain_mask';
 roi_dir = pwd; % change this path name to wherever you put it on the penn computer!
 code_dir = pwd;
@@ -39,7 +33,6 @@ end
 cd(process_dir_today)
 %% now register for second day mask
 subjDate2 = '9-22-17';
-runNum = 3;
 %subjectName2 = [datestr(subjDate2,5) datestr(subjDate2,7) datestr(subjDate2,11) num2str(runNum) '_' projectName];
 %dicom_dir2 = ['/Data1/subjects/' datestr(subjDate2,10) datestr(subjDate2,5) datestr(subjDate2,7) '.' subjectName2 '.' subjectName2 '/'];
 subjectName2 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
@@ -159,11 +152,7 @@ end
 % brain
 mask=mask_brain;
 %save anatomical mask
-if matchNum == 0
-    save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(DAYNUM)],'mask');
-else
-    save([code_dir '/data/' num2str(matchNum) '_match/mask_' num2str(subjectNum) '_' num2str(DAYNUM)],'mask');
-end
+save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(dayNum)],'mask');
 
 fprintf('Done with mask creation\n');
 % if cd into the directory, cd out of it back to the general exp folder

@@ -1,4 +1,4 @@
-function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,runNum,useButtonBox,fMRI,rtData,debug)
+function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,DAYNUM,useButtonBox,fMRI,rtData,debug)
 % function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -28,8 +28,8 @@ function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,matchNum,r
 %% check inputs
 KbName('UnifyKeyNames');
 %check that there is a sufficient number of inputs
-if nargin < 8
-    error('8 inputs are required: subjectNum, subjectName, matchNum, runNum, useButtonBox, fMRI, rtData, debug');
+if nargin < 7
+    error('8 inputs are required: subjectNum, subjectName, runNum, useButtonBox, fMRI, rtData, debug');
 end
 
 if ~isnumeric(subjectNum)
@@ -38,10 +38,6 @@ end
 
 if ~ischar(subjectName)
     error('subjectName must be a string');
-end
-
-if ~isnumeric(matchNum)
-   error('matchNum must be a number'); 
 end
 
 if ~isnumeric(runNum)
@@ -234,13 +230,9 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 dataDirHeader = pwd;
-if matchNum == 0
-    dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
-else
-    dataHeader = fullfile(dataDirHeader,['data/' num2str(matchNum) '_match']);
-    % shouldn't this be matchNum??
-end
-runHeader = [dataHeader '/run' num2str(runNum)];
+dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
+dayHeader = [dataHeader '/day' num2str(DAYNUM)];
+runHeader = [dayHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
 fname = findNewestFile(runHeader, fullfile(runHeader, ['blockdatadesign_' num2str(runNum) '*.mat']));
 %fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
@@ -402,8 +394,9 @@ if (rtData && ~debug )
         %runStart = WaitTRPulsePTB3_skyra(1);
         timing.trig.wait = WaitTRPulse(TRIGGER_keycode,DEVICE);
         runStart = timing.trig.wait;
-        tempBounds = Screen('TextBounds', mainWindow, STILLREMINDER);
-        Screen('drawtext',mainWindow,STILLREMINDER,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
+        DrawFormattedText(mainWindow,STILLREMINDER,'center','center',textColor,70)
+        %tempBounds = Screen('TextBounds', mainWindow, STILLREMINDER);
+        %Screen('drawtext',mainWindow,STILLREMINDER,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
         startTime = Screen('Flip',mainWindow);
         elapsedTime = 0;
         while (elapsedTime < STILLDURATION)

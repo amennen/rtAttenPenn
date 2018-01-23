@@ -4,12 +4,13 @@
 % WILL BE COMING FROM DIFFERENT SCANNER LOCATIONS
 
 subjectNum = 6; % multiday test is subject 5, intel demo is subject 3, rtPenn pilot is subject 6
-matchNum = 0;
-projectName = 'rtAttenPenn';
+runNum = 2;
+dayNum = 1;
 highresScan = 5;
 functionalScan=6;
-flash_hrScan = 7;
 
+%%
+projectName = 'rtAttenPenn';
 biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
 fslpath='/opt/fsl/5.0.9/bin/';
@@ -20,12 +21,8 @@ if ~exist('readmr','file')
     addpath([biac_dir '/general/'])
 end
 setenv('FSLOUTPUTTYPE','NIFTI_GZ');
-project_folder = '/Data1/code/rtAttenPenn';
-if matchNum == 0
-    save_dir = [project_folder '/data/' num2str(subjectNum)];
-else
-    save_dir = [project_folder '/data/' num2str(matchNum) '_match'];
-end
+dataDirHeader = pwd;
+save_dir = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(dayNum)]);
 process_dir = [save_dir '/' 'reg' '/'];
 roi_name = 'wholebrain_mask';
 roi_dir = pwd; % change this path name to wherever you put it on the penn computer!
@@ -40,11 +37,8 @@ cd(process_dir)
 %subjDate1 = '9-22-17';
 %subjectName1 = [datestr(subjDate1,5) datestr(subjDate1,7) datestr(subjDate1,11) num2str(runNum) '_' projectName];
 startProcess=GetSecs;
-runNum = 2;
 subjectName1 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
 dicom_dir1 = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName1 '.' subjectName1 '/'];
-
-%% now do steps registration for first day scans to make the mask
 
 %% Process t1-weighted MPRAGE and check brain extraction!
 highresFN = 'highres';
@@ -155,12 +149,8 @@ end
 % brain
 mask=mask_brain;
 %save anatomical mask
+save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(1)],'mask');
 
-if matchNum == 0
-    save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(1)],'mask');
-else
-    save([code_dir '/data/' num2str(matchNum) '_match/mask_' num2str(subjectNum) '_' num2str(1)],'mask');
-end
 
 fprintf('Done with mask creation\n');
 t.mask = GetSecs - startMask;
