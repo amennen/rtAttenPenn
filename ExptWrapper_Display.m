@@ -3,8 +3,8 @@ subjectNum = 100;
 subjectRun = 1;
 subjectDay = 1;
 
-useButtonBox=1;
-realtimeData = 1;
+useButtonBox=0;
+realtimeData = 0;
 debug=0;
 
 %% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
@@ -24,7 +24,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 %%
 runNum=1;
 % today's scanning number
-fMRI = 9;
+fMRI = 0;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
 
 %%
