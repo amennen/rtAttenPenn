@@ -1,4 +1,4 @@
-function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,runNum,debug)
+function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,runNum,DAYNUM,debug)
 % function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,matchNum,runNum,debug)
 %
 % These are the instructions for the behavioral version of the experiment. 
@@ -47,13 +47,14 @@ end
 
 
 %% Boilerplate
-
-if (debug) %so that when debugging you can do other things
-    Screen('Preference', 'SkipSyncTests', 1);
+if (~debug) %so that when debugging you can do other things
+    %Screen('Preference', 'SkipSyncTests', 1);
+   ListenChar(2);  %prevent command window output
+   HideCursor;     %hide mouse cursor    
 else
-    %ListenChar(2);  %prevent command window output
-    HideCursor;     %hide mouse cursor    
+    Screen('Preference', 'SkipSyncTests', 1);
 end
+
 
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
@@ -82,7 +83,7 @@ respWindow = .85;   % secs
 % display parameters
 textColor = 0;
 textFont = 'Arial';
-textSize = 16;
+textSize = 25;
 textSpacing = 25;
 fixColor = 0;
 respColor = 255;
@@ -94,16 +95,38 @@ progHeight = 20;
 
 % how to average the faces and scenes
 attImgProp = .5;
+screenNumbers = Screen('Screens');
+faceProp = 0.6;
+sceneProp = 1-faceProp;
+% show full screen if real, otherwise part of screen
+if debug
+    screenNum = 0;
+else
+    screenNum = screenNumbers(end);
+end
 
-ScreenResX = 1600;
-ScreenResY = 900;
-windowSize.degrees = [35 30];
-screens = Screen('Screens');
-screenNumber = max(screens);
-resolution = Screen('Resolution',screenNumber);
-windowSize.pixels = [resolution.width resolution.height];
-ScreenResX=windowSize.pixels(1);
-ScreenResY=windowSize.pixels(2);
+%retrieve the size of the display screen
+if debug
+    screenX = 800;
+    screenY = 800;
+else
+    % first just make the screen tiny
+    
+    [screenX screenY] = Screen('WindowSize',screenNum);
+    % put this back in!!!
+    windowSize.degrees = [51 30];
+    resolution = Screen('Resolution', screenNum);
+    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
+    windowSize.pixels = [resolution.width resolution.height];
+    screenX = windowSize.pixels(1);
+    screenY = windowSize.pixels(2);
+%     screenX = 800;
+%     screenY = 800;
+%     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
+%     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
+%         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
+%     end
+end
 
 SCENE = 1;
 FACE = 2;
@@ -112,6 +135,7 @@ FACE = 2;
 
 % skyra: use current design button box (keys 1,2,3,4)
 LEFT = KbName('1!');
+RETURN = KbName('Return');
 DEVICE = -1;
 
 % counterbalancing response mapping based on subject assignment
@@ -176,33 +200,10 @@ switch (respMap)
         error('Impossible response mapping!');
 end
 
-contInstruct = sprintf('Please hit spacebar to continue');
-startInstruct = sprintf('Please hit spacebar to start run %d',runNum);
+contInstruct = sprintf('Please hit enter to continue');
+startInstruct = sprintf('Please hit enter to start run %d',runNum);
 
 %% Initialize Screens
-
-screenNumbers = Screen('Screens');
-
-% show full screen if real, otherwise part of screen
-if debug
-    screenNum = 0;
-else
-    screenNum = screenNumbers(end);
-end
-
-%retrieve the size of the display screen
-if debug
-    [screenX screenY] = Screen('WindowSize',screenNum);
-    screenX = screenX/2;
-    screenY = screenY/2;
-else
-    [screenX screenY] = Screen('WindowSize',screenNum);
-    
-    %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
-    if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
-        fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
-    end
-end
 
 %create main window
 mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
@@ -226,15 +227,24 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
-
-
-    dataHeader = ['data/' num2str(subjectNum)];
-
-    runHeader = [dataHeader '/run' num2str(runNum)];
-    fn = findNewestFile(runHeader,fullfile(runHeader,['blockdatadesign_' num2str(runNum) '_*']));
-    assert(~isempty(fn),'have not created the block design');
-    load([runHeader '/' deblank(fn)]);
+try ls('~/Documents/Norman/rtAttenPenn/');
+    base_path = '~/Documents/Norman/rtAttenPenn/';
+catch 
+    try ls('~/rtAttenPenn/');
+        base_path = '~/rtAttenPenn/';
+    catch 
+        % put other laptop here
+    end  
 end
+addpath(genpath(base_path));
+
+dataDirHeader = pwd;
+dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
+dayHeader = [dataHeader '/day' num2str(DAYNUM)];
+runHeader = [dayHeader '/run' num2str(runNum)];
+fn = findNewestFile(runHeader,fullfile(runHeader,['blockdatadesign_' num2str(runNum) '_*']));
+assert(~isempty(fn),'have not created the block design');
+load(fn);
 
 %% Load Images
 
@@ -315,8 +325,7 @@ for instruct=1:length(runInstruct)
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
-pause; 
-
+waitForKeyboard(RETURN,DEVICE);
 %% face instruct
 % clear screen
 Screen(mainWindow,'FillRect',backColor);
@@ -338,8 +347,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% face instruct #2 
 
@@ -360,8 +370,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% face stim
 
@@ -377,7 +388,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -441,9 +452,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
-
+waitForKeyboard(RETURN,DEVICE);
 
 %% Scene instructions
 
@@ -463,8 +474,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% scene stim
 
@@ -480,7 +492,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -541,8 +553,9 @@ for instruct=1:length(fixInstruct)
     Screen('drawtext',mainWindow,fixInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 tFix = Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% scene instruct 2
 
@@ -565,8 +578,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% scene stim
 
@@ -598,7 +612,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -658,8 +672,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% face stim
 
@@ -691,7 +706,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -752,8 +767,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% face stim
 
@@ -786,7 +802,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -841,7 +857,7 @@ for iTrial = 4:8;
     end
     
     % generate image
-    fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+    fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
     
     % make textures
     imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -903,8 +919,9 @@ for instruct=1:length(runInstruct)
     Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
     clear tempBounds;
 end
+FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-pause;
+waitForKeyboard(RETURN,DEVICE);
 
 %% scene stim
 
@@ -937,7 +954,7 @@ for half=[SCENE FACE]
 end
         
 % generate image
-fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
         
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -992,7 +1009,7 @@ for iTrial = 4:8;
     end
     
     % generate image
-    fullImage = uint8(.5*tempImage{SCENE}+.5*tempImage{FACE});
+    fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
     
     % make textures
     imageTex = Screen('MakeTexture',mainWindow,fullImage);

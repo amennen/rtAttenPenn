@@ -18,31 +18,15 @@ rtfeedback = 0;
 useButtonBox = 0; %maybe replace with keyboard eventually?
 rtData = 0;
 fMRI = 0;
-code_dir = '~/rtAttenPenn/';
-image_dir = code_dir; % the images will be in the same place so we don't need to recopy them
+debug = 0;
 ex_image_dir = pwd;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
-%% COUNTERBALANCE
-% each person is doing this 4 times so each person will have the order
-% % differ
-% condMap = mod(subjectNum-1,4)+1;
-% switch (condMap)
-%     case 1
-%         typeOrder = [SAD HAPPY];
-%         neutralVec = [1 1 ];
-%     case 2
-%         typeOrder = [SAD HAPPY];
-%         neutralVec = [0 0];
-%     case 3
-%         typeOrder = [HAPPY SAD];
-%         neutralVec = [1 1];
-%     case 4
-%         typeOrder = [HAPPY SAD];
-%         neutralVec = [0 0];
-%     otherwise
-%         error('Impossible response mapping!');
-% end
+
+% figure out how to find what directory you need
+
+
+
 %% Generate expt sequence
 %make it fore each of the different type numbers and counterbalance order
 %for every subject
@@ -50,7 +34,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 % generate all neutral first seconds
 
 runNum = 1;
-[blockData patterns] = RealTimePunisherExptSequence_NEW(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
+[blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
 
 % now go through the rest
 nRuns = 2;
@@ -59,13 +43,16 @@ nRuns = 2;
 for i = 1:nRuns
     % changing it here for behavioral have rtfeedback = 0
     runNum = i+1;
-    [blockData patterns] = RealTimePunisherExptSequence_NEW(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
+    [blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
 end
 
 %% now run instructions
 
-RealTimeBehavInstruct(subjectNum,subjectName,matchNum,1,debug);
+BehavInstruct(subjectNum,subjectName,1,subjectDay,debug);
 
 %% now run exp sequence
+runNum = 1;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
 % change the image paths inside this script
+runNum = 2;
+BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)

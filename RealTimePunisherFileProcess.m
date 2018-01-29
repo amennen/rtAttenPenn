@@ -114,11 +114,11 @@ end
 
 %load previous patterns
 if runNum>1
-    patsfn = ls([dataHeader '/patternsdata_' num2str(runNum-1) '_*']);
-    oldpats = load(deblank(patsfn));
-    
-    modelfn = ls([dataHeader '/trainedModel_' num2str(runNum-1) '_*']);
-    load(deblank(modelfn),'trainedModel');
+    prevrunHeader = [dayHeader '/run' num2str(runNum-1)];
+    patsfn = findNewestFile(prevrunHeader, fullfile(prevrunHeader, ['patternsdata_' num2str(runNum-1) '*.mat']));
+    oldpats = load(patsfn);
+    modelfn = findNewestFile(prevrunHeader, fullfile(prevrunHeader, ['trainedModel_' num2str(runNum-1) '*.mat']));
+    load(modelfn,'trainedModel');
 end
 
 
@@ -165,7 +165,7 @@ patterns.firstTestTR = find(patterns.regressor(1,:)+patterns.regressor(2,:),1,'f
 %% Output Files Setup
 
 % open and set-up output file
-dataFile = fopen([dataHeader '/fileprocessing.txt'],'a');
+dataFile = fopen([runHeader '/fileprocessing.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'* rtAttenPenn v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
@@ -418,8 +418,8 @@ end
 
 %%
 
-save([dataHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
-save([dataHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
+save([runHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
+save([runHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
 
 % clean up and go home
 fclose('all');

@@ -107,7 +107,8 @@ minimumDisplay = 0.25;
 % how to average the faces and scenes
 attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
-
+faceProp = 0.6;
+sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in
 gain = 3;
@@ -189,7 +190,7 @@ else
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
     resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
-    windowSize.pixels = [resolution.width/2 resolution.height];
+    windowSize.pixels = [resolution.width resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
 %     screenX = 800;
@@ -229,6 +230,22 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 
 
 %% Load or Initialize Real-Time Data & Staircasing Parameters
+
+% figure out which directory you're in to know:
+% image directory
+% where to save files
+try ls('~/Documents/Norman/rtAttenPenn/');
+    base_path = '~/Documents/Norman/rtAttenPenn/';
+catch 
+    try ls('~/rtAttenPenn/');
+        base_path = '~/rtAttenPenn/';
+    catch 
+        % put other laptop here
+    end  
+end
+addpath(genpath(base_path));
+image_dir = fullfile(base_path, 'images');
+code_dir = pwd;
 dataDirHeader = pwd;
 dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
 dayHeader = [dataHeader '/day' num2str(DAYNUM)];
@@ -246,11 +263,12 @@ end
 restDur = 3; % seconds to keep that display on
 stimFix = 6; % seconds to keep the middle on before starting the block 5
 %% Load Images
-
-cd images;
+% cd to image directory but has to apply to any computer
+cd(image_dir);
 % 1/25: updating to _new image categories where luminance isn't made to
 % have the same mean--instead the luminance is scaled by the maximum
 % luminance that it is to see if that makes things more equal in luminance
+% now-we need to send them do the right directory
 for categ=1:nSubCategs
     
     % move into the right folder
@@ -312,14 +330,14 @@ for categ=1:nSubCategs
         error('Need at least one image per directory!');
     end
 end
-cd ..;
+cd(code_dir);
 Screen('Flip',mainWindow);
 
 
 %% Output Files Setup
 
 % open and set-up output file
-dataFile = fopen([dataHeader '/behavior.txt'],'a');
+dataFile = fopen([runHeader '/behavior.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'* rtAttenPenn v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
@@ -372,17 +390,7 @@ for instruct=1:length(runInstruct)
 end
 Screen('Flip',mainWindow);
 [~,~] = WaitTRPulse(subj_keycode,DEVICE);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% now here we're adding to say waiting for scanner, hold tight!
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-waitMessage = 'Waiting for scanner start, hold tight!';
-tempBounds = Screen('TextBounds', mainWindow, waitMessage);
-Screen('drawtext',mainWindow,waitMessage,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
-Screen('Flip', mainWindow);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% now here we're going to say to stay still once the triggers start coming
-% in
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %% Start Experiment
 STILLREMINDER = ['The scan is now starting.\n\nMoving your head even a little blurs the image, so '...
@@ -392,28 +400,9 @@ STILLDURATION = 6;
 % wait for initial trigger
 Priority(MaxPriority(screenNum));
 
-if (rtData && ~debug )
-   % if strcmp(computer,'MACI') % taking out because we're running on a linux!
-        %runStart = WaitTRPulsePTB3_skyra(1);
-        timing.trig.wait = WaitTRPulse(TRIGGER_keycode,DEVICE);
-        runStart = timing.trig.wait;
-        DrawFormattedText(mainWindow,STILLREMINDER,'center','center',textColor,70)
-        %tempBounds = Screen('TextBounds', mainWindow, STILLREMINDER);
-        %Screen('drawtext',mainWindow,STILLREMINDER,centerX-tempBounds(3)/2,centerY-tempBounds(4)/2,textColor);
-        startTime = Screen('Flip',mainWindow);
-        elapsedTime = 0;
-        while (elapsedTime < STILLDURATION)
-            pause(0.005)
-            elapsedTime = GetSecs()-startTime;
-        end
-        % else
-   %     WaitSecs(.5);
-   %     runStart = KbWait;
-   % end
-else
-    runStart = GetSecs;
-    timing = -1;
-end
+
+runStart = GetSecs;
+timing = -1;
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 Screen('Flip',mainWindow);
@@ -486,7 +475,10 @@ for iBlock=1:numel(indBlocksPhase1)
         blockData(iBlock).attImgProp(iTrial)=attImgPropPhase1; %#ok<AGROW>
         
         % generate image
-        fullImage = uint8((1-blockData(iBlock).attImgProp(iTrial))*tempImage{SCENE}+blockData(iBlock).attImgProp(iTrial)*tempImage{FACE});
+        %fullImage = uint8((1-blockData(iBlock).attImgProp(iTrial))*tempImage{SCENE}+blockData(iBlock).attImgProp(iTrial)*tempImage{FACE});
+        % generate image: 30 % Scene // 70 % Face
+        fullImage = uint8(tempImage{SCENE}*sceneProp+tempImage{FACE}*faceProp);
+        
         
         % make textures
         imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -655,8 +647,9 @@ for iBlock=indBlocksPhase2
         end
         
         % generate image
-        fullImage = uint8((1-blockData(iBlock).smoothAttImgProp(iTrial))*tempImage{blockData(iBlock).inattCateg}+blockData(iBlock).smoothAttImgProp(iTrial)*tempImage{blockData(iBlock).attCateg});
-        
+        %fullImage = uint8((1-blockData(iBlock).smoothAttImgProp(iTrial))*tempImage{blockData(iBlock).inattCateg}+blockData(iBlock).smoothAttImgProp(iTrial)*tempImage{blockData(iBlock).attCateg});
+        % generate image-using ratio
+        fullImage = uint8(tempImage{SCENE}*sceneProp+tempImage{FACE}*faceProp);
         % make textures
         imageTex = Screen('MakeTexture',mainWindow,fullImage);
         Screen('PreloadTextures',mainWindow,imageTex);
@@ -816,12 +809,12 @@ for iBlock=indBlocksPhase2
     fprintf('Flip time error = %.4f\n', blockData(iBlock).actualIBI-blockData(iBlock).plannedIBI)
 end % phase 2 block loop
 % want to wait 7 TRS--2 IBIs and then 5 more TRs
-WaitSecs(14);
+WaitSecs(2);
 
 %% save
 % question: do you want to save it to this computer's data or where you
 % save the data folder???
-save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
+save([runHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
 
 % clean up and go home
 sca;

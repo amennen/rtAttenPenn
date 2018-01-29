@@ -319,7 +319,7 @@ Screen('Flip',mainWindow);
 %% Output Files Setup
 
 % open and set-up output file
-dataFile = fopen([dataHeader '/behavior.txt'],'a');
+dataFile = fopen([runHeader '/behavior.txt'],'a');
 fprintf(dataFile,'\n*********************************************\n');
 fprintf(dataFile,'* rtAttenPenn v.1.0\n');
 fprintf(dataFile,['* Date/Time: ' datestr(now,0) '\n']);
@@ -371,7 +371,7 @@ for instruct=1:length(runInstruct)
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
-[~,~] = WaitTRPulse(subj_keycode,DEVICE);
+waitForKeyboard(subj_keycode,DEVICE);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % now here we're adding to say waiting for scanner, hold tight!
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -821,7 +821,7 @@ WaitSecs(14);
 %% save
 % question: do you want to save it to this computer's data or where you
 % save the data folder???
-save([dataHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
+save([runHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
 
 % clean up and go home
 sca;

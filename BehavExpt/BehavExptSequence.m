@@ -51,6 +51,19 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 % ACM: took out the if statement on 2/13
 %if strcmp(computer,'MACI');
+
+try ls('~/Documents/Norman/rtAttenPenn/');
+    base_path = '~/Documents/Norman/rtAttenPenn/';
+catch 
+    try ls('~/rtAttenPenn/');
+        base_path = '~/rtAttenPenn/';
+    catch 
+        % put other laptop here
+    end
+    
+end
+image_dir = fullfile(base_path, 'images');
+code_dir = pwd;
 dataHeader = ['data/' num2str(subjectNum)];
 dayHeader = [dataHeader '/day' num2str(expDay)];
 runHeader = [dayHeader '/run' num2str(runNum)];
@@ -175,7 +188,7 @@ end
 
 %% Load Images
 
-cd images;
+cd(image_dir);
 for categ=1:nSubCategs
     
     % move into the right folder
@@ -233,7 +246,7 @@ for categ=1:nSubCategs
         error('Need at least one image per directory!');
     end
 end
-cd ..;
+cd(code_dir);
 
 
 %% Generate Trial and Block Sequences
@@ -361,7 +374,7 @@ for iBlock=1:numBlocks
     blockData(iBlock).attImgProp = nan(2,ceil(blockData(iBlock).trialsPerBlock/2)); %#ok<AGROW>
     blockData(iBlock).smoothAttImgProp = nan(2,ceil(blockData(iBlock).trialsPerBlock/2));  %#ok<AGROW>
     
-    if blockData(iBlock).specificBlock ==  ATTSCENE_DISTNEUTFACE || ATTNEUTFACE_DISTSCENE% NEUTRAL/NEUTRAL
+    if blockData(iBlock).specificBlock ==  ATTSCENE_DISTNEUTFACE || blockData(iBlock).specificBlock == ATTNEUTFACE_DISTSCENE% NEUTRAL/NEUTRAL
         blockData(iBlock).categs{blockData(iBlock).attCateg} = PsychRandSample(randSampAttCategList(blockData(iBlock).attCateg,:),[1 blockData(iBlock).trialsPerBlock]); % this randomly samples the probability list so that ratio of go/no trials are kept
         tempNoGoTrials = find(blockData(iBlock).categs{blockData(iBlock).attCateg}==nogoSubCategs(blockData(iBlock).attCateg)); % this finds where the no go trials are
         while ((numel(tempNoGoTrials)~=nNoGoTrials) || (tempNoGoTrials(1)<10) || (any(diff(tempNoGoTrials)<4)) || (tempNoGoTrials(end)>47)) % don't want the no go trials to be too early, too frequent, or too late
