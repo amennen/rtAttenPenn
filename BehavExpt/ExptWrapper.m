@@ -56,3 +56,5 @@ BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,d
 % change the image paths inside this script
 runNum = 2;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
+%%
+copyallfilesforsubject(subjectNum,subjectDay);
