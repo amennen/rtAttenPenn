@@ -63,6 +63,7 @@ if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
    ListenChar(2);  %prevent command window output
    HideCursor;     %hide mouse cursor    
+   Screen('Preference', 'SkipSyncTests', 1);
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end
@@ -147,7 +148,7 @@ switch (respMap)
         sceneInstruct = 'Places: respond if it is an indoor place. DO NOT respond if it is an outdoor place';
         faceInstruct = 'Faces: respond if it is a male face. DO NOT respond if it is a female face';
         sceneShorterInstruct = 'indoor places';
-        faceShorter = 'male faces';
+        faceShorterInstruct = 'male faces';
     case 2
         sceneInstruct = 'Places: respond if it is an outdoor place. DO NOT respond if it is an indoor place';
         faceInstruct = 'Faces: respond if it is a female face. DO NOT respond if it is a male face';

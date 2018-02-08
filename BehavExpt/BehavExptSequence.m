@@ -313,24 +313,29 @@ cd(code_dir);
 % end
 if runNum == 1 % first run only neutral faces/scenes
     nBlockTypes = 2;
-    blockSequencePhase1A = randperm(nBlockTypes);
-    blockSequencePhase1B = randperm(nBlockTypes);
+    neut_types = [1 3];
+    blockSequencePhase1A = neut_types(randperm(nBlockTypes));
+    blockSequencePhase1B = neut_types(randperm(nBlockTypes));
     categOrderPhase1 = [blockSequencePhase1A blockSequencePhase1B];
-
-    blockSequencePhase2A = randperm(nBlockTypes);
-    blockSequencePhase2B = randperm(nBlockTypes);
+    
+    blockSequencePhase2A = neut_types(randperm(nBlockTypes));
+    blockSequencePhase2B = neut_types(randperm(nBlockTypes));
     categOrderPhase2 = [blockSequencePhase2A blockSequencePhase2B];
-
+    
     blockTypes = [categOrderPhase1 categOrderPhase2];
+    %attCategOrder = [categOrderPhase1 categOrderPhase2];
+    %inattCategOrder = (attCategOrder==1)+1; 
 else
     nBlockTypes = 4;
     blockSequencePhase1A = randperm(nBlockTypes);
     categOrderPhase1 = [blockSequencePhase1A];
-
+    
     blockSequencePhase2A = randperm(nBlockTypes);
     categOrderPhase2 = [blockSequencePhase2A];
-
+    
     blockTypes = [categOrderPhase1 categOrderPhase2];
+    
+   
 end
 attCategOrder = (([categOrderPhase1 categOrderPhase2]>2)+1); % this is saying if it's face or scene!!
 inattCategOrder = (([categOrderPhase1 categOrderPhase2]<=2)+1);

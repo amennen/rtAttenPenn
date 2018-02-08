@@ -50,7 +50,8 @@ end
 if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
    ListenChar(2);  %prevent command window output
-   HideCursor;     %hide mouse cursor    
+   HideCursor;     %hide mouse cursor  
+   Screen('Preference', 'SkipSyncTests', 1);
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end

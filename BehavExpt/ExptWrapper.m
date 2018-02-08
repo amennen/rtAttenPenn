@@ -1,6 +1,6 @@
 %ExptWrapper_FileProcess_Subject9
 
-subjectNum = 100;
+subjectNum = 500;
 subjectName = ['behav' num2str(subjectNum)];
 subjectDay = 1;
 % if subjectDay == 1
@@ -37,7 +37,7 @@ runNum = 1;
 [blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
 
 % now go through the rest
-nRuns = 2;
+nRuns = 1;
 % counterbalance order of if happy or sad is first/then if first or
 % second order so 4 options
 for i = 1:nRuns
@@ -56,5 +56,9 @@ BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,d
 % change the image paths inside this script
 runNum = 2;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
+
+%runNum = 3;
+%BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
+
 %%
 copyallfilesforsubject(subjectNum,subjectDay);
