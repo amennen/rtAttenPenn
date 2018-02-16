@@ -215,7 +215,7 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
 if (~ispc)
-    dataHeader = ['data/' num2str(subjectNum)];
+    dataHeader = ['data/subject' num2str(subjectNum)];
     runHeader = [dataHeader '/run' num2str(runNum)];
     fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
     load(deblank(fn));

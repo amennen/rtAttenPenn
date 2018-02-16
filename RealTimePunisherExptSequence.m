@@ -47,7 +47,7 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 % ACM: took out the if statement on 2/13
 %if strcmp(computer,'MACI');
-dataHeader = ['data/' num2str(subjectNum)];
+dataHeader = ['data/subject' num2str(subjectNum)];
 dayHeader = [dataHeader '/day' num2str(expDay)];
 runHeader = [dayHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
