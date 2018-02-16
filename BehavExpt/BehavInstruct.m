@@ -240,7 +240,7 @@ end
 addpath(genpath(base_path));
 
 dataDirHeader = pwd;
-dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
+dataHeader = fullfile(dataDirHeader,[ 'data/subject' num2str(subjectNum)]);
 dayHeader = [dataHeader '/day' num2str(DAYNUM)];
 runHeader = [dayHeader '/run' num2str(runNum)];
 fn = findNewestFile(runHeader,fullfile(runHeader,['blockdatadesign_' num2str(runNum) '_*']));

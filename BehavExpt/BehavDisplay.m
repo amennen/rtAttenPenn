@@ -248,7 +248,7 @@ addpath(genpath(base_path));
 image_dir = fullfile(base_path, 'images');
 code_dir = pwd;
 dataDirHeader = pwd;
-dataHeader = fullfile(dataDirHeader,[ 'data/' num2str(subjectNum)]);
+dataHeader = fullfile(dataDirHeader,[ 'data/subject' num2str(subjectNum)]);
 dayHeader = [dataHeader '/day' num2str(DAYNUM)];
 runHeader = [dayHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];

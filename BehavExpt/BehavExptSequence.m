@@ -64,7 +64,7 @@ catch
 end
 image_dir = fullfile(base_path, 'images');
 code_dir = pwd;
-dataHeader = ['data/' num2str(subjectNum)];
+dataHeader = ['data/subject' num2str(subjectNum)];
 dayHeader = [dataHeader '/day' num2str(expDay)];
 runHeader = [dayHeader '/run' num2str(runNum)];
 % we want order of everything to be counterbalanced with first run
