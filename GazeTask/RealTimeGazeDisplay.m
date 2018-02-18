@@ -1,4 +1,4 @@
-function RealTimeGazeDisplay(subjectNum,matchNum,eyeTrack,debug)
+function RealTimeGazeDisplay(subjectNum,expDay,eyeTrack,debug)
 % function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -28,11 +28,6 @@ if ~isnumeric(subjectNum)
 end
 
 
-if ~isnumeric(matchNum)
-    error('matchNum must be a number');
-end
-
-
 if (eyeTrack~=1) && (eyeTrack~=0)
     error('eyeTrack  must be either 1 (if using) or 0 (if not)')
 end
@@ -43,7 +38,7 @@ if (debug~=1) && (debug~=0)
     error('debug must be either 1 (if debugging) or 0 (if not)')
 end
 
-
+%
 %% Boilerplate
 
 if (~debug) %so that when debugging you can do other things
@@ -58,9 +53,6 @@ end
 
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
-
-
-
 
 %initialize system time calls
 GetSecs;
@@ -86,7 +78,7 @@ textSpacing = 25;
 fixColor = 255;
 respColor = 255;
 backColor = 0;
-imageSize = [800 600]; % X AND Y NOT NROWS NCOLS
+imageSize = [300 300]; % X AND Y NOT NROWS NCOLS
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -148,7 +140,7 @@ while ~done
     for t=1:nFillers
         % for each trial choose four images
         chosen = randperm(length(fillerVec),4);
-        stim.fillerPosition(t,:) = fillerVec(chosen);
+        stim.fillerPosition(t,:) = Shuffle(fillerVec(chosen));
         fillerVec(chosen) = [];
     end
     for t=1:nFillers
@@ -245,24 +237,13 @@ Screen(mainWindow,'TextFont',textFont);
 Screen(mainWindow,'TextSize',textSize);
 
 % original dimensions
-quarterSize = [centerX centerY];
-areaRatio = 2/3;
-imageSize2 = [quarterSize(1)*areaRatio quarterSize(1)*areaRatio*(3/4)];
-quarterHalf = quarterSize/2;
-
-% calculate centers of quadrant
-% center(1,:) = [quarterSize(1)+quarterHalf(1) quarterHalf(2)];
-% center(2,:) = [quarterHalf(1) quarterHalf(2)];
-% center(3,:) = [quarterHalf(1) quarterSize(2)+quarterHalf(2)];
-% center(4,:) = [quarterSize(1)+quarterHalf(1) quarterSize(2)+quarterHalf(2)];
-
+imageSize2 = imageSize;
+actual_imageSize = [400 400];
+imageRect = [0 0 actual_imageSize(1) actual_imageSize(2)];
 % placeholder for images
-imageRect = [0,0,imageSize(1),imageSize(2)];
-destDims = imageSize2/2;
-%BorderX = screenX/20;
-%BorderY = screenY/20;
-
-border = screenX/5;
+%border = screenX/20;
+% try to scale border to area of screen
+border = (screenY - imageSize(2)*2)/2;
 borderH = border/2;
 
 % for upper right
@@ -293,63 +274,36 @@ Y1 = centerY + borderH;
 Y2 = Y1 + imageSize2(2);
 imPos(4,:) = [X1,Y1,X2,Y2];
 
-% position of each image
-% position of images
-% imPos(1,:) = [BorderX,BorderY,BorderX+destDims(1),BorderY+destDims(2)];
-% imPos(2,:) = [screenX-BorderX-destDims(1),BorderY,screenX-BorderX,BorderY+destDims(2)];
-% imPos(3,:) = [BorderX,screenY-BorderY-destDims(2),BorderX+destDims(1),screenY-BorderY];
-% imPos(4,:) = [screenX-BorderX-destDims(1),screenY-BorderY-destDims(2),screenX-BorderX,screenY-BorderY];
-
-% imPos(1,:) = [center(1,1)-destDims(1),center(1,2)-destDims(2),center(1,1)+destDims(1),center(1,2)+destDims(2)];
-% imPos(2,:) = [center(2,1)-destDims(1),center(2,2)-destDims(2),center(2,1)+destDims(1),center(2,2)+destDims(2)];
-% imPos(3,:) = [center(3,1)-destDims(1),center(3,2)-destDims(2),center(3,1)+destDims(1),center(3,2)+destDims(2)];
-% imPos(4,:) = [center(4,1)-destDims(1),center(4,2)-destDims(2),center(4,1)+destDims(1),center(4,2)+destDims(2)];
-
-% image loading progress bar
-%progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY+progHeight/2];
-
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 
-if matchNum == 0
-    dataHeader = ['data/' num2str(subjectNum)];
-    if ~exist(dataHeader)
-        mkdir(dataHeader);
-        MdataHeader = ['data/' num2str(subjectNum) '_match'];
-        mkdir(MdataHeader);
-    end
-else
-    dataHeader = ['data/' num2str(subjectNum) '_match'];
+dataHeader = ['data/subject' num2str(subjectNum)];
+dayHeader = [dataHeader '/day' num2str(expDay)];
+
+if ~exist(dayHeader)
+    mkdir(dayHeader);
 end
 
-% runHeader = [dataHeader '/run' num2str(runNum)];
-% classOutputDir = [runHeader '/classoutput'];
-% fname = findNewestFile(runHeader, fullfile(runHeader, ['blockdatadesign_' num2str(runNum) '*.mat']));
-% %fn = ls([runHeader '/blockdatadesign_' num2str(runNum) '_*']);
-% load(fname);
-%
-% if any([blockData.type]==2) %#ok<NODEF>
-%     restInstruct = 'The feedback blocks will start soon';
-% else
-%     restInstruct = 'The next blocks will start soon';
-% end
-% restDur = 4;
-
+% get the image director for the day
+imorder = load([dataHeader '/subjorder.mat']);
+today_folder = imorder.testOrder(expDay);
+image_path = ['imagesbyday' '/' 'T' num2str(today_folder) '/'];
+code_path = pwd;
 %% Load Images
 nSubCategs = 5;
-cd images;
+cd(image_path);
 for categ=1:nSubCategs
     
     % move into the right folder
     if (categ == DYSPHORIC)
-        cd Dysphoric_proc;
+        cd dys;
     elseif (categ == THREAT)
-        cd Threat_proc;
+        cd threat;
     elseif (categ == NEUTRAL)
-        cd Neutral_proc;
+        cd neut;
     elseif (categ == POSITIVE)
-        cd Positive_proc;
+        cd pos;
     elseif (categ == NEUTRALFILLER)
-        cd NeutralFiller_proc;
+        cd neutf;
     else
         error('Impossible category!');
     end
@@ -389,7 +343,7 @@ for categ=1:nSubCategs
         error('Need at least one image per directory!');
     end
 end
-cd ..;
+cd(code_path);
 Screen('Flip',mainWindow);
 
 
@@ -494,7 +448,7 @@ for iTrial=1:config.nTrials
     
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
-    timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
+     timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
     % now close previous trial's data
     if eyeTrack
         if iTrial > 1
@@ -510,6 +464,7 @@ for iTrial=1:config.nTrials
     if stim.trialType(iTrial) == 1
         vCount = vCount + 1;
         for im = 1:4
+            % for valence trials
             categ = stim.position(vCount,im);
             stim.image{vCount,im} = images{categ,stim.order(vCount,categ)};
             % make textures
@@ -517,7 +472,7 @@ for iTrial=1:config.nTrials
             Screen('PreloadTextures',mainWindow,imageTex);
             Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
         end
-    else
+    else % for filler trials
         fCount = fCount + 1;
         categ=NEUTRALFILLER;
         for im = 1:4
@@ -569,9 +524,9 @@ Screen('FillRect',mainWindow,backColor);
 Screen('Flip',mainWindow);
 %% save
 if ~eyeTrack
-    save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing');
+    save([dayHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing');
 else
-    save([dataHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing', 'GazeData');
+    save([dayHeader '/gazedata' '_' datestr(now,30)],'stim', 'config', 'timing', 'GazeData');
 end
 % clean up and go home
 sca;

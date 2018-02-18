@@ -6,7 +6,7 @@
 % 3. ProcessMultiday - save for each day so you know the settings
 
 function copyallfilesforsubject(subjectNum,DAYNUM)
-dataHeader = ['data/' num2str(subjectNum) '/' 'usedscripts' '/'];
+dataHeader = ['data/subject' num2str(subjectNum) '/' 'usedscripts' '/'];
 if ~exist(dataHeader)
     mkdir(dataHeader)
 end

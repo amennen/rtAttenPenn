@@ -4,31 +4,36 @@ addpath(genpath('/Applications/Psychtoolbox/'))
 addpath(genpath('~/Tobii/'))
 
 subjectNum = 100;
+subjectDay=1;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
 % **** types of stimuli to train/show to subjects *******
 
-matchNum = 0;
-useTobii=1;
+useTobii=0;
 realtimeData = 0;
 debug=0;
 KbName('UnifyKeyNames')
 
-% set the parameters for which day you're on
-dayNum = 1;
-% RANDOMIZE THE ORDER!!!! NOT COUNTERBALANCED!!!
-
-% now counterbalance orders of testing
-dayMap = mod(subjectNum-1,4)+1;
 % randomize order order
 seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
-% could be perfectly counterbalnced or just randomized for each subject
-% what their order is
+
+%% make randomized order
+if subjectDay==1
+    ndays = 4;
+    testOrder = randperm(ndays);
+    dataHeader = ['data/subject' num2str(subjectNum)];
+    if ~exist(dataHeader)
+        mkdir(dataHeader)
+    end
+    save([dataHeader '/' 'subjorder'], 'testOrder');
+end
+
 %%
 runNum=1;
-RealTimeGazeDisplay(subjectNum,matchNum,useTobii,debug)
+RealTimeGazeDisplay(subjectNum,subjectDay,useTobii,debug)
 close all;
 Screen('CloseAll')
 
 %%
+copyallfilesforsubject(subjectNum,subjectDay)
