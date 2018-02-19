@@ -368,7 +368,7 @@ if runNum == 1
     patterns.phase2Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
     patterns.phase2Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
     patterns.phase2Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
-    patterns.phase2Var(1,:) = patterns.phase1Std(1,:).^2;
+    patterns.phase2Var(1,:) = patterns.phase2Std(1,:).^2;
     patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase2Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase2Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
     p2 = GetSecs;
     fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
