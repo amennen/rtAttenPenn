@@ -483,6 +483,7 @@ for iTrial=1:config.nTrials
             Screen('DrawTexture',mainWindow,imageTex,imageRect,imPos(im,:));
         end
     end
+    % start eye tracking here
     if eyeTrack
         tetio_startTracking;
         timing.startEye(iTrial) = GetSecs;
@@ -492,6 +493,7 @@ for iTrial=1:config.nTrials
     if eyeTrack
         Temp = tetio_localTimeNow;
         timing.gaze.pic(iTrial) = tetio_localToRemoteTime(Temp);
+        % this gets the time that it flipped in the eye tracker time
     end
     %fprintf('Flip time error = %.4f\n', timing.actualOnsets.pic(iTrial) - timing.plannedOnsets.pic(iTrial));
     if stim.trialType(iTrial)==1

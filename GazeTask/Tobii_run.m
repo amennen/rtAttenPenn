@@ -53,3 +53,25 @@ end
 tetio_disconnectTracker;
 tetio_cleanUp;
 
+%% how to look at the eye tracking data saved-- check it seems okay
+d = load('gazedata_20180219T103925.mat');
+% saves a different array for each of the trials--left, right, remote
+% now look for indiividual trial
+trial = 1;
+GazeX.Left = d.GazeData.Left{trial}(:,7);
+GazeY.Left = d.GazeData.Left{trial}(:,8);
+GazeX.Right = d.GazeData.Right{trial}(:,7);
+GazeY.Right = d.GazeData.Right{trial}(:,8);
+GazeStatus.Left = d.GazeData.Left{trial}(:,13);
+GazeStatus.Right = d.GazeData.Left{trial}(:,13);
+nPts = size(d.GazeData.Left{trial},1);
+deltaTime = nPts/120
+% check that the same time is the same difference for the other saved time
+onstim = d.timing.actualOnsets.pic(1);
+offstim = d.timing.actualOnsets.preITI(2);
+gaze = (d.timing.gaze.pic(1) - d.timing.gaze.off(1))/1000
+nTrial=20;
+for trial = 1:nTrial
+    DisplayData(z.GazeData.Left{trial},z.GazeData.Right{trial} );
+end
+
