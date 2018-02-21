@@ -574,7 +574,6 @@ clear tempBounds;
 timespec = timing.plannedreston - slack;
 timing.actualreston = Screen('Flip',mainWindow,timespec); % show instructions
 fprintf('Flip time error = %.4f\n', timing.actualreston-timing.plannedreston)
-save([runHeader '/blockdata_training'],'blockData');
 
 % show fixation
 Screen(mainWindow,'FillRect',backColor);

@@ -1,4 +1,4 @@
-function [blockData patterns] = RealTimePunisherExptSequence_NEW(subjectNum,subjectName,runNum,rtfeedback,expDay)
+function [blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,expDay)
 % NEW VERSION MADE GOING TO COUNTERBALANCE BUT MAKE IT SO THAT EACH PERSON
 % WILL HAVE ALL THE BLOCKS DIVIDED MORE FLUENTLY
 
