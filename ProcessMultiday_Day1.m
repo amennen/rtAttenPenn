@@ -149,7 +149,7 @@ end
 % brain
 mask=mask_brain;
 %save anatomical mask
-save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(1)],'mask');
+save([code_dir '/data/' num2str(subjectNum) '/day' num2str(dayNum) '/mask_' num2str(subjectNum) '_' num2str(1)],'mask');
 
 
 fprintf('Done with mask creation\n');

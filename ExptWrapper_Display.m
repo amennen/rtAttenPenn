@@ -1,12 +1,13 @@
 %% first specify the things that change
-subjectNum = 100;
+subjectNum = 7;
 subjectRun = 1;
 subjectDay = 1;
 
-useButtonBox=0;
-realtimeData = 0;
+useButtonBox=1;
+% CHANGE TRIGGER BACK!!!
+realtimeData = 1;
 debug=0;
-
+usepyoutput = 0;
 %% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
 copyallfilesforsubject(subjectNum,subjectDay)
 %% then specify everything else
@@ -24,54 +25,54 @@ addpath(genpath('/opt/psychtoolbox/'))
 %%
 runNum=1;
 % today's scanning number
-fMRI = 0;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+fMRI = 9;
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum=2;
-fMRI = 13;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+fMRI = 11;
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 3;
 fMRI = 15;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 4;
 fMRI = 17;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 5;
 fMRI = 19;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum = 6;
 fMRI = 20;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
 runNum = 7;
 fMRI = 20;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
 runNum = 8;
 fMRI = 22;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
 runNum = 9;
 fMRI = 24;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug)
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)

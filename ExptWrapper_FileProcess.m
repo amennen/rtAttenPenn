@@ -1,5 +1,5 @@
 %% first specify things that change
-subjectNum = 100;
+subjectNum = 7;
 subjectRun = 1; % run number for the day
 subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 imgDirHeader = '/Data1/subjects/';
@@ -58,13 +58,13 @@ fMRI = 9;
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 13;
+fMRI = 11;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%
 
 runNum = 3;
-fMRI = 15;
+fMRI = 13;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 

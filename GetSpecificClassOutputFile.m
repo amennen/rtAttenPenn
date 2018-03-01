@@ -1,8 +1,11 @@
-function [fileAvail specificFile] = GetSpecificClassOutputFile(imgDir,fileNum)
+function [fileAvail specificFile] = GetSpecificClassOutputFile(imgDir,fileNum,usepython)
 
 fileStr = num2str(fileNum);
-specificFile = ['vol_' fileStr '.mat'];
-
+if ~usepython
+    specificFile = ['vol_' fileStr '.mat'];
+else
+    specificFile = ['vol_' fileStr '_py.txt'];
+end
 if exist(fullfile(imgDir,specificFile),'file');
     fileAvail = 1;
 else
