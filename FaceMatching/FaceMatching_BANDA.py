@@ -35,8 +35,10 @@ if os.path.exists(configFile):
                 output=row[1]
 else:
     # CHANGED FOR THIS FILE!!
-    outerpath = '/Users/amennen/Dropbox/rtPennBehavData/facematching/'
-    output=os.path.abspath(os.path.join(outerpath,"tfMRI_output"))
+    #outerpath = '/Users/amennen/Dropbox/rtPennBehavData/facematching/'
+    #output=os.path.abspath(os.path.join(outerpath,"tfMRI_output"))
+    # changing back to just save data in this directory so the data will be stored on this computer only
+    output=os.path.abspath(os.path.join(os.path.dirname( __file__ ), '../..',"tfMRI_output"))
 
     
 _thisDir = os.path.dirname(os.path.abspath(__file__))

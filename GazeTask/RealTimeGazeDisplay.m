@@ -243,7 +243,10 @@ imageRect = [0 0 actual_imageSize(1) actual_imageSize(2)];
 % placeholder for images
 %border = screenX/20;
 % try to scale border to area of screen
-border = (screenY - imageSize(2)*2)/2;
+% maybe make a little bigger?
+%border = (screenY - imageSize(2)*2)/2;
+border = (screenY - imageSize(2)*2)/1.5;
+% try 2/28 make border bigger
 borderH = border/2;
 
 % for upper right
