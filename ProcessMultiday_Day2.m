@@ -152,7 +152,7 @@ end
 % brain
 mask=mask_brain;
 %save anatomical mask
-save([code_dir '/data/' num2str(subjectNum) '/mask_' num2str(subjectNum) '_' num2str(dayNum)],'mask');
+save([code_dir '/data/' num2str(subjectNum) '/day' num2str(dayNum) '/mask_' num2str(subjectNum) '_' num2str(dayNum)],'mask');
 
 fprintf('Done with mask creation\n');
 % if cd into the directory, cd out of it back to the general exp folder

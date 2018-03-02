@@ -1,4 +1,4 @@
-function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,DAYNUM,useButtonBox,fMRI,rtData,debug)
+function [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,DAYNUM,useButtonBox,fMRI,rtData,debug,usepython)
 % function [blockData] = RealTimePunisherDisplay(dataDirHeader,subjectNum,subjectName,runNum,useButtonBox,fMRI,rtData,debug)
 %
 % Face/house attention experiment with real-time classifier feedback
@@ -137,6 +137,7 @@ else
     DEVICE = -1;
 end
 TRIGGER = '5%';
+%TRIGGER ='=+' put in for Princeton scanner
 TRIGGER_keycode = getKeys(TRIGGER);
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
@@ -735,7 +736,7 @@ for iBlock=indBlocksPhase2
                 
                 %check for classifier output file
                 while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
-                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1); %#ok<AGROW>
+                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1,usepython); %#ok<AGROW>
                 end
                 
                 %load classifier output file
