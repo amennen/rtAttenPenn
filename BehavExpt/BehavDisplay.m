@@ -246,8 +246,8 @@ catch
 end
 addpath(genpath(base_path));
 image_dir = fullfile(base_path, 'images');
-code_dir = pwd;
-dataDirHeader = pwd;
+code_dir = [base_path 'BehavExpt'];
+dataDirHeader =[base_path 'BehavExpt'];
 dataHeader = fullfile(dataDirHeader,[ 'data/subject' num2str(subjectNum)]);
 dayHeader = [dataHeader '/day' num2str(DAYNUM)];
 runHeader = [dayHeader '/run' num2str(runNum)];
