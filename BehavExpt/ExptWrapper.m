@@ -18,7 +18,7 @@ rtfeedback = 0;
 useButtonBox = 0; %maybe replace with keyboard eventually?
 rtData = 0;
 fMRI = 0;
-debug = 1;
+debug = 0;
 ex_image_dir = pwd;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))

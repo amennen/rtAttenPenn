@@ -108,7 +108,7 @@ minimumDisplay = 0.25;
 % how to average the faces and scenes
 attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
-faceProp = 0.6;
+faceProp = 0.03;
 sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in
@@ -190,7 +190,7 @@ else
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
-    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
+    %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
     windowSize.pixels = [resolution.width resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
@@ -208,7 +208,8 @@ end
 %if (useButtonBox)%scanner display monitor has error with inputs of screen size
 %    mainWindow = Screen(screenNum,'OpenWindow',backColor);
 %else
-mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+% REMOVING COORDINATES BECAUSE IF YOU HAVE MULTIPLE SCREENS YOU CAN'T INPUT COORDINATES!!
+mainWindow = Screen(screenNum,'OpenWindow',backColor);
 %end
 ifi = Screen('GetFlipInterval', mainWindow);
 slack  = ifi/2;
