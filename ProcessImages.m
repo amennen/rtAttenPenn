@@ -28,15 +28,20 @@ cliplimit = .01;    %contrast:  limit of contrast enhancement
 %% set up directories
 
 % where raw files are located 
-imFn = 'outdoor';
+imFn = 'F_square';
 old_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/scenes/'];
 % where new files will be written 
 new_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/scenes'];
+
+% now 3/8: using for color versions
+old_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/'];
+new_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/'];
+code_dir = pwd;
 cd(old_root_dir);
 % subfolders containing image files
 %folders =  {'indoor','outdoor','male','female'};
 oldfolders = {imFn};
-newfolders = {[imFn '_LUMproc_NEW']};
+newfolders = {[imFn '_LUMproc_NEW2']};
 idealM = 127;
 %oldfolders = {'male_happy'};
 %newfolders = {'male_happy_proc'}
@@ -90,3 +95,5 @@ for folder=1:length(oldfolders) % loop through each folder
         imwrite(imad_lum, [new_folder '/' num2str(imageCounter) '.jpg'], 'jpg');
     end % end image loop
 end % end folder loop 
+
+cd(code_dir);

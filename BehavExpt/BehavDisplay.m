@@ -108,7 +108,7 @@ minimumDisplay = 0.25;
 % how to average the faces and scenes
 attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
-faceProp = 0.03;
+faceProp = 0.25;
 sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in

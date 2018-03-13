@@ -94,15 +94,17 @@ if exist(sprintf('%s_exfunc.nii.gz',roi_name),'file')
 end
 unix(sprintf('%sbxhabsorb %s_exfunc.nii %s_exfunc.bxh',bxhpath,roi_name,roi_name));
 
+% CHANGING 3/13: don't extract functional scan to make sure we stay in
+% brain!!
 % brain extract functional scan to make sure we stay inside the brain of
 % the subject!
-unix(sprintf('%sbet %s.nii.gz %s_brain -R -m',fslpath,functionalFN_RE,functionalFN_RE)); % check that this is okay!
+%unix(sprintf('%sbet %s.nii.gz %s_brain -R -m',fslpath,functionalFN_RE,functionalFN_RE)); % check that this is okay!
 %CHECK OKAY
-fprintf('%sfslview %s_brain.nii.gz', fslpath,functionalFN_RE)
-if exist(sprintf('%s_brain.nii.gz',functionalFN_RE),'file')
-    unix(sprintf('gunzip %s_brain.nii.gz',functionalFN_RE));
-end
-unix(sprintf('%sbxhabsorb %s_brain.nii %s_brain.bxh',bxhpath,functionalFN_RE,functionalFN_RE));
+% fprintf('%sfslview %s_brain.nii.gz', fslpath,functionalFN_RE)
+% if exist(sprintf('%s_brain.nii.gz',functionalFN_RE),'file')
+%     unix(sprintf('gunzip %s_brain.nii.gz',functionalFN_RE));
+% end
+%unix(sprintf('%sbxhabsorb %s_brain.nii %s_brain.bxh',bxhpath,functionalFN_RE,functionalFN_RE));
 
 t.standard2func = GetSecs - startFunctional;
 fprintf('Done with standard2func registration, time = %6.2f', t.standard2func);
@@ -118,22 +120,23 @@ save(['mask_wholeBrain' '.mat'], 'mask');
 startMask = GetSecs;
 %load registered anatomical ROI
 maskStruct = readmr([roi_name '_exfunc.bxh'],'BXH',{[],[],[]});
-brainExtFunc = readmr([functionalFN_RE '_brain.bxh'], 'BXH',{[],[],[]});
+%brainExtFunc = readmr([functionalFN_RE '_brain.bxh'], 'BXH',{[],[],[]});
 
 %rotate anatomical ROI to be in the same space as the mask - check that this works for different scans/ROIs
 anatMaskRot = zeros(size(mask));
-brainExtRot = zeros(size(mask));
+%brainExtRot = zeros(size(mask));
 for i = 1:size(maskStruct.data,3)
     anatMaskRot(:,:,i) = rot90(maskStruct.data(:,:,i)); %rotates entire slice by 90 degrees
-    brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
+    %brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
 end
 
 %overwrite whole-brain mask
 mask = logical(anatMaskRot); %make it so it's just 1's and 0's
-brainExt = logical(brainExtRot);
+%brainExt = logical(brainExtRot);
 allinMask = find(anatMaskRot);
-allinBrainExt = find(brainExt);
-mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
+%allinBrainExt = find(brainExt);
+%mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
+mask_indices = find(allinMask); % just use all the ones from the registration
 [gX gY gZ] = ind2sub(size(mask),mask_indices);
 mask_brain = zeros(size(mask,1),size(mask,2),size(mask,3));
 for j=1:length(mask_indices)
