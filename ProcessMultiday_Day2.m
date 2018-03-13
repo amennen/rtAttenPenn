@@ -1,7 +1,7 @@
 % THIS SCRIPT WILL REGISTER THE FLASH AND THE MASK TO BE USED FOR DAY 21
 % MAKE SURE YOU DO THE SAME BET SETTINGS AS WITH DAY 1!
 
-subjectNum = 6; % multiday test is subject 5, intel demo is subject 3
+subjectNum = 6; % multiday test is subject 5, intel demo is subject 3, %NK is 6, phantom is 7
 runNum = 3;
 dayNum = 2; % REMEMBER TO SPECIFY WHAT DAY IT IS!!
 flash_hrScan = 5;
@@ -18,7 +18,7 @@ if ~exist('readmr','file')
     addpath([biac_dir '/general/'])
 end
 setenv('FSLOUTPUTTYPE','NIFTI_GZ');
-dataDirHeader = pwd;
+dataDirHeader = pwd; % this has to be in the code directory
 save_dir = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(dayNum)]);
 process_dir1 = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(1) '/reg' '/']);
 process_dir_today = [save_dir '/' 'reg' '/'];
@@ -32,11 +32,12 @@ if ~exist(process_dir_today)
 end
 cd(process_dir_today)
 %% now register for second day mask
-subjDate2 = '9-22-17';
-%subjectName2 = [datestr(subjDate2,5) datestr(subjDate2,7) datestr(subjDate2,11) num2str(runNum) '_' projectName];
-%dicom_dir2 = ['/Data1/subjects/' datestr(subjDate2,10) datestr(subjDate2,5) datestr(subjDate2,7) '.' subjectName2 '.' subjectName2 '/'];
-subjectName2 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
-dicom_dir2 = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName2 '.' subjectName2 '/'];
+
+subjDate2 = '1-22-18';%'9-22-17';
+subjectName2 = [datestr(subjDate2,5) datestr(subjDate2,7) datestr(subjDate2,11) num2str(runNum) '_' projectName];
+dicom_dir2 = ['/Data1/subjects/' datestr(subjDate2,10) datestr(subjDate2,5) datestr(subjDate2,7) '.' subjectName2 '.' subjectName2 '/'];
+%subjectName2 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+%dicom_dir2 = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName2 '.' subjectName2 '/'];
 
 %%
 % get both flashes ready
@@ -73,7 +74,7 @@ unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,functional2FN_RE,fu
 
 % now check okay and make bxh 
 fprintf('%sfslview %s_brain.nii.gz', fslpath,functional2FN_RE)
-%%
+%% if okay make functional into bxh file
 if exist(sprintf('%s_brain.nii.gz',functional2FN_RE),'file')
     unix(sprintf('gunzip %s_brain.nii.gz',functional2FN_RE));
 end
@@ -105,6 +106,13 @@ unix(sprintf('%sflirt -in %swholebrain_mask_exfunc.nii.gz -ref %s_brain.nii.gz -
 unix(sprintf('%sflirt -in mask1-2-flashlr -ref %s_brain.nii.gz -applyxfm -init flashlr2func2.mat -interp nearestneighbour -out mask12func2_lr', fslpath, functional2FN_RE))
 
 % WHICHEVER ONE YOU GO WITH: SAVE AS mask1-2-func2
+
+%% other option: go directly from exfunc1 --> exfunc 2
+% now you have a mask in func 2 space!
+unix(sprintf('%sflirt -dof 6 -in %s%s_brain.nii.gz -ref %s_brain.nii.gz -out func12func2 -omat func12func2.mat', fslpath, process_dir1,functionalFN_RE,functional2FN_RE))
+% 3. apply old mask - apply mask to func12func2
+unix(sprintf('%sflirt -in %swholebrain_mask_exfunc.nii.gz -ref %s_brain.nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2', fslpath, process_dir1,functional2FN_RE))
+
 %% NOW CREATE MASK IN MATLAB
 
 % this is where you would make the mask bigger
