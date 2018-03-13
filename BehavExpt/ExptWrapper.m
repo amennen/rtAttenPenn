@@ -33,16 +33,12 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 % generate all neutral first seconds
 
-runNum = 1;
-[blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
-
-% now go through the rest
-nRuns = 1;
+nRuns = 3;
 % counterbalance order of if happy or sad is first/then if first or
 % second order so 4 options
 for i = 1:nRuns
     % changing it here for behavioral have rtfeedback = 0
-    runNum = i+1;
+    runNum = i;
     [blockData patterns] = BehavExptSequence(subjectNum,subjectName,runNum,rtfeedback,subjectDay);
 end
 
@@ -53,6 +49,7 @@ BehavInstruct(subjectNum,subjectName,1,subjectDay,debug);
 %% now run exp sequence
 runNum = 1;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
+%%
 % change the image paths inside this script
 runNum = 2;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)

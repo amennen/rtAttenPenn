@@ -311,32 +311,29 @@ cd(code_dir);
 % else
 %     emblocks = [0 0 0 0 0 0 0 0]; % if not a feedback run
 % end
-if runNum == 1 % first run only neutral faces/scenes
-    nBlockTypes = 2;
-    neut_types = [1 3];
-    blockSequencePhase1A = neut_types(randperm(nBlockTypes));
-    blockSequencePhase1B = neut_types(randperm(nBlockTypes));
-    categOrderPhase1 = [blockSequencePhase1A blockSequencePhase1B];
-    
-    blockSequencePhase2A = neut_types(randperm(nBlockTypes));
-    blockSequencePhase2B = neut_types(randperm(nBlockTypes));
-    categOrderPhase2 = [blockSequencePhase2A blockSequencePhase2B];
-    
-    blockTypes = [categOrderPhase1 categOrderPhase2];
-    %attCategOrder = [categOrderPhase1 categOrderPhase2];
-    %inattCategOrder = (attCategOrder==1)+1; 
-else
-    nBlockTypes = 4;
-    blockSequencePhase1A = randperm(nBlockTypes);
-    categOrderPhase1 = [blockSequencePhase1A];
-    
-    blockSequencePhase2A = randperm(nBlockTypes);
-    categOrderPhase2 = [blockSequencePhase2A];
-    
-    blockTypes = [categOrderPhase1 categOrderPhase2];
-    
-   
-end
+% taking this out so every block has every condition ***
+% if runNum == 1 % first run only neutral faces/scenes
+%     nBlockTypes = 2;
+%     neut_types = [1 3];
+%     blockSequencePhase1A = neut_types(randperm(nBlockTypes));
+%     blockSequencePhase1B = neut_types(randperm(nBlockTypes));
+%     categOrderPhase1 = [blockSequencePhase1A blockSequencePhase1B];
+%     
+%     blockSequencePhase2A = neut_types(randperm(nBlockTypes));
+%     blockSequencePhase2B = neut_types(randperm(nBlockTypes));
+%     categOrderPhase2 = [blockSequencePhase2A blockSequencePhase2B];
+%     
+%     blockTypes = [categOrderPhase1 categOrderPhase2];
+%     %attCategOrder = [categOrderPhase1 categOrderPhase2];
+%     %inattCategOrder = (attCategOrder==1)+1; 
+% else
+nBlockTypes = 4;
+blockSequencePhase1A = randperm(nBlockTypes);
+categOrderPhase1 = [blockSequencePhase1A];
+blockSequencePhase2A = randperm(nBlockTypes);
+categOrderPhase2 = [blockSequencePhase2A];
+blockTypes = [categOrderPhase1 categOrderPhase2];
+%end
 attCategOrder = (([categOrderPhase1 categOrderPhase2]>2)+1); % this is saying if it's face or scene!!
 inattCategOrder = (([categOrderPhase1 categOrderPhase2]<=2)+1);
 %attCategOrder = [categOrderPhase1 categOrderPhase2]; % SAYS IF THAT BLOCK ATTEND TO SCENE OR FACE, ALL 8 BLOCKS IN RUN

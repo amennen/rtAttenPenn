@@ -189,7 +189,7 @@ else
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
-    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
+    %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
     windowSize.pixels = [resolution.width/2 resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
