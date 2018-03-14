@@ -2,10 +2,10 @@
 subjectNum = 7;
 subjectRun = 1; % run number for the day
 subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
-imgDirHeader = '/Data1/subjects/';
+%imgDirHeader = '/Data1/subjects/';
 % for testing code at Princeton
 % for Penn
-%imgDirHeader = '/mnt/';
+imgDirHeader = '/mnt/rtexport/RTexport_Current/';
 realtimeData = 1;
 debug = 0;
 %% specify everything else

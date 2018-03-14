@@ -8,19 +8,20 @@ flash_hrScan = 5;
 functionalScan=6;
 %%
 projectName = 'rtAttenPenn';
-biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
+biac_dir = '/home/amennen/code/BIAC_Matlab_R2014a/';
+%biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
-fslpath='/opt/fsl/5.0.9/bin/';
+fslpath='/opt/FSL/5.0.9/bin/';
 %add necessary package
-if ~exist('readmr','file')
+%if ~exist('readmr','file')
     addpath(genpath(biac_dir));
     addpath([biac_dir '/mr/']);
     addpath([biac_dir '/general/'])
-end
+%end
 setenv('FSLOUTPUTTYPE','NIFTI_GZ');
 dataDirHeader = pwd; % this has to be in the code directory
-save_dir = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(dayNum)]);
-process_dir1 = fullfile(dataDirHeader,['/data/' num2str(subjectNum), '/day' num2str(1) '/reg' '/']);
+save_dir = fullfile(dataDirHeader,['/data/subject' num2str(subjectNum), '/day' num2str(dayNum)]);
+process_dir1 = fullfile(dataDirHeader,['/data/subject' num2str(subjectNum), '/day' num2str(1) '/reg' '/']);
 process_dir_today = [save_dir '/' 'reg' '/'];
 roi_name = 'wholebrain_mask';
 roi_dir = pwd; % change this path name to wherever you put it on the penn computer!
@@ -33,12 +34,12 @@ end
 cd(process_dir_today)
 %% now register for second day mask
 
-subjDate2 = '1-22-18';%'9-22-17';
-subjectName2 = [datestr(subjDate2,5) datestr(subjDate2,7) datestr(subjDate2,11) num2str(runNum) '_' projectName];
-dicom_dir2 = ['/Data1/subjects/' datestr(subjDate2,10) datestr(subjDate2,5) datestr(subjDate2,7) '.' subjectName2 '.' subjectName2 '/'];
-%subjectName2 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
-%dicom_dir2 = ['/Data1/subjects/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName2 '.' subjectName2 '/'];
-
+%subjDate2 = '1-22-18';%'9-22-17';
+%subjectName2 = [datestr(subjDate2,5) datestr(subjDate2,7) datestr(subjDate2,11) num2str(runNum) '_' projectName];
+%dicom_dir2 = ['/home/amennen/temp/' datestr(subjDate2,10) datestr(subjDate2,5) datestr(subjDate2,7) '.' subjectName2 '.' subjectName2 '/'];
+subjectName2 = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(runNum) '_' projectName];
+dicom_dir2 = ['/mnt/rtexport/RTexport_Current/' datestr(now,10) datestr(now,5) datestr(now,7) '.' subjectName2 '.' subjectName2 '/'];
+fprintf('dicom files are going to be read from: %s\n', dicom_dir2)
 %%
 % get both flashes ready
 
@@ -70,23 +71,24 @@ exfunc_str = sprintf('%s001_0000%s_0000%s.dcm',dicom_dir2,num2str(functionalScan
 unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,exfunc_str,functional2FN));
 unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,functional2FN,functional2FN_RE));
 unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,functional2FN_RE,functional2FN_RE))
-%unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,functional2FN_RE,functional2FN_RE)) 
+unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,functional2FN_RE,functional2FN_RE)) 
 
 % now check okay and make bxh 
-%fprintf('%sfslview %s_brain.nii.gz', fslpath,functional2FN_RE)
+fprintf('%sfslview %s_brain.nii.gz\n', fslpath,functional2FN_RE)
 %% if okay make functional into bxh file
-% if exist(sprintf('%s_brain.nii.gz',functional2FN_RE),'file')
-%     unix(sprintf('gunzip %s_brain.nii.gz',functional2FN_RE));
-% end
-% unix(sprintf('%sbxhabsorb %s_brain.nii %s_brain.bxh',bxhpath,functional2FN_RE,functional2FN_RE));
+ if exist(sprintf('%s_brain.nii.gz',functional2FN_RE),'file')
+     unix(sprintf('gunzip %s_brain.nii.gz',functional2FN_RE));
+ end
+ unix(sprintf('%sbxhabsorb %s_brain.nii %s_brain.bxh',bxhpath,functional2FN_RE,functional2FN_RE));
 
 %% REGISTRATION
 % repeat over with flash scans being scan numbers 7 AND OR 8!!!
 % go directly from exfunc1 --> exfunc 2
 % now you have a mask in func 2 space!
-unix(sprintf('%sflirt -dof 6 -in %s%s_brain.nii.gz -ref %s_brain.nii.gz -out func12func2 -omat func12func2.mat', fslpath, process_dir1,functionalFN_RE,functional2FN_RE))
+% aligning NON brain extracted parts to help it find things
+unix(sprintf('%sflirt -dof 6 -in %s%s.nii.gz -ref %s.nii.gz -out func12func2 -omat func12func2.mat', fslpath, process_dir1,functionalFN_RE,functional2FN_RE))
 % 3. apply old mask - apply mask to func12func2
-unix(sprintf('%sflirt -in %swholebrain_mask_exfunc -ref %s_brain.nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2', fslpath, process_dir1,functional2FN_RE))
+unix(sprintf('%sflirt -in %swholebrain_mask_exfunc -ref %s.nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2', fslpath, process_dir1,functional2FN_RE))
 
 %% NOW CREATE MASK IN MATLAB
 
@@ -104,23 +106,23 @@ if exist(sprintf('%s.nii.gz',regmask),'file')
 end
 unix(sprintf('%sbxhabsorb %s.nii %s.bxh',bxhpath,regmask,regmask));
 maskStruct = readmr([regmask '.bxh'],'BXH',{[],[],[]});
-%brainExtFunc = readmr([functional2FN_RE '_brain.bxh'], 'BXH',{[],[],[]});
+brainExtFunc = readmr([functional2FN_RE '_brain.bxh'], 'BXH',{[],[],[]});
 
 %rotate anatomical ROI to be in the same space as the mask - check that this works for different scans/ROIs
 anatMaskRot = zeros(size(mask));
-%brainExtRot = zeros(size(mask));
+brainExtRot = zeros(size(mask));
 for i = 1:size(maskStruct.data,3)
     anatMaskRot(:,:,i) = rot90(maskStruct.data(:,:,i)); %rotates entire slice by 90 degrees
-    %brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
+    brainExtRot(:,:,i) = rot90(brainExtFunc.data(:,:,i));
 end
 
 %overwrite whole-brain mask
 mask = logical(anatMaskRot); %make it so it's just 1's and 0's
-%brainExt = logical(brainExtRot);
+brainExt = logical(brainExtRot);
 allinMask = find(anatMaskRot);
-%allinBrainExt = find(brainExt);
-%mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
-mask_indices = allinMask; % don't worry about if not in exfunc bc could remove some frontal regions
+allinBrainExt = find(brainExt);
+mask_indices = allinMask(find(ismember(allinMask,allinBrainExt))); %these are the good mask indices that are only brain
+%mask_indices = allinMask; % don't worry about if not in exfunc bc could remove some frontal regions
 [gX gY gZ] = ind2sub(size(mask),mask_indices);
 mask_brain = zeros(size(mask,1),size(mask,2),size(mask,3));
 for j=1:length(mask_indices)
@@ -136,7 +138,7 @@ end
 % brain
 mask=mask_brain;
 %save anatomical mask
-save([code_dir '/data/' num2str(subjectNum) '/day' num2str(dayNum) '/mask_' num2str(subjectNum) '_' num2str(dayNum)],'mask');
+save([code_dir '/data/subject' num2str(subjectNum) '/day' num2str(dayNum) '/mask_' num2str(subjectNum) '_' num2str(dayNum)],'mask');
 
 fprintf('Done with mask creation\n');
 % if cd into the directory, cd out of it back to the general exp folder
