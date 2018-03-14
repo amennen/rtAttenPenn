@@ -1,5 +1,5 @@
 %% first specify the things that change
-subjectNum = 7;
+subjectNum = 8;
 subjectRun = 1;
 subjectDay = 1;
 
@@ -25,12 +25,12 @@ addpath(genpath('/opt/psychtoolbox/'))
 %%
 runNum=1;
 % today's scanning number
-fMRI = 9;
+fMRI = 8;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum=2;
-fMRI = 11;
+fMRI = 10;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

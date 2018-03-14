@@ -3,11 +3,11 @@
 % THE SUBJECTS REGISTERED FILES WILL BE ALL IN THE SAME FOLDER BUT THEY
 % WILL BE COMING FROM DIFFERENT SCANNER LOCATIONS
 
-subjectNum = 6; % multiday test is subject 5, intel demo is subject 3, rtPenn pilot is subject 6
-runNum = 2;
+subjectNum = 8; % multiday test is subject 5, intel demo is subject 3, rtPenn pilot is subject 6
+runNum = 1;
 dayNum = 1;
-highresScan = 5;
-functionalScan=6;
+highresScan = 2;
+functionalScan=4;
 
 %%
 projectName = 'rtAttenPenn';
@@ -36,7 +36,7 @@ if ~exist(process_dir)
 end
 cd(process_dir)
 %% 
-subjDate1 = '1-22-18';
+%subjDate1 = '1-22-18';
 %subjectName1 = [datestr(subjDate1,5) datestr(subjDate1,7) datestr(subjDate1,11) num2str(runNum) '_' projectName];
 %dicom_dir1 = ['/home/amennen/temp/' datestr(subjDate1,10) datestr(subjDate1,5) datestr(subjDate1,7) '.' subjectName1 '.' subjectName1 '/'];
 startProcess=GetSecs;
@@ -50,7 +50,7 @@ highresfiles_genstr = sprintf('%s001_0000%s_0*',dicom_dir1,num2str(highresScan,'
 unix(sprintf('%sdicom2bxh %s %s.bxh',bxhpath,highresfiles_genstr,highresFN));
 unix(sprintf('%sbxhreorient --orientation=LAS %s.bxh %s.bxh',bxhpath,highresFN,highresFN_RE));
 unix(sprintf('%sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s %s.bxh %s',bxhpath,highresFN_RE,highresFN_RE))
-unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m',fslpath,highresFN_RE,highresFN_RE)) 
+unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -R -m -f .3',fslpath,highresFN_RE,highresFN_RE)) 
 %unix(sprintf('%sbet %s.nii.gz %s_brain.nii.gz -r 90 -R',fslpath,highresFN_RE,highresFN_RE)) 
 
 % for dcm2niix the command would be 'dcm2niix dicomdir -f test -o dicomdir -s y dicomdir/001_000007_000008.dcm'
