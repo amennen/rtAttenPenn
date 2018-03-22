@@ -211,7 +211,8 @@ for r in runs:
     msgMachine.draw()
     msgMachine.draw()
     win.flip()
-    event.waitKeys(keyList=["=","equal"])
+    ## CHANGE THIS TO CHANGE HOW THE TRIGGER COMES IN
+    event.waitKeys(keyList=["=","equal", "5", "5%", "%", "=+"])
     
     # the Routine "trigger" was not non-slip safe, so reset the non-slip timer
     routineTimer.reset()
