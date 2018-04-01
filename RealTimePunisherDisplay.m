@@ -107,12 +107,14 @@ minimumDisplay = 0.25;
 % how to average the faces and scenes
 attImgPropPhase1 = .5;
 attImgPropPhase2 = .5;
-
+% new: to use during the stable trials
+faceProp = 0.6;
+sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in
-gain = 3;
+gain = 2.75;
 x_shift = .2;
-y_shift = .15;
+y_shift = .05;
 steepness = .9;
 
 ScreenResX = 1280;
@@ -484,10 +486,12 @@ for iBlock=1:numel(indBlocksPhase1)
         end
        
         %update imgProp value
-        blockData(iBlock).attImgProp(iTrial)=attImgPropPhase1; %#ok<AGROW>
+        blockData(iBlock).attImgProp(iTrial)=attImgPropPhase1; 
         
         % generate image
-        fullImage = uint8((1-blockData(iBlock).attImgProp(iTrial))*tempImage{SCENE}+blockData(iBlock).attImgProp(iTrial)*tempImage{FACE});
+        %fullImage = uint8((1-blockData(iBlock).attImgProp(iTrial))*tempImage{SCENE}+blockData(iBlock).attImgProp(iTrial)*tempImage{FACE});
+        % new: have it always be 60% face, 40% scene
+        fullImage = uint8(tempImage{SCENE}*sceneProp+tempImage{FACE}*faceProp);
         
         % make textures
         imageTex = Screen('MakeTexture',mainWindow,fullImage);
@@ -645,8 +649,13 @@ for iBlock=indBlocksPhase2
             tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
         end
         
-        if iTrial <= nTrialsPerTR %initialize attImgProp
+        if iTrial <= nTrialsPerTR %initialize attImgProp for first 2 trials
             if iTrial == 1
+                if blockData(iBlock).attCateg == FACE
+                    attImgPropPhase2 = faceProp;
+                else % attend to scene
+                    attImgPropPhase2 = sceneProp;
+                end
                 blockData(iBlock).attImgProp(iTrial) = attImgPropPhase2; %#ok<AGROW>
                 blockData(iBlock).smoothAttImgProp(iTrial) = attImgPropPhase2; %#ok<AGROW>
             end
@@ -720,8 +729,6 @@ for iBlock=indBlocksPhase2
             end
         end
         blockData(iBlock).tr2(iTrial) = GetSecs;
-
-         % *************
 
         %load rtfeedback values once per TR
         blockData(iBlock).RT1(iTrial) = GetSecs;

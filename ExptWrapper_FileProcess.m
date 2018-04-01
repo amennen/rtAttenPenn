@@ -10,6 +10,7 @@ realtimeData = 1;
 debug = 0;
 %% specify everything else
 projectName = 'rtAttenPenn';
+%subjDate = '3-14-18';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
 %subjectName = [datestr(subjDate,5) datestr(subjDate,7) datestr(subjDate,11) num2str(subjectRun) '_' projectName];
 

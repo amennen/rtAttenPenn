@@ -66,37 +66,37 @@ def register_images(subject_dir, subject_id):
         fixation_sum=0
         
         for i in range(3,len(my_dataA)): #block_starts:
-           
-        happyA_write = csv.writer(happyA_file, delimiter=' ', lineterminator='\n')
-        fearA_write = csv.writer(fearA_file, delimiter=' ', lineterminator='\n')
-        neutralA_write = csv.writer(neutralA_file, delimiter=' ', lineterminator='\n')
-        objectsA_write = csv.writer(objectsA_file, delimiter=' ', lineterminator='\n')
-        fixationA_write = csv.writer(fixationA_file, delimiter=' ', lineterminator='\n')
-      
             
-        if 'happy' in my_dataA[i][2]:
-            print count,my_dataA[i][2],count*3+fixation_sum,3,1
-            count+=1
-            happyA_write.writerow((count*3+fixation_sum,3,1))
-        elif 'fear' in my_dataA[i][2]:
-            print count,my_dataA[i][2],count*3+fixation_sum,3,1
-            fearA_write.writerow((count*3+fixation_sum,3,1))
-            count+=1
-        elif 'neutral' in my_dataA[i][2]:
-            print count,my_dataA[i][2],count*3+fixation_sum,3,1
-            neutralA_write.writerow((count*3+fixation_sum,3,1))
-            count+=1
-        elif 'object' in my_dataA[i][2]:
-            print count,my_dataA[i][2],count*3+fixation_sum,3,1
-            objectsA_write.writerow((count*3+fixation_sum,3,1))
-            count+=1 
-        elif 'fixation'in my_dataA[i][0]:
-            print count, my_dataA[i][0],count*3+fixation_sum,18,1
-            fixationA_write.writerow((count*3+fixation_sum,18,1))
-            fixation_sum+=18    
-        
-        else:
-            print count
+            happyA_write = csv.writer(happyA_file, delimiter=' ', lineterminator='\n')
+            fearA_write = csv.writer(fearA_file, delimiter=' ', lineterminator='\n')
+            neutralA_write = csv.writer(neutralA_file, delimiter=' ', lineterminator='\n')
+            objectsA_write = csv.writer(objectsA_file, delimiter=' ', lineterminator='\n')
+            fixationA_write = csv.writer(fixationA_file, delimiter=' ', lineterminator='\n')
+            
+            
+            if 'happy' in my_dataA[i][2]:
+                print count,my_dataA[i][2],count*3+fixation_sum,3,1
+                count+=1
+                happyA_write.writerow((count*3+fixation_sum,3,1))
+            elif 'fear' in my_dataA[i][2]:
+                print count,my_dataA[i][2],count*3+fixation_sum,3,1
+                fearA_write.writerow((count*3+fixation_sum,3,1))
+                count+=1
+            elif 'neutral' in my_dataA[i][2]:
+                print count,my_dataA[i][2],count*3+fixation_sum,3,1
+                neutralA_write.writerow((count*3+fixation_sum,3,1))
+                count+=1
+            elif 'object' in my_dataA[i][2]:
+                print count,my_dataA[i][2],count*3+fixation_sum,3,1
+                objectsA_write.writerow((count*3+fixation_sum,3,1))
+                count+=1
+            elif 'fixation'in my_dataA[i][0]:
+                print count, my_dataA[i][0],count*3+fixation_sum,18,1
+                fixationA_write.writerow((count*3+fixation_sum,18,1))
+                fixation_sum+=18
+            
+            else:
+                print count
 
 
     #looking for run B events
