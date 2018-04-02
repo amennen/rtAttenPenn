@@ -250,7 +250,7 @@ load(fn);
 %% Load Images
 
 cd instructstim;
-for categ=1:4
+for categ=1:8
     
     % move into the right folder
     if (categ == INDOOR)
@@ -261,6 +261,14 @@ for categ=1:4
         cd male;
     elseif (categ == FEMALE)
         cd female;
+    elseif (categ == MALESAD)
+        cd male_sad;
+    elseif (categ == FEMALESAD)
+        cd female_sad;
+    elseif (categ == MALEHAPPY)
+        cd male_happy;
+    elseif (categ == FEMALEHAPPY)
+        cd female_happy;
     else
         error('Impossible category!');
     end
