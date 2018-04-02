@@ -67,6 +67,9 @@ code_dir = pwd;
 dataHeader = ['data/subject' num2str(subjectNum)];
 dayHeader = [dataHeader '/day' num2str(expDay)];
 runHeader = [dayHeader '/run' num2str(runNum)];
+if ~exist(runHeader)
+    mkdir(runHeader)
+end
 % we want order of everything to be counterbalanced with first run
 % everything neutral and randomized
 % then after that randomize

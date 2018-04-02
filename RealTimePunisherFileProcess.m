@@ -53,7 +53,8 @@ end
 %% Boilerplate
 
 seed = sum(100*clock); %get random seed
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+% taking out because shouldn't reinitiatlize every single run - 4/2/18
+%RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %initialize system time calls
 GetSecs;

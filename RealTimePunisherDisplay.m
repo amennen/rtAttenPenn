@@ -67,10 +67,10 @@ else
     Screen('Preference', 'SkipSyncTests', 1);
 end
 
-seed = sum(100*clock); %get random seed
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+
 
 %initialize system time calls
+seed = sum(100*clock); %get random seed
 GetSecs;
 
 %% Experimental Parameters
