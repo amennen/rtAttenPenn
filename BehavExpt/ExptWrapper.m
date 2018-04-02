@@ -33,7 +33,7 @@ addpath(genpath('/opt/psychtoolbox/'))
 
 % generate all neutral first seconds
 
-nRuns = 3;
+nRuns = 4;
 % counterbalance order of if happy or sad is first/then if first or
 % second order so 4 options
 for i = 1:nRuns

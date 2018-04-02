@@ -332,7 +332,7 @@ blockSequencePhase1A = randperm(nBlockTypes);
 categOrderPhase1 = [blockSequencePhase1A];
 blockSequencePhase2A = randperm(nBlockTypes);
 categOrderPhase2 = [blockSequencePhase2A];
-blockTypes = [categOrderPhase1 categOrderPhase2];
+blockTypes = [categOrderPhase1 categOrderPhase2]; % this will be the actual block types out of 4
 %end
 attCategOrder = (([categOrderPhase1 categOrderPhase2]>2)+1); % this is saying if it's face or scene!!
 inattCategOrder = (([categOrderPhase1 categOrderPhase2]<=2)+1);
@@ -349,7 +349,7 @@ trialCounter = 0;
 TRCounter = 0;
 
 for iBlock=1:numBlocks
-    blockData(iBlock).specificBlock = blockTypes(iBlock); % this says what stimuli
+    blockData(iBlock).specificBlock = blockTypes(iBlock); % this says what stimuli it is out of 4
     % set up block data structure
     blockData(iBlock).block = iBlock; %#ok<AGROW> 
     blockData(iBlock).type = typeOrder(iBlock); %#ok<AGROW> % this says stable or RT
