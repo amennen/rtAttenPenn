@@ -22,23 +22,27 @@ scanFolder=$dicom_path/$(date +"%Y%m%d")'.'$subjName'.'$subjName
 echo "looking for dicoms in $scanFolder"
 
 # Process t1-weighted MPRAGE and check brain extraction!
+functionalFN=exfunc
 functional2FN=exfunc2
-functional2FN_RE=exfunc2_re
 fileN=6
 exfunc_str=$(printf "%s/001_0000%02d_0000%02d.dcm" "$scanFolder" "$functionalScan" "$fileN")
 if [ $1 -eq 1 ]
 then
-	$bxhpath/dicom2bxh $highresfiles_genstr $functional2FN.bxh
-	$bxhpath/bxhreorient --orientation=LAS $functional2FN.bxh $functional2FN_RE.bxh  
-	$bxhpath/sbxh2analyze --overwrite --analyzetypes --niigz --niftihdr -s $functional2FN_RE.bxh $functional2FN_RE
+	dcm2niix -f $functional2FN -z y -o $subject_save_path -s y $exfunc_str
 fi
 
-bet $functional2FN_RE.nii.gz$ $functional2FN_RE_brain -R -m
-if [ -f $functional2FN_RE_brain.nii.gz ]; then echo "ungzipping epi"; gunzip $functional2FN_RE_brain.nii.gz ; fi
-bxhabsorb $functional2FN_RE_brain.nii $functional2FN_RE_brain.bxh
+bet $functional2FN'.'nii.gz $functional2FN'_'brain -R -m
+fslview $functional2FN'.'nii.gz $functional2FN'_'brain.nii.gz &
+if [ -f $functional2FN'_'brain.nii.gz ]; then echo "ungzipping epi"; gunzip $functional2FN'_'brain.nii.gz ; fi
+$bxhpath/bxhabsorb $functional2FN'_'brain.nii $functional2FN'_'brain.bxh
 
-flirt -dof 6 -in $subject_day1_path/$functionalFN_RE.nii.gz -ref $functional2FN_RE.nii.gz -out func12func2 -omat func12func2.mat 
-flirt -in $subject_day1_path/wholebrain_mask_exfunc -ref $functional2FN_RE.nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2
+flirt -dof 6 -in $subject_day1_path/$functionalFN'.'nii.gz -ref $functional2FN'.'nii.gz -out func12func2 -omat func12func2.mat 
+flirt -in $subject_day1_path/wholebrain_mask_exfunc -ref $functional2FN'.'nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2
 
-if [ -f $mask12func2.nii.gz ]; then echo "ungzipping mask"; gunzip $mask12func2.nii.gz ; fi
-$bxhpath/bxhabsorb $mask12func2.nii $mask12func2.bxh
+if [ -f mask12func2.nii.gz ]; then echo "ungzipping mask"; gunzip mask12func2.nii.gz ; fi
+# now check on past mask again
+fslview $functional2FN'.'nii.gz $functional2FN'_'brain_mask.nii.gz mask12func2.nii.gz &
+$bxhpath/bxhabsorb mask12func2.nii mask12func2.bxh
+
+echo="copying this version for safe keeping!"
+cp $project_path/reg_epi_day2.sh $project_path/data/subject$subjectNum/usedscripts/reg_epi_day2.sh
