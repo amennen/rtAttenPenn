@@ -1,8 +1,8 @@
 function makemask_day1(subjectNum,dayNum)
 %%
 projectName = 'rtAttenPenn';
-%biac_dir = '/home/amennen/code/BIAC_Matlab_R2014a/';
-biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
+biac_dir = '/home/amennen/code/BIAC_Matlab_R2014a/';
+%biac_dir = '/Data1/packages/BIAC_Matlab_R2014a/';
 bxhpath='/opt/BXH/1.11.1/bin/';
 fslpath='/opt/fsl/5.0.9/bin/';
 %fslpath = '/opt/FSL/5.0.9/bin/';

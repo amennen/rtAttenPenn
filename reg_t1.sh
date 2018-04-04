@@ -22,6 +22,6 @@ applywarp -i $highresFN'_'brain.nii.gz -r $FSLDIR/data/standard/MNI152_T1_2mm_br
 convert_xfm -inverse -omat standard2highres.mat highres2standard.mat
 invwarp -w highres2standard_warp -o standard2highres_warp -r $highresFN'_'brain.nii.gz
 
-cd $projectpath
 # now run the exfunc when that finishes
+cd $project_path
 bash reg_epi.sh 1 1

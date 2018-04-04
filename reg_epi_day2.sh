@@ -15,10 +15,7 @@ mkdir -pv $subject_save_path
 cd $subject_save_path
 echo "moving into folder: $subject_save_path"
 
-subjName=$(date +"%m%d%y")$runNum'_'$projectName
 echo "subject name is $subjName"
-scannerdate=$(date +"%Y%m%d")
-scanFolder=$dicom_path/$(date +"%Y%m%d")'.'$subjName'.'$subjName
 echo "looking for dicoms in $scanFolder"
 
 # Process t1-weighted MPRAGE and check brain extraction!
@@ -30,19 +27,17 @@ if [ $1 -eq 1 ]
 then
 	dcm2niix -f $functional2FN -z y -o $subject_save_path -s y $exfunc_str
 fi
+if [ $2 -eq 1 ]
+then
+	flirt -dof 6 -in $subject_day1_path/$functionalFN'.'nii.gz -ref $functional2FN'.'nii.gz -out func12func2 -omat func12func2.mat
+	flirt -in $subject_day1_path/wholebrain_mask_exfunc -ref $functional2FN'.'nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2
+fi
 
 bet $functional2FN'.'nii.gz $functional2FN'_'brain -R -m
 fslview $functional2FN'.'nii.gz $functional2FN'_'brain.nii.gz &
-if [ -f $functional2FN'_'brain.nii.gz ]; then echo "ungzipping epi"; gunzip $functional2FN'_'brain.nii.gz ; fi
-$bxhpath/bxhabsorb $functional2FN'_'brain.nii $functional2FN'_'brain.bxh
 
-flirt -dof 6 -in $subject_day1_path/$functionalFN'.'nii.gz -ref $functional2FN'.'nii.gz -out func12func2 -omat func12func2.mat 
-flirt -in $subject_day1_path/wholebrain_mask_exfunc -ref $functional2FN'.'nii.gz -applyxfm -init func12func2.mat -interp nearestneighbour -out mask12func2
-
-if [ -f mask12func2.nii.gz ]; then echo "ungzipping mask"; gunzip mask12func2.nii.gz ; fi
 # now check on past mask again
 fslview $functional2FN'.'nii.gz $functional2FN'_'brain_mask.nii.gz mask12func2.nii.gz &
-$bxhpath/bxhabsorb mask12func2.nii mask12func2.bxh
 
 echo="copying this version for safe keeping!"
 cp $project_path/reg_epi_day2.sh $project_path/data/subject$subjectNum/usedscripts/reg_epi_day2.sh
