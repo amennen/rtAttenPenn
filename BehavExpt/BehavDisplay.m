@@ -100,6 +100,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
+destSize = 422;
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -222,7 +223,8 @@ Screen(mainWindow,'TextSize',textSize);
 imageRect = [0,0,imageSize,imageSize];
 
 % position of images
-centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+%centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+centerRect = [centerX-destSize/2,centerY-destSize/2,centerX+destSize/2,centerY+destSize/2];
 
 % position of fixation dot
 fixDotRect = [centerX-fixationSize,centerY-fixationSize,centerX+fixationSize,centerY+fixationSize];

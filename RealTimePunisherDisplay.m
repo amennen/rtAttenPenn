@@ -99,6 +99,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
+destSize = 462; % size that we want image
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -192,9 +193,10 @@ else
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
     %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
-    windowSize.pixels = [resolution.width/2 resolution.height];
-    screenX = windowSize.pixels(1);
-    screenY = windowSize.pixels(2);
+    %windowSize.pixels = [resolution.width/2 resolution.height];
+    %screenX = windowSize.pixels(1);
+    %screenY = windowSize.pixels(2);
+    % new: setting resolution manually
      screenX = 1920;
      screenY = 1080;
 %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
@@ -222,7 +224,8 @@ Screen(mainWindow,'TextSize',textSize);
 imageRect = [0,0,imageSize,imageSize];
 
 % position of images
-centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+%centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+centerRect = [centerX-destSize/2,centerY-destSize/2,centerX+destSize/2,centerY+destSize/2];
 
 % position of fixation dot
 fixDotRect = [centerX-fixationSize,centerY-fixationSize,centerX+fixationSize,centerY+fixationSize];

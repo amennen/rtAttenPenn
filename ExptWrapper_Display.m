@@ -3,7 +3,7 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 9; % subject 9 on penn
+subjectNum = 1; % subject 9 on penn
 subjectRun = 1;
 subjectDay = 1;
 
