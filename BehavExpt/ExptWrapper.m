@@ -22,7 +22,7 @@ debug = 0;
 ex_image_dir = pwd;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
-
+addpath(genpath('~/rtAttenPenn/'))
 % figure out how to find what directory you need
 
 
