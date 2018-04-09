@@ -3,7 +3,7 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 8;
+subjectNum = 9; % subject 9 on penn
 subjectRun = 1;
 subjectDay = 1;
 
@@ -35,7 +35,7 @@ fMRI = 8;
 
 %%
 runNum=2;
-fMRI = 10;
+fMRI = 12;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

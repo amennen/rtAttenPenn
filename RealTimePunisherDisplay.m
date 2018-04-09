@@ -149,7 +149,7 @@ switch (respMap)
         sceneInstruct = 'Places: respond if it is an indoor place. DO NOT respond if it is an outdoor place';
         faceInstruct = 'Faces: respond if it is a male face. DO NOT respond if it is a female face';
         sceneShorterInstruct = 'indoor places';
-        faceShorter = 'male faces';
+        faceShorterInstruct = 'male faces';
     case 2
         sceneInstruct = 'Places: respond if it is an outdoor place. DO NOT respond if it is an indoor place';
         faceInstruct = 'Faces: respond if it is a female face. DO NOT respond if it is a male face';
@@ -195,8 +195,8 @@ else
     windowSize.pixels = [resolution.width/2 resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
-%     screenX = 800;
-%     screenY = 800;
+     screenX = 1920;
+     screenY = 1080;
 %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
 %     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
 %         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);

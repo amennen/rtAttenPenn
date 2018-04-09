@@ -74,7 +74,7 @@ imgDir = [imgDirHeader datestr(now,10) datestr(now,5) datestr(now,7) '.' subject
 
 %%%%%%%%
 %DELETE AFTER
-%\subjDate = '8-11-17';
+%subjDate = '4-5-17';
 %imgDir = [imgDirHeader datestr(subjDate,10) datestr(subjDate,5) datestr(subjDate,7) '.' subjectName '.' subjectName '/'];
 %%%%%%%%
 

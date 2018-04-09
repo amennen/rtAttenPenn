@@ -101,7 +101,8 @@ attImgProp = .5;
 
 ScreenResX = 1600;
 ScreenResY = 900;
-
+ScreenResX = 1920;
+ScreenResY = 1080;
 
 %% Response Mapping and Counterbalancing
 
