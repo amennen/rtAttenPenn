@@ -25,15 +25,16 @@ addpath(genpath('/opt/psychtoolbox/'))
 addpath(genpath('~/rtAttenPenn/'))
 % figure out how to find what directory you need
 
-
+seed = sum(100*clock); %get random seed
+RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% Generate expt sequence
 %make it fore each of the different type numbers and counterbalance order
 %for every subject
 
 % generate all neutral first seconds
-
-nRuns = 3;
+% NOTE: YOU MUST RUN THIS FROM BEHAVEXPT PATH!
+nRuns = 4;
 % counterbalance order of if happy or sad is first/then if first or
 % second order so 4 options
 for i = 1:nRuns

@@ -29,13 +29,14 @@ cliplimit = .01;    %contrast:  limit of contrast enhancement
 
 % where raw files are located 
 imFn = 'F_square';
+imFn = 'outdoor2';
 old_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/scenes/'];
 % where new files will be written 
 new_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/scenes'];
 
 % now 3/8: using for color versions
-old_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/'];
-new_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/'];
+old_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/instructstim/'];
+new_root_dir = ['/Volumes/norman/amennen/FINALPENNIMAGES/instructstim/'];
 code_dir = pwd;
 cd(old_root_dir);
 % subfolders containing image files

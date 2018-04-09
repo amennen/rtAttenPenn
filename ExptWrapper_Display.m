@@ -1,3 +1,7 @@
+% do this once at the start
+seed = sum(100*clock); %get random seed
+RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+
 %% first specify the things that change
 subjectNum = 8;
 subjectRun = 1;
@@ -8,6 +12,7 @@ useButtonBox=1;
 realtimeData = 1;
 debug=0;
 usepyoutput = 0;
+
 %% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
 copyallfilesforsubject(subjectNum,subjectDay)
 %% then specify everything else

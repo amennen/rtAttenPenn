@@ -52,7 +52,7 @@ else
 end
 
 seed = sum(100*clock); %get random seed
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+%RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %initialize system time calls
 GetSecs;
@@ -67,7 +67,11 @@ instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
 
 % trial timing
-stim.picDuration = 5 %change for debugging;        % secs
+if debug
+    stim.picDuration = 5; %change for debugging;        % secs
+else
+    stim.picDuration = 30;
+end
 stim.isiDuration = 1; %ITI
 
 % display parameters

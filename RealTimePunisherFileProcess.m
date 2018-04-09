@@ -53,7 +53,8 @@ end
 %% Boilerplate
 
 seed = sum(100*clock); %get random seed
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+% taking out because shouldn't reinitiatlize every single run - 4/2/18
+%RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %initialize system time calls
 GetSecs;
@@ -134,12 +135,9 @@ roiInds = find(roi);
 
 %pre-processing parameters
 FWHM = 5;
-cutoff = 112;
+cutoff = 200;
 %timeOut = TR/2+.25;
 
-zscoreNew = 1;
-useHistory = 1;
-firstBlockTRs = 64; %total number of TRs to take for standard deviation of last run
 %% Block Sequence
 
 firstVolPhase1 = find(patterns.block==1,1,'first'); %#ok<NODEF>
@@ -308,24 +306,17 @@ for iTrialPhase2=firstVolPhase2:nVols
             patterns.raw(iTrialPhase2,:) = patterns.raw(indLastValidPattern,:); %replicate last complete pattern
         else
             patterns.fileload(iTrialPhase2) = 1;
-        end
-        
+        end 
         %smooth
         patterns.raw_sm(iTrialPhase2,:) = SmoothRealTime2(patterns.raw(iTrialPhase2,:),roiDims,roiInds,FWHM);
-        
-        %z-score
     else
         patterns.fileload(iTrialPhase2) = 0;
         indLastValidPatterns = find(patterns.fileload,1,'last');
         patterns.raw_sm_filt(iTrialPhase2,:) = patterns.raw_sm_filt(indLastValidPatterns,:);
     end
-    
-    
     % detrend
     patterns.raw_sm_filt(iTrialPhase2,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase2,:),TR,cutoff);
-    
     % only update if the latest file wasn't nan
-    
     patterns.raw_sm_filt_z(iTrialPhase2,:) = (patterns.raw_sm_filt(iTrialPhase2,:) - patterns.phase1Mean(1,:))./patterns.phase1Std(1,:);
     
     if rtfeedback
@@ -352,35 +343,29 @@ for iTrialPhase2=firstVolPhase2:nVols
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase2),iTrialPhase2,patterns.type(iTrialPhase2),patterns.attCateg(iTrialPhase2),patterns.stim(iTrialPhase2),patterns.fileNum(iTrialPhase2),patterns.fileAvail(iTrialPhase2),patterns.categoryseparation(iTrialPhase2),nanmean(patterns.categoryseparation(firstVolPhase2:iTrialPhase2)));
     fprintf('%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase2),iTrialPhase2,patterns.type(iTrialPhase2),patterns.attCateg(iTrialPhase2),patterns.stim(iTrialPhase2),patterns.fileNum(iTrialPhase2),patterns.fileAvail(iTrialPhase2),patterns.categoryseparation(iTrialPhase2),nanmean(patterns.categoryseparation(firstVolPhase2:iTrialPhase2)));
-    
-    
 end % Phase 2 loop
-
 patterns.runStd = std(patterns.raw_sm_filt,[],1); %std dev across all volumes per voxel
 
 %%
 % NOW IF RUN 1, REDO EVERYTHING BECAUSE CAN PROCESS OFFLINE
-% if runNum == 1
-%     fprintf(dataFile,'\n*********************************************\n');
-%     fprintf(dataFile,'beginning highpass filter/zscore...\n');
-%     fprintf('\n*********************************************\n');
-%     fprintf('beginning highpassfilter/zscore...\n');
-%     p1 = GetSecs;
-%     i1 = firstVolPhase2;
-%     i2 = nVols;
-%     patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
-%     patterns.phase2Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
-%     patterns.phase2Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
-%     patterns.phase2Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
-%     patterns.phase2Var(1,:) = patterns.phase2Std(1,:).^2;
-%     patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase2Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase2Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
-%     p2 = GetSecs;
-%     fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
-%     fprintf(sprintf('elapsed time...%.4f seconds\n',p2-p1));
-% end
-
-
-
+if runNum == 1
+    fprintf(dataFile,'\n*********************************************\n');
+    fprintf(dataFile,'beginning highpass filter/zscore for phase 2...\n');
+    fprintf('\n*********************************************\n');
+    fprintf('beginning highpassfilter/zscore for phase 2...\n');
+    p1 = GetSecs;
+    i1 = firstVolPhase2;
+    i2 = nVols;
+    %patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
+    patterns.phase2Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
+    patterns.phase2Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
+    patterns.phase2Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
+    patterns.phase2Var(1,:) = patterns.phase2Std(1,:).^2;
+    patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase2Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase2Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
+    p2 = GetSecs;
+    fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
+    fprintf(sprintf('elapsed time...%.4f seconds\n',p2-p1));
+end
 %% training
 trainStart = tic; %start timing
 

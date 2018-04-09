@@ -1,7 +1,7 @@
 function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,runNum,DAYNUM,debug)
 % function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,matchNum,runNum,debug)
 %
-% These are the instructions for the behavioral version of the experiment. 
+% These are the instructions for the behavioral version of the experiment.
 %
 %
 % REQUIRED INPUTS:
@@ -28,7 +28,7 @@ if nargin < 4
 end
 
 if ~isnumeric(subjectNum)
-   error('subjectNum must be a number'); 
+    error('subjectNum must be a number');
 end
 
 if ~ischar(subjectName)
@@ -49,9 +49,9 @@ end
 %% Boilerplate
 if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
-   ListenChar(2);  %prevent command window output
-   HideCursor;     %hide mouse cursor  
-   Screen('Preference', 'SkipSyncTests', 1);
+    ListenChar(2);  %prevent command window output
+    HideCursor;     %hide mouse cursor
+    Screen('Preference', 'SkipSyncTests', 1);
 else
     Screen('Preference', 'SkipSyncTests', 1);
 end
@@ -62,7 +62,7 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %assert(strcmp(computer,'PCWIN'),'this code is only written to run on windows');
 %assert(isempty(findstr(computer,'64')),'this code is only written to run on 32 bit matlab');
-    
+
 %initialize system time calls
 GetSecs;
 
@@ -117,16 +117,16 @@ else
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
-    resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
+    %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
     windowSize.pixels = [resolution.width resolution.height];
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
-%     screenX = 800;
-%     screenY = 800;
-%     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
-%     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
-%         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
-%     end
+    %     screenX = 800;
+    %     screenY = 800;
+    %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
+    %     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
+    %         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
+    %     end
 end
 
 SCENE = 1;
@@ -157,7 +157,7 @@ switch (respMap)
         sceneShorterInstruct = 'indoor places';
         faceShorterInstruct = 'male faces';
         CAT{SCENE} = 1;
-        CAT{FACE}= 3; 
+        CAT{FACE}= 3;
     case 2
         sceneInstruct{1} = 'For places you will be looking for OUTDOOR places. If you see an outdoor place in the photo, press the 1 key.';
         sceneInstruct{2} = 'If you see an INDOOR place in the photo do not press anything.';
@@ -207,7 +207,7 @@ startInstruct = sprintf('Please hit enter to start run %d',runNum);
 %% Initialize Screens
 
 %create main window
-mainWindow = Screen(screenNum,'OpenWindow',backColor,[0 0 screenX screenY]);
+mainWindow = Screen(screenNum,'OpenWindow',backColor);
 
 % details of main window
 centerX = screenX/2; centerY = screenY/2;
@@ -230,12 +230,12 @@ progRect = [centerX-progWidth/2,centerY-progHeight/2,centerX+progWidth/2,centerY
 %% Load or Initialize Real-Time Data & Staircasing Parameters
 try ls('~/Documents/Norman/rtAttenPenn/');
     base_path = '~/Documents/Norman/rtAttenPenn/';
-catch 
+catch
     try ls('~/rtAttenPenn/');
         base_path = '~/rtAttenPenn/';
-    catch 
+    catch
         % put other laptop here
-    end  
+    end
 end
 addpath(genpath(base_path));
 
@@ -248,9 +248,10 @@ assert(~isempty(fn),'have not created the block design');
 load(fn);
 
 %% Load Images
-
+INDOOR2 = 9;
+OUTDOOR2 = 10;
 cd instructstim;
-for categ=1:4
+for categ=1:10
     
     % move into the right folder
     if (categ == INDOOR)
@@ -261,6 +262,18 @@ for categ=1:4
         cd male;
     elseif (categ == FEMALE)
         cd female;
+    elseif (categ == MALESAD)
+        cd male_sad;
+    elseif (categ == FEMALESAD)
+        cd female_sad;
+    elseif (categ == MALEHAPPY)
+        cd male_happy;
+    elseif (categ == FEMALEHAPPY)
+        cd female_happy;
+    elseif (categ == INDOOR2)
+        cd indoor2;
+    elseif (categ == OUTDOOR2)
+        cd outdoor2;
     else
         error('Impossible category!');
     end
@@ -352,7 +365,7 @@ FlushEvents('keyDown');
 Screen('Flip',mainWindow);
 waitForKeyboard(RETURN,DEVICE);
 
-%% face instruct #2 
+%% face instruct #2
 
 % clear screen
 Screen(mainWindow,'FillRect',backColor);
@@ -387,14 +400,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},1}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -413,8 +426,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -491,14 +504,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},1}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -517,8 +530,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -611,14 +624,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},2}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -637,8 +650,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -705,14 +718,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},3}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -731,8 +744,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -801,14 +814,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},iTrial}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -827,8 +840,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -854,7 +867,7 @@ for iTrial = 4:8;
         end
         tempPower{half} = imagePower{x,iTrial}; %#ok<NODEF>
         tempImagePhase{half} = imagePhase{x,iTrial}; %#ok<AGROW>
-        tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>    
+        tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
     end
     
     % generate image
@@ -953,14 +966,14 @@ for half=[SCENE FACE]
     tempImagePhase{half} = imagePhase{CAT{half},iTrial}; %#ok<AGROW>
     tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
 end
-        
+
 % generate image
 fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
-        
+
 % make textures
 imageTex = Screen('MakeTexture',mainWindow,fullImage);
 Screen('PreloadTextures',mainWindow,imageTex);
-        
+
 % wait for trigger and show image
 FlushEvents('keyDown');
 Priority(MaxPriority(screenNum));
@@ -979,8 +992,8 @@ while(GetSecs < tRespTimeout)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
             if (keyCode(LEFT))
-                rts = secs-tStim; 
-                resps = find(keyCode,1); 
+                rts = secs-tStim;
+                resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
                 if (stimOn) % leave image up if response before image duration
                     Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
@@ -1006,7 +1019,7 @@ for iTrial = 4:8;
         end
         tempPower{half} = imagePower{x,iTrial}; %#ok<NODEF>
         tempImagePhase{half} = imagePhase{x,iTrial}; %#ok<AGROW>
-        tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>    
+        tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
     end
     
     % generate image
@@ -1053,7 +1066,240 @@ Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 tFix = Screen('Flip',mainWindow,tStim+stimDur);
 WaitSecs(TR);
 
-%% 
+%% emotion instruct 1
+
+% clear screen
+Screen(mainWindow,'FillRect',backColor);
+Screen('Flip',mainWindow);
+FlushEvents('keyDown');
+
+% show instructions
+clearvars runInstruct;
+runInstruct{1} = 'Throughout the experiment, you will also be shown blocks of different facial expressions.';
+runInstruct{2} = 'The instructions and the task will remain the same.';
+runInstruct{3} = ' ';
+runInstruct{4} = contInstruct;
+
+for instruct=1:length(runInstruct)
+    tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+    Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+    clear tempBounds;
+end
+FlushEvents('keyDown');
+Screen('Flip',mainWindow,tFix+TR);
+waitForKeyboard(RETURN,DEVICE);
+%% first let's do negative faces and natural scenes
+% negative faces: category 5/6
+% neutral scenes: indoor or outdoor 2 - 9/10
+% clear screen
+Screen(mainWindow,'FillRect',backColor);
+Screen('Flip',mainWindow);
+FlushEvents('keyDown');
+
+% show instructions
+clearvars runInstruct;
+runInstruct{1} = sceneShorterInstruct;
+
+for instruct=1:length(runInstruct)
+    tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+    Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+    clear tempBounds;
+end
+tInstruct = Screen('Flip',mainWindow);
+
+% show fixation
+Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+tFix = Screen('Flip',mainWindow,tInstruct+instructDur);
+tricktrial = randi(8);
+faceorder = randperm(8,8);
+sceneorder = randperm(16,8);
+for iTrial = 1:8;
+    for half=[SCENE FACE]
+        % get current images
+        if (half == SCENE) && (iTrial==tricktrial) % on trial 5 one that they have to get
+            if mod(CAT{half},2)
+                x = CAT{half} + 1;
+            else
+                x = CAT{half} - 1;
+            end
+        else
+            x = CAT{half};
+        end
+        if half == SCENE
+            shift = 8;
+            tempPower{half} = imagePower{x+shift,sceneorder(iTrial)}; %#ok<NODEF>
+            tempImagePhase{half} = imagePhase{x+shift,sceneorder(iTrial)}; %#ok<AGROW>
+            tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
+        elseif half == FACE
+            shift = 2;
+            tempPower{half} = imagePower{x+shift,faceorder(iTrial)}; %#ok<NODEF>
+            tempImagePhase{half} = imagePhase{x+shift,faceorder(iTrial)}; %#ok<AGROW>
+            tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
+        end
+        
+    end
+    
+    % generate image
+    fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
+    
+    % make textures
+    imageTex = Screen('MakeTexture',mainWindow,fullImage);
+    Screen('PreloadTextures',mainWindow,imageTex);
+    
+    % wait for trigger and show image
+    FlushEvents('keyDown');
+    Priority(MaxPriority(screenNum));
+    Screen('FillRect',mainWindow,backColor);
+    Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
+    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+    tStim = Screen('Flip',mainWindow,tStim+stimDur);
+    tRespTimeout = tStim+respWindow; %response timeout
+    stimOn = 1;
+    rts = NaN;
+    
+    while(GetSecs < tRespTimeout)
+        
+        % check for responses if none received yet
+        if isnan(rts)
+            [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
+            if keyIsDown
+                if (keyCode(LEFT))
+                    rts = secs-tStim;
+                    resps = find(keyCode,1);
+                    Screen('FillRect',mainWindow,backColor);
+                    if (stimOn) % leave image up if response before image duration
+                        Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
+                    end
+                    Screen(mainWindow,'FillOval',respColor,fixDotRect);
+                    Screen('Flip',mainWindow);
+                end
+            end
+        end
+    end
+end
+
+Screen('FillRect',mainWindow,backColor);
+Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+tFix = Screen('Flip',mainWindow,tStim+stimDur);
+WaitSecs(TR);
+%% emotion instruct 2
+
+% clear screen
+Screen(mainWindow,'FillRect',backColor);
+Screen('Flip',mainWindow);
+FlushEvents('keyDown');
+
+% show instructions
+clearvars runInstruct;
+runInstruct{1} = 'Let''s practice again for a different emotion block.';
+runInstruct{2} = 'The instructions and the task will remain the same.';
+runInstruct{3} = ' ';
+runInstruct{4} = contInstruct;
+
+for instruct=1:length(runInstruct)
+    tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+    Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+    clear tempBounds;
+end
+FlushEvents('keyDown');
+Screen('Flip',mainWindow,tFix+TR);
+waitForKeyboard(RETURN,DEVICE);
+%% happy faces and natural scenes
+% negative faces: category 5/6
+% neutral scenes: indoor or outdoor 2 - 9/10
+% clear screen
+Screen(mainWindow,'FillRect',backColor);
+Screen('Flip',mainWindow);
+FlushEvents('keyDown');
+
+% show instructions
+clearvars runInstruct;
+runInstruct{1} = faceShorterInstruct;
+
+for instruct=1:length(runInstruct)
+    tempBounds = Screen('TextBounds',mainWindow,runInstruct{instruct});
+    Screen('drawtext',mainWindow,runInstruct{instruct},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(instruct-1),textColor);
+    clear tempBounds;
+end
+tInstruct = Screen('Flip',mainWindow);
+
+% show fixation
+Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+tFix = Screen('Flip',mainWindow,tInstruct+instructDur);
+tricktrial = randi(8);
+faceorder = randperm(8,8);
+sceneorder = randperm(16,8);
+for iTrial = 1:8;
+    for half=[SCENE FACE]
+        % get current images
+        if (half == FACE) && (iTrial==tricktrial) % on trial 5 one that they have to get
+            if mod(CAT{half},2)
+                x = CAT{half} + 1;
+            else
+                x = CAT{half} - 1;
+            end
+        else
+            x = CAT{half};
+        end
+        if half == SCENE
+            shift = 8;
+            tempPower{half} = imagePower{x+shift,sceneorder(iTrial)}; %#ok<NODEF>
+            tempImagePhase{half} = imagePhase{x+shift,sceneorder(iTrial)}; %#ok<AGROW>
+            tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
+        elseif half == FACE
+            shift = 4;
+            tempPower{half} = imagePower{x+shift,faceorder(iTrial)}; %#ok<NODEF>
+            tempImagePhase{half} = imagePhase{x+shift,faceorder(iTrial)}; %#ok<AGROW>
+            tempImage{half} = real(ifft2(tempPower{half}.*exp(sqrt(-1)*tempImagePhase{half}))); %#ok<AGROW>
+        end
+        
+    end
+    
+    % generate image
+    fullImage = uint8(sceneProp*tempImage{SCENE}+faceProp*tempImage{FACE});
+    
+    % make textures
+    imageTex = Screen('MakeTexture',mainWindow,fullImage);
+    Screen('PreloadTextures',mainWindow,imageTex);
+    
+    % wait for trigger and show image
+    FlushEvents('keyDown');
+    Priority(MaxPriority(screenNum));
+    Screen('FillRect',mainWindow,backColor);
+    Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
+    Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+    tStim = Screen('Flip',mainWindow,tStim+stimDur);
+    tRespTimeout = tStim+respWindow; %response timeout
+    stimOn = 1;
+    rts = NaN;
+    
+    while(GetSecs < tRespTimeout)
+        
+        % check for responses if none received yet
+        if isnan(rts)
+            [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
+            if keyIsDown
+                if (keyCode(LEFT))
+                    rts = secs-tStim;
+                    resps = find(keyCode,1);
+                    Screen('FillRect',mainWindow,backColor);
+                    if (stimOn) % leave image up if response before image duration
+                        Screen('DrawTexture',mainWindow,imageTex,imageRect,centerRect);
+                    end
+                    Screen(mainWindow,'FillOval',respColor,fixDotRect);
+                    Screen('Flip',mainWindow);
+                end
+            end
+        end
+    end
+end
+
+Screen('FillRect',mainWindow,backColor);
+Screen(mainWindow,'FillOval',fixColor,fixDotRect);
+tFix = Screen('Flip',mainWindow,tStim+stimDur);
+WaitSecs(TR);
+
+%%
 
 congratsText{1} = 'Congrats!';
 congratsText{2} = 'Now you are ready to start the task.';
