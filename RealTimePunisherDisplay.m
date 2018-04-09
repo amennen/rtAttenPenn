@@ -746,9 +746,16 @@ for iBlock=indBlocksPhase2
                 
                 %check for classifier output file
                 while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
-                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1,usepython); %#ok<AGROW>
+                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-2,usepython); %#ok<AGROW>
                 end
                 
+                % get newest file in that TR
+                blockData(iBlock).fileList{iTrial} = ls(classOutputDir);
+                allFn = dir([classOutputDir 'vol' '*.mat']);
+                dates = [allFn.datenum];
+                names = {allFn.name};
+                [~,newestIndex] = max(dates);
+                blockData(iBlock).newestFile{iTrial} = names{newestIndex};
                 %load classifier output file
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
