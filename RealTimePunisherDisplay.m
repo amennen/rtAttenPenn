@@ -599,8 +599,8 @@ timing.actualrestoff = Screen('Flip',mainWindow,timespec); %turn off
 %% Block Sequence - Phase2
 
 % prepare for trial sequence
-fprintf(dataFile,'run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
-fprintf('run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
+fprintf(dataFile,'run\tblock\tloadsep\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
+fprintf('run\tblock\tloadsep\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
 
 trialCounter = 0;
 volCounter = firstVolPhase2+disdaqs/TR-1;
@@ -735,8 +735,9 @@ for iBlock=indBlocksPhase2
 
         %load rtfeedback values once per TR
         blockData(iBlock).RT1(iTrial) = GetSecs;
+        FILEFOUND = 'NOSEP';
         if rtfeedback
-            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
+            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR*2)
                 %number of odd trials - paired with TRs
                 iTrialOdd = ceil(iTrial/2);
                 
@@ -760,6 +761,7 @@ for iBlock=indBlocksPhase2
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
                     blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
+                    FILEFOUND = 'FOUNDSEP';
                 else
                     blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
                 end
