@@ -7,9 +7,9 @@ subjectNum = 1; % subject 9 on penn
 subjectRun = 1;
 subjectDay = 1;
 
-useButtonBox=1;
+useButtonBox=0;
 % CHANGE TRIGGER BACK!!!
-realtimeData = 1;
+realtimeData = 0;
 debug=0;
 usepyoutput = 0;
 
