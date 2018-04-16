@@ -348,24 +348,24 @@ patterns.runStd = std(patterns.raw_sm_filt,[],1); %std dev across all volumes pe
 
 %%
 % NOW IF RUN 1, REDO EVERYTHING BECAUSE CAN PROCESS OFFLINE
-if runNum == 1
-    fprintf(dataFile,'\n*********************************************\n');
-    fprintf(dataFile,'beginning highpass filter/zscore for phase 2...\n');
-    fprintf('\n*********************************************\n');
-    fprintf('beginning highpassfilter/zscore for phase 2...\n');
-    p1 = GetSecs;
-    i1 = firstVolPhase2;
-    i2 = nVols;
-    %patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
-    patterns.phase2Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
-    patterns.phase2Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
-    patterns.phase2Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
-    patterns.phase2Var(1,:) = patterns.phase2Std(1,:).^2;
-    patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase2Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase2Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
-    p2 = GetSecs;
-    fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
-    fprintf(sprintf('elapsed time...%.4f seconds\n',p2-p1));
-end
+% if runNum == 1
+%     fprintf(dataFile,'\n*********************************************\n');
+%     fprintf(dataFile,'beginning highpass filter/zscore for phase 2...\n');
+%     fprintf('\n*********************************************\n');
+%     fprintf('beginning highpassfilter/zscore for phase 2...\n');
+%     p1 = GetSecs;
+%     i1 = firstVolPhase2;
+%     i2 = nVols;
+%     %patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
+%     patterns.phase2Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
+%     patterns.phase2Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
+%     patterns.phase2Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
+%     patterns.phase2Var(1,:) = patterns.phase2Std(1,:).^2;
+%     patterns.raw_sm_filt_z(i1:i2,:) = (patterns.raw_sm_filt(i1:i2,:) - repmat(patterns.phase2Mean,size(patterns.raw_sm_filt(i1:i2,:),1),1))./repmat(patterns.phase2Std,size(patterns.raw_sm_filt(i1:i2,:),1),1);
+%     p2 = GetSecs;
+%     fprintf(dataFile,sprintf('elapsed time...%.4f seconds\n',p2-p1));
+%     fprintf(sprintf('elapsed time...%.4f seconds\n',p2-p1));
+% end
 %% training
 trainStart = tic; %start timing
 
