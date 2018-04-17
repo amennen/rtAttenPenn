@@ -113,9 +113,11 @@ faceProp = 0.6;
 sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in
-gain = 2.75;
+%gain = 2.75;
+gain = 2.3;
 x_shift = .2;
-y_shift = .05;
+%y_shift = .05;
+y_shift = 0.1;
 steepness = .9;
 
 ScreenResX = 1280;
@@ -763,7 +765,7 @@ for iBlock=indBlocksPhase2
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
                     blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
-                    FILEFOUND = 'FOUNDSEP';
+                    FILEFOUND = 'FSEP';
                 else
                     blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
                 end
