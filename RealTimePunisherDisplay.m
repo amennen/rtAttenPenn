@@ -737,7 +737,7 @@ for iBlock=indBlocksPhase2
         blockData(iBlock).RT1(iTrial) = GetSecs;
         FILEFOUND = 'NOSEP';
         if rtfeedback
-            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR*2)
+            if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
                 %number of odd trials - paired with TRs
                 iTrialOdd = ceil(iTrial/2);
                 
@@ -752,11 +752,13 @@ for iBlock=indBlocksPhase2
                 
                 % get newest file in that TR
                 blockData(iBlock).fileList{iTrial} = ls(classOutputDir);
-                allFn = dir([classOutputDir 'vol' '*.mat']);
+                allFn = dir([classOutputDir '/vol' '*.mat']);
                 dates = [allFn.datenum];
                 names = {allFn.name};
                 [~,newestIndex] = max(dates);
-                blockData(iBlock).newestFile{iTrial} = names{newestIndex};
+                if ~isempty(ls(classOutputDir))
+                    blockData(iBlock).newestFile{iTrial} = names{newestIndex};
+                end
                 %load classifier output file
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);

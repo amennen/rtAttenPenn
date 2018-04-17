@@ -1,11 +1,12 @@
 %% first specify things that change
-subjectNum = 1;
+subjectNum = 7;
 subjectRun = 1; % run number for the day
-subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
+subjectDay = 2; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 %imgDirHeader = '/Data1/subjects/';
 % for testing code at Princeton
 % for Penn
-imgDirHeader = '/mnt/rtexport/RTexport_Current/';
+imgDirHeader = '/Data1/subjects/';
+%imgDirHeader = '/mnt/rtexport/RTexport_Current/';
 realtimeData = 1;
 debug = 0;
 %% specify everything else
@@ -54,13 +55,13 @@ rtfeedback = 1;
 
 %% Run 1 file process
 runNum = 1;
-fMRI = 10;
+fMRI = 8;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 12;
+fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%
