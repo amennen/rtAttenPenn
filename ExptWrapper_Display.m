@@ -3,16 +3,17 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 8;
+subjectNum = 7; % subject 9 on penn
 subjectRun = 1;
-subjectDay = 1;
+subjectDay = 2;
 
 useButtonBox=1;
 % CHANGE TRIGGER BACK!!!
 realtimeData = 1;
 debug=0;
 usepyoutput = 0;
-
+fprintf('Running for subject %i, run% i, day %i\n', subjectNum,subjectRun,subjectDay);
+fprintf('usebuttonbox: %i\nrealtimedata: %i\ndebug: %i\nusepyoutput: %i\n', useButtonBox,realtimeData,debug, usepyoutput);
 %% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
 copyallfilesforsubject(subjectNum,subjectDay)
 %% then specify everything else
@@ -35,7 +36,7 @@ fMRI = 8;
 
 %%
 runNum=2;
-fMRI = 10;
+fMRI = 14;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

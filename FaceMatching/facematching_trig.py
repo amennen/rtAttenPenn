@@ -13,6 +13,7 @@ from psychopy.constants import *  # things like STARTED, FINISHED
 import numpy as np  # whole numpy lib is available, prepend 'np.'
 from numpy import sin, cos, tan, log, log10, pi, average, sqrt, std, deg2rad, rad2deg, linspace, asarray
 from numpy.random import random, randint, normal, shuffle
+from psychopy.hardware.emulator import launchScan
 import os  # handy system and path functions
 
 
@@ -74,6 +75,18 @@ expInfo['date'] = data.getDateStr()  # add a simple timestamp
 #filename = 'data/'+expInfo['participant']+ os.path.sep + '%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['session'],expInfo['run'],expName,expInfo['date'])
 filename = output + os.sep + expInfo['participant'] + os.sep +'%s_%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['runMode'],expInfo['session'],expInfo['run'],expInfo['expName'],expInfo['date'])
  
+
+MR_settings = {
+    'TR': 2.0000, # duration per volume
+    'volumes': 147, # number of volumes per runs
+    'sync': '5',
+    'skip': 5, # number of volumes to skip
+    'sound': False # for test omode
+    }
+    
+infoDlg = gui.DlgFromDict(MR_settings,title='fMRI parameters', order=['TR', 'volumes'])
+if not infoDlg.OK:
+    core.quit()
 
             
 
@@ -173,8 +186,10 @@ instructions_text_pressM.draw()
 win.flip()
 event.waitKeys(keyList=["2","8"])
 
-
+    
 for r in runs:
+    
+    
     expInfo['run'] = r
     conditionFile='face_matching_stimuli_'+r+'.csv'###CHANGED CONDITION FILE
     """#Write condition file (randomize block file sequence)
@@ -207,16 +222,26 @@ for r in runs:
     win.flip()
     event.waitKeys(keyList=["q"])
     # Initialize components for Routine "trigger"
-    msgMachine = visual.TextStim(win,text="Waiting for the scanner.", pos=(0,0),colorSpace='rgb',color=1,height=0.1,wrapWidth=1.5,depth=0.01)
-    msgMachine.draw()
-    msgMachine.draw()
+    # summary of run timing, for each key press:
+    output = u'vol    onset key\n'
+    for i in range(-1 * MR_settings['skip'], 0):
+        output += u'%d prescan skip (no sync)\n' % i
+    counter = visual.TextStim(win, height=.05, pos=(0, 0), color=win.rgb + 0.5)
+    output += u"  0    0.000 sync  [Start of scanning run, vol 0]\n"
+    # launch: operator selects Scan or Test (emulate); see API documentation
+    vol = launchScan(win, MR_settings, globalClock=globalClock, simResponses=None,mode='Scan')
+    counter.setText(u"%d volumes\n%.3f seconds" % (0, 0.0))
+    counter.draw()
     win.flip()
+    duration = MR_settings['volumes'] * MR_settings['TR']
+
+    #msgMachine = visual.TextStim(win,text="Waiting for the scanner.", pos=(0,0),colorSpace='rgb',color=1,height=0.1,wrapWidth=1.5,depth=0.01)
+    #msgMachine.draw()
+    #msgMachine.draw()
     ## CHANGE THIS TO CHANGE HOW THE TRIGGER COMES IN
-    event.waitKeys(keyList=["=","equal", "5", "5%", "%", "=+"])
-    fixation_text.draw()
-    win.flip()
+    #event.waitKeys(keyList=["=","equal", "5", "5%", "%", "=+"])
     # adding to wait 5 TR's at the start of everything
-    core.wait(10)
+    #core.wait(10)
     # CHECK THIS
     # the Routine "trigger" was not non-slip safe, so reset the non-slip timer ONCE TRIGGER COMES IN
     routineTimer.reset()
@@ -249,7 +274,15 @@ for r in runs:
         seed=None, name='trials')
 
 
-
+    ALLKEYTRIG = event.getKeys()
+    for KEYTRIG in ALLKEYTRIG:
+        if KEYTRIG == MR_settings['sync']:
+            onset = globalClock.getTime()
+            counter.setText(u"%d volumes\n%.3f seconds" % (vol, onset))
+            output += u"%3d  %7.3f sync\n" % (vol, onset)
+            counter.draw()
+            win.flip()
+            vol += 1
     thisExp.addLoop(trials)  # add the loop to the experiment
     thisTrial = trials.trialList[0]  # so we can initialise stimuli with some values
     # abbreviate parameter names if possible (e.g. rgb=thisTrial.rgb)

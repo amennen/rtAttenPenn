@@ -6,9 +6,9 @@
 % cs = -1:.1:1;
 % y = steepness./(1+exp(-gain*(cs-x_shift)))+y_shift;
 
-gain = 2.75;
+gain = 2.3;
 x_shift = .2;
-y_shift = 0.05;
+y_shift = 0.1;
 steepness = .9;
 cs = -1:.1:1;
 y2 = steepness./(1+exp(-gain*(cs-x_shift)))+y_shift;

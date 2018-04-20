@@ -1,17 +1,19 @@
 %% first specify things that change
-subjectNum = 8;
+subjectNum = 7;
 subjectRun = 1; % run number for the day
-subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
+subjectDay = 2; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 %imgDirHeader = '/Data1/subjects/';
 % for testing code at Princeton
 % for Penn
-imgDirHeader = '/mnt/rtexport/RTexport_Current/';
+imgDirHeader = '/Data1/subjects/';
+%imgDirHeader = '/mnt/rtexport/RTexport_Current/';
 realtimeData = 1;
 debug = 0;
 %% specify everything else
 projectName = 'rtAttenPenn';
-%subjDate = '3-14-18';
 subjectName = [datestr(now,5) datestr(now,7) datestr(now,11) num2str(subjectRun) '_' projectName];
+
+%subjDate = '4-5-17';
 %subjectName = [datestr(subjDate,5) datestr(subjDate,7) datestr(subjDate,11) num2str(subjectRun) '_' projectName];
 
 % **** types of stimuli to train/show to subjects *******
@@ -59,7 +61,7 @@ fMRI = 8;
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 10;
+fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%

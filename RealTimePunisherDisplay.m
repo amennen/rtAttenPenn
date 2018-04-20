@@ -99,6 +99,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
+destSize = 462; % size that we want image
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -112,9 +113,11 @@ faceProp = 0.6;
 sceneProp = 1-faceProp;
 % function mapping classifier output to attended image proportion
 % this has the constraints built in
-gain = 2.75;
+%gain = 2.75;
+gain = 2.3;
 x_shift = .2;
-y_shift = .05;
+%y_shift = .05;
+y_shift = 0.1;
 steepness = .9;
 
 ScreenResX = 1280;
@@ -149,7 +152,7 @@ switch (respMap)
         sceneInstruct = 'Places: respond if it is an indoor place. DO NOT respond if it is an outdoor place';
         faceInstruct = 'Faces: respond if it is a male face. DO NOT respond if it is a female face';
         sceneShorterInstruct = 'indoor places';
-        faceShorter = 'male faces';
+        faceShorterInstruct = 'male faces';
     case 2
         sceneInstruct = 'Places: respond if it is an outdoor place. DO NOT respond if it is an indoor place';
         faceInstruct = 'Faces: respond if it is a female face. DO NOT respond if it is a male face';
@@ -192,11 +195,12 @@ else
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
     %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
-    windowSize.pixels = [resolution.width/2 resolution.height];
-    screenX = windowSize.pixels(1);
-    screenY = windowSize.pixels(2);
-%     screenX = 800;
-%     screenY = 800;
+    %windowSize.pixels = [resolution.width/2 resolution.height];
+    %screenX = windowSize.pixels(1);
+    %screenY = windowSize.pixels(2);
+    % new: setting resolution manually
+     screenX = 1920;
+     screenY = 1080;
 %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
 %     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
 %         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
@@ -222,7 +226,8 @@ Screen(mainWindow,'TextSize',textSize);
 imageRect = [0,0,imageSize,imageSize];
 
 % position of images
-centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+%centerRect = [centerX-imageSize/2,centerY-imageSize/2,centerX+imageSize/2,centerY+imageSize/2];
+centerRect = [centerX-destSize/2,centerY-destSize/2,centerX+destSize/2,centerY+destSize/2];
 
 % position of fixation dot
 fixDotRect = [centerX-fixationSize,centerY-fixationSize,centerX+fixationSize,centerY+fixationSize];
@@ -596,8 +601,8 @@ timing.actualrestoff = Screen('Flip',mainWindow,timespec); %turn off
 %% Block Sequence - Phase2
 
 % prepare for trial sequence
-fprintf(dataFile,'run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
-fprintf('run\tblock\tbltyp\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
+fprintf(dataFile,'run\tblock\tloadsep\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
+fprintf('run\tblock\tloadsep\tblcat\ttrial\tonsdif\tscat\tfcat\tsimg\tfimg\tcorresp\tresp\tacc\trt\tfile\tload\tcatsep\tattProp\tsmoothProp\n');
 
 trialCounter = 0;
 volCounter = firstVolPhase2+disdaqs/TR-1;
@@ -732,6 +737,7 @@ for iBlock=indBlocksPhase2
 
         %load rtfeedback values once per TR
         blockData(iBlock).RT1(iTrial) = GetSecs;
+        FILEFOUND = 'NOSEP';
         if rtfeedback
             if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
                 %number of odd trials - paired with TRs
@@ -743,13 +749,23 @@ for iBlock=indBlocksPhase2
                 
                 %check for classifier output file
                 while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
-                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-1,usepython); %#ok<AGROW>
+                    [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-2,usepython); %#ok<AGROW>
                 end
                 
+                % get newest file in that TR
+                blockData(iBlock).fileList{iTrial} = ls(classOutputDir);
+                allFn = dir([classOutputDir '/vol' '*.mat']);
+                dates = [allFn.datenum];
+                names = {allFn.name};
+                [~,newestIndex] = max(dates);
+                if ~isempty(ls(classOutputDir))
+                    blockData(iBlock).newestFile{iTrial} = names{newestIndex};
+                end
                 %load classifier output file
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
                     blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
+                    FILEFOUND = 'FSEP';
                 else
                     blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
                 end
@@ -805,8 +821,8 @@ for iBlock=indBlocksPhase2
         end
         blockData(iBlock).RT2(iTrial) = GetSecs;  
         % print trial results
-        fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
-        fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,typeStr{blockData(iBlock).type},categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
+        fprintf(dataFile,'%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,FILEFOUND,categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
+        fprintf('%d\t%d\t%s\t%s\t%d\t%.3f\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t%.3f\n',runNum,iBlock,FILEFOUND,categStr{blockData(iBlock).attCateg},iTrial,blockData(iBlock).actualtrialonsets(iTrial)-blockData(iBlock).plannedtrialonsets(iTrial),blockData(iBlock).categs{SCENE}(iTrial),blockData(iBlock).categs{FACE}(iTrial),blockData(iBlock).images{SCENE}(iTrial),blockData(iBlock).images{FACE}(iTrial),blockData(iBlock).corrresps(iTrial),blockData(iBlock).resps(iTrial),blockData(iBlock).accs(iTrial),blockData(iBlock).rts(iTrial),blockData(iBlock).volCounter(iTrial),blockData(iBlock).classOutputFileLoad(iTrial),blockData(iBlock).categsep(iTrial),blockData(iBlock).attImgProp(iTrial),blockData(iBlock).smoothAttImgProp(iTrial));
 
     end % trial loop
     
