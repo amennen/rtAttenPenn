@@ -233,11 +233,11 @@ for iTrialPhase1 = 1:(firstVolPhase2-1) % (change ACM 8/10/17: keeping this goin
     
     %smooth files
     patterns.raw_sm(iTrialPhase1,:) = SmoothRealTime2(patterns.raw(iTrialPhase1,:),roiDims,roiInds,FWHM);
-    if iTrialPhase1 == (patterns.firstTestTR-1)
-        patterns.raw_sm_filt(1:iTrialPhase1,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
-    elseif iTrialPhase1 >= patterns.firstTestTR
-        patterns.raw_sm_filt(iTrialPhase1,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
-    end
+%     if iTrialPhase1 == (patterns.firstTestTR-1)
+%         patterns.raw_sm_filt(1:iTrialPhase1,:) = HighPassBetweenRuns(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
+%     elseif iTrialPhase1 >= patterns.firstTestTR
+%         patterns.raw_sm_filt(iTrialPhase1,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase1,:),TR,cutoff);
+%     end
     
     % print trial results
     fprintf(dataFile,'%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%.3f\t%.3f\n',runNum,patterns.block(iTrialPhase1),iTrialPhase1,patterns.type(iTrialPhase1),patterns.attCateg(iTrialPhase1),patterns.stim(iTrialPhase1),patterns.fileNum(iTrialPhase1),patterns.fileAvail(iTrialPhase1),NaN,NaN);
@@ -254,7 +254,7 @@ fprintf('beginning highpassfilter/zscore...\n');
 p1 = GetSecs;
 i1 = 1;
 i2 = firstVolPhase2-1;
-%patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
+patterns.raw_sm_filt(i1:i2,:) = HighPassBetweenRuns(patterns.raw_sm(i1:i2,:),TR,cutoff);
 patterns.phase1Mean(1,:) = mean(patterns.raw_sm_filt(i1:i2,:),1);
 patterns.phase1Y(1,:) = mean(patterns.raw_sm_filt(i1:i2,:).^2,1);
 patterns.phase1Std(1,:) = std(patterns.raw_sm_filt(i1:i2,:),[],1);
