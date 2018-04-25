@@ -100,7 +100,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
-destSize = 422;
+destSize = 458;
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -126,10 +126,11 @@ ScreenResY = 720;
 
 % skyra: use current design button box (keys 1,2,3,4)
 KbName('UnifyKeyNames');
-LEFT = KbName('1!');
+
+LEFT = [KbName('1!') KbName('1')];
 subj_keycode = LEFT;
-DEVICENAME = 'Current Designs, Inc. 932';
-if useButtonBox && (~debug)
+DEVICENAME = 'Dell KB216 Wired Keyboard';
+if (~debug) % use external keyboard
     [index devName] = GetKeyboardIndices;
     for device = 1:length(index)
         if strcmp(devName(device),DEVICENAME)
@@ -515,7 +516,7 @@ for iBlock=1:numel(indBlocksPhase1)
             if isnan(blockData(iBlock).rts(iTrial))
                 [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
                 if keyIsDown
-                    if (keyCode(LEFT))
+                    if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                         blockData(iBlock).rts(iTrial) = secs-blockData(iBlock).actualtrialonsets(iTrial); %#ok<AGROW> NTB: deltasecs is timed to last KbCheck call
                         blockData(iBlock).resps(iTrial) = find(keyCode,1); %#ok<AGROW>
                         Screen('FillRect',mainWindow,backColor);
@@ -687,7 +688,7 @@ for iBlock=indBlocksPhase2
             if isnan(blockData(iBlock).rts(iTrial))
                 [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
                 if keyIsDown
-                    if (keyCode(LEFT))
+                    if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                         blockData(iBlock).rts(iTrial) = secs-blockData(iBlock).actualtrialonsets(iTrial); %#ok<AGROW> NTB: deltasecs is timed to last KbCheck call
                         blockData(iBlock).resps(iTrial) = find(keyCode,1); %#ok<AGROW>
                         Screen('FillRect',mainWindow,backColor);

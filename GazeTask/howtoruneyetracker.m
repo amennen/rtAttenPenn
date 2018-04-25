@@ -59,7 +59,11 @@ Temp/(1E6)
 % check that the time isn't too far apart
 
 %%
-d = load('gazedata_20180228T112516.mat');
+subject = 10;
+dayNum = 1;
+subjectDir = ['data/subject' num2str(subject) '/day' num2str(dayNum) '/'];
+d = load(findNewestFile(subjectDir,fullfile(subjectDir,['gazedata_*.mat'])));
+%d = load('gazedata_20180228T112516.mat');
 % saves a different array for each of the trials--left, right, remote
 % now look for indiividual trial
 trial = 3;
@@ -86,10 +90,11 @@ d.timing.actualOnsets.preITI(2)-  d.timing.startEye(1); % this is longer than 5 
 %temp = typecast(tp1, 'int64')
 %loctime = tetio_remoteToLocalTime(temp);
 %%
-trial = 20;
+trial = 16;
+fprintf('trial %i\n', trial)
 remote_start = d.timing.gaze.pic(trial);
 remote_stop = d.timing.gaze.off(trial);
-(remote_stop-remote_start)/(1E6)
+(remote_stop-remote_start)/(1E6);
 % now find the data between these time points
 time_trial = d.GazeData.Timing.Remote{trial}; % 709 points
 trial_rows = intersect(find(time_trial>=remote_start), find(time_trial<=remote_stop));
@@ -106,8 +111,9 @@ DisplayData(d.GazeData.Left{trial}(trial_rows,:),d.GazeData.Right{trial}(trial_r
 screenX = 1280;
 screenY = 1024;
 centerX = screenX/2; centerY = screenY/2;
-imageSize2 = imageSize;
-actual_imageSize = [400 400];
+imageSize2 = [300 300];
+imageSize = imageSize2;
+%imageSize2 = imageSize;
 imageRect = [0 0 actual_imageSize(1) actual_imageSize(2)];
 % placeholder for images
 %border = screenX/20;
@@ -153,6 +159,8 @@ pos_4 = imPos(4,:)./resvec;
 
 % now test to see what comes where
 % take mean of x and y
+% y axis if flipped!!
+
 
 rightEyeAll = d.GazeData.Right{trial}(trial_rows,:);
 leftEyeAll = d.GazeData.Left{trial}(trial_rows,:);
@@ -165,7 +173,7 @@ gaze.y = mean([rightGazePoint2d.y, leftGazePoint2d.y],2);
 % so ignore any negatives (will do that anyway)
 % find points in area one
 % when you have both left and right eye (later can just use one)
-n_points = length(find(gaze.x > 0 & gaze.y >0));
+n_points = length(find(gaze.x > 0 | gaze.y >0));
 n_pos1 = find((gaze.x >= pos_1(1) & gaze.x<=pos_1(3)) & (gaze.y >= pos_1(2) & gaze.y<=pos_1(4)));
 n_pos2 = find((gaze.x >= pos_2(1) & gaze.x<=pos_2(3)) & (gaze.y >= pos_2(2) & gaze.y<=pos_2(4)));
 n_pos3 = find((gaze.x >= pos_3(1) & gaze.x<=pos_3(3)) & (gaze.y >= pos_3(2) & gaze.y<=pos_3(4)));

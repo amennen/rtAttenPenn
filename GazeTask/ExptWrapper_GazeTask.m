@@ -1,15 +1,15 @@
-%exptDir = '~/code/rtAttenPenn/';
-%cd(exptDir)
+exptDir = '~/rtAttenPenn/GazeTask/';
+cd(exptDir)
 addpath(genpath('/Applications/Psychtoolbox/'))
 addpath(genpath('~/Tobii/'))
 
-subjectNum = 100;
+subjectNum = 10;
 subjectDay=1;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
 % **** types of stimuli to train/show to subjects *******
 
-useTobii=1;
+useTobii=0;
 debug=0;
 KbName('UnifyKeyNames')
 

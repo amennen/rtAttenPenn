@@ -1,4 +1,4 @@
-function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,runNum,DAYNUM,debug)
+function [blockData] = BehavInstruct(subjectNum,subjectName,runNum,DAYNUM,debug)
 % function [blockData] = RealTimeBehavInstruct(subjectNum,subjectName,matchNum,runNum,debug)
 %
 % These are the instructions for the behavioral version of the experiment.
@@ -58,7 +58,7 @@ end
 
 
 seed = sum(100*clock); %get random seed
-RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+%RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %assert(strcmp(computer,'PCWIN'),'this code is only written to run on windows');
 %assert(isempty(findstr(computer,'64')),'this code is only written to run on 32 bit matlab');
@@ -90,7 +90,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
-destSize = 422;
+destSize = 458;
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -139,6 +139,19 @@ FACE = 2;
 LEFT = KbName('1!');
 RETURN = KbName('Return');
 DEVICE = -1;
+LEFT = [KbName('1!') KbName('1')];
+subj_keycode = LEFT;
+DEVICENAME = 'Dell KB216 Wired Keyboard';
+if (~debug) % use external keyboard
+    [index devName] = GetKeyboardIndices;
+    for device = 1:length(index)
+        if strcmp(devName(device),DEVICENAME)
+            DEVICE = index(device);
+        end
+    end
+else
+    DEVICE = -1;
+end
 
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
@@ -427,7 +440,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -531,7 +544,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -651,7 +664,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -745,7 +758,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -841,7 +854,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -896,7 +909,7 @@ for iTrial = 4:8;
         if isnan(rts)
             [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
             if keyIsDown
-                if (keyCode(LEFT))
+                if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                     rts = secs-tStim;
                     resps = find(keyCode,1);
                     Screen('FillRect',mainWindow,backColor);
@@ -993,7 +1006,7 @@ while(GetSecs < tRespTimeout)
     if isnan(rts)
         [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
         if keyIsDown
-            if (keyCode(LEFT))
+            if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                 rts = secs-tStim;
                 resps = find(keyCode,1);
                 Screen('FillRect',mainWindow,backColor);
@@ -1048,7 +1061,7 @@ for iTrial = 4:8;
         if isnan(rts)
             [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
             if keyIsDown
-                if (keyCode(LEFT))
+                if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                     rts = secs-tStim;
                     resps = find(keyCode,1);
                     Screen('FillRect',mainWindow,backColor);
@@ -1165,7 +1178,7 @@ for iTrial = 1:8;
         if isnan(rts)
             [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
             if keyIsDown
-                if (keyCode(LEFT))
+                if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                     rts = secs-tStim;
                     resps = find(keyCode,1);
                     Screen('FillRect',mainWindow,backColor);
@@ -1281,7 +1294,7 @@ for iTrial = 1:8;
         if isnan(rts)
             [keyIsDown, secs, keyCode] = KbCheck(DEVICE); % -1 checks all keyboards
             if keyIsDown
-                if (keyCode(LEFT))
+                if (keyCode(LEFT(1)) | keyCode(LEFT(2)))
                     rts = secs-tStim;
                     resps = find(keyCode,1);
                     Screen('FillRect',mainWindow,backColor);

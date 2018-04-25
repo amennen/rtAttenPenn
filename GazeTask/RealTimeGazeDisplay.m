@@ -379,12 +379,40 @@ fprintf('*********************************************\n\n');
 
      
 %% Show Instructions
-instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
+instruct{1} = 'This task will assess the associations between pupil size and emotional images.';
+instruct{1} = 'Multiple images will be presented on the screen as once.';
+instruct{2} = 'Please view the images naturally, as if you are watching television.';
+instruct{3} = 'The only requirement is that you view the images at all times during each trial.';
+instruct{4} = 'At the start of the start of each trial. There will be a fixation point. Please look at the fixation point between each trial.';
+instruct{5} = 'Press ''1'' to continue';
+%instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
 
 % clear screen
 Screen(mainWindow,'FillRect',backColor);
 Screen('Flip',mainWindow);
 FlushEvents('keyDown');
+
+for i=1:length(instruct)
+    tempBounds = Screen('TextBounds',mainWindow,instruct{i});
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(i-1),textColor);
+    clear tempBounds;
+end
+Screen('Flip',mainWindow);
+
+% wait for experimenter to advance with 'q' key
+FlushEvents('keyDown');
+while(1)
+    temp = GetChar;
+    if (temp == '1')
+        break;
+    end
+end
+instruct = {};
+% another page of instructions?
+instruct{1} = 'Again, look freely at the images for the entire duration of a trial, as if you are watching television or looking at a photo album.';
+instruct{2} = 'Just please remember to look at the fixation between trials.';
+instruct{4} = 'And lastly, please do not move your head throughout the task.';
+
 
 % % show instructions
 % if (blockData(1).type == 1)

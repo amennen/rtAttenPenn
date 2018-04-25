@@ -15,7 +15,6 @@ HAPPY = 3;
 % *******************************************************
 realtimeData = 0;    
 rtfeedback = 0;
-useButtonBox = 0; %maybe replace with keyboard eventually?
 rtData = 0;
 fMRI = 0;
 debug = 0;
