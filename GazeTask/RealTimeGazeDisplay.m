@@ -398,7 +398,7 @@ instruct{1} = 'In this task, you will see multiple images displayed at once.';
 instruct{2} = 'Your only task is to freely view the images, as if you were watching televion or looking at pictures in a photo album.';
 instruct{3} = 'We only ask that you: (1) look at the fixation cross at the start of every trial and (2) look at the images during the entire trial.';
 instruct{4} = 'We are trying to compare pupil sizes during emotional image viewing, so it is very important that you do both of these things.';
-runInstruct{5} = 'Please repeat these instructions in your own words to the person helping you';
+instruct{5} = 'Please repeat these instructions in your own words to the person helping you';
 instruct{6} = 'Press ''1'' to continue to see an example fixation point and press ''1'' again to start the task.';
 
 for i=1:length(instruct)

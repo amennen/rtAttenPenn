@@ -15,9 +15,10 @@ HAPPY = 3;
 % *******************************************************
 realtimeData = 0;    
 rtfeedback = 0;
+useButtonBox=0;
 rtData = 0;
 fMRI = 0;
-debug = 1;
+debug = 0;
 ex_image_dir = pwd;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
