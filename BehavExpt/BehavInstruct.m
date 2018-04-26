@@ -90,7 +90,7 @@ fixColor = 0;
 respColor = 255;
 backColor = 127;
 imageSize = 256; % assumed square %MdB check image size
-destSize = 458;
+destSize = 349;
 fixationSize = 4;% pixels
 progWidth = 400; % image loading progress bar
 progHeight = 20;
@@ -1090,8 +1090,8 @@ FlushEvents('keyDown');
 
 % show instructions
 clearvars runInstruct;
-runInstruct{1} = 'Throughout the experiment, you will also be shown blocks of different facial expressions.';
-runInstruct{2} = 'The instructions and the task will remain the same.';
+runInstruct{1} = 'Throughout the experiment, you will also be shown blocks that may contain different facial expressions.';
+runInstruct{2} = 'All instructions for the task will remain the same as explained above.';
 runInstruct{3} = ' ';
 runInstruct{4} = contInstruct;
 
@@ -1206,7 +1206,7 @@ FlushEvents('keyDown');
 
 % show instructions
 clearvars runInstruct;
-runInstruct{1} = 'Let''s practice again for a different emotion block.';
+runInstruct{1} = 'Let''s practice again for another facial expression.';
 runInstruct{2} = 'The instructions and the task will remain the same.';
 runInstruct{3} = ' ';
 runInstruct{4} = contInstruct;
@@ -1319,7 +1319,7 @@ WaitSecs(TR);
 congratsText{1} = 'Congrats!';
 congratsText{2} = 'Now you are ready to start the task.';
 congratsText{3} = ' ';
-congratsText{4} = 'The task will be only 30 minutes long so please try your best!';
+congratsText{4} = 'The task will be only ~30 minutes long so please try your best!';
 congratsText{5} = ' ';
 congratsText{6} = 'Good luck!';
 

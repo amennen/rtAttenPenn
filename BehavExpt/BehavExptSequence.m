@@ -335,7 +335,15 @@ blockSequencePhase1A = randperm(nBlockTypes);
 categOrderPhase1 = [blockSequencePhase1A];
 blockSequencePhase2A = randperm(nBlockTypes);
 categOrderPhase2 = [blockSequencePhase2A];
+% make sure the order isn't the same
+while sum(categOrderPhase1 == categOrderPhase2)==length(categOrderPhase2)
+    blockSequencePhase1A = randperm(nBlockTypes);
+    categOrderPhase1 = [blockSequencePhase1A];
+    blockSequencePhase2A = randperm(nBlockTypes);
+    categOrderPhase2 = [blockSequencePhase2A];
+end
 blockTypes = [categOrderPhase1 categOrderPhase2]; % this will be the actual block types out of 4
+
 %end
 attCategOrder = (([categOrderPhase1 categOrderPhase2]>2)+1); % this is saying if it's face or scene!!
 inattCategOrder = (([categOrderPhase1 categOrderPhase2]<=2)+1);

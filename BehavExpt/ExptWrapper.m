@@ -17,7 +17,7 @@ realtimeData = 0;
 rtfeedback = 0;
 rtData = 0;
 fMRI = 0;
-debug = 0;
+debug = 1;
 ex_image_dir = pwd;
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))

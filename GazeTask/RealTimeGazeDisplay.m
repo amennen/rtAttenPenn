@@ -94,7 +94,21 @@ ScreenResY = 720;
 
 % skyra: use current design button box (keys 1,2,3,4)
 KbName('UnifyKeyNames');
+RETURN = KbName('Return');
 DEVICE = -1;
+LEFT = [KbName('1!') KbName('1')];
+subj_keycode = LEFT;
+DEVICENAME = 'Dell KB216 Wired Keyboard';
+if (~debug) % use external keyboard
+    [index devName] = GetKeyboardIndices;
+    for device = 1:length(index)
+        if strcmp(devName(device),DEVICENAME)
+            DEVICE = index(device);
+        end
+    end
+else
+    DEVICE = -1;
+end
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
 
@@ -379,18 +393,13 @@ fprintf('*********************************************\n\n');
 
      
 %% Show Instructions
-instruct{1} = 'This task will assess the associations between pupil size and emotional images.';
-instruct{1} = 'Multiple images will be presented on the screen as once.';
-instruct{2} = 'Please view the images naturally, as if you are watching television.';
-instruct{3} = 'The only requirement is that you view the images at all times during each trial.';
-instruct{4} = 'At the start of the start of each trial. There will be a fixation point. Please look at the fixation point between each trial.';
-instruct{5} = 'Press ''1'' to continue';
-%instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
 
-% clear screen
-Screen(mainWindow,'FillRect',backColor);
-Screen('Flip',mainWindow);
-FlushEvents('keyDown');
+instruct{1} = 'In this task, you will see multiple images displayed at once.';
+instruct{2} = 'Your only task is to freely view the images, as if you were watching televion or looking at pictures in a photo album.';
+instruct{3} = 'We only ask that you: (1) look at the fixation cross at the start of every trial and (2) look at the images during the entire trial.';
+instruct{4} = 'We are trying to compare pupil sizes during emotional image viewing, so it is very important that you do both of these things.';
+runInstruct{5} = 'Please repeat these instructions in your own words to the person helping you';
+instruct{6} = 'Press ''1'' to continue to see an example fixation point and press ''1'' again to start the task.';
 
 for i=1:length(instruct)
     tempBounds = Screen('TextBounds',mainWindow,instruct{i});
@@ -398,6 +407,14 @@ for i=1:length(instruct)
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
+
+%instruct{1} = 'Please look at the computer screen for the allotted time in the trial.';
+
+% clear screen
+%Screen(mainWindow,'FillRect',backColor);
+FlushEvents('keyDown');
+
+
 
 % wait for experimenter to advance with 'q' key
 FlushEvents('keyDown');
@@ -407,11 +424,24 @@ while(1)
         break;
     end
 end
+
+t_on = isi_specific(mainWindow,fixColor);
+FlushEvents('keyDown');
+while(1)
+    temp = GetChar;
+    if (temp == '1')
+        break;
+    end
+end
+
+
+
 instruct = {};
 % another page of instructions?
-instruct{1} = 'Again, look freely at the images for the entire duration of a trial, as if you are watching television or looking at a photo album.';
+instruct{1} = 'Again, your task is to look freely at the images, while keeping your eyes on the images the entire time they are on the screen.';
 instruct{2} = 'Just please remember to look at the fixation between trials.';
-instruct{4} = 'And lastly, please do not move your head throughout the task.';
+instruct{3} = 'And lastly, please do not move your head throughout the task.';
+instruct{4} = 'Press ''1'' to start the task.';
 
 
 % % show instructions
