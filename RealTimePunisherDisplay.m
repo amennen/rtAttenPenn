@@ -64,7 +64,7 @@ if (~debug) %so that when debugging you can do other things
    ListenChar(2);  %prevent command window output
    HideCursor;     %hide mouse cursor    
 else
-    Screen('Preference', 'SkipSyncTests', 1);
+    Screen('Preference', 'SkipSyncTests', 2);
 end
 
 
@@ -420,7 +420,7 @@ if (rtData && ~debug )
    % end
 else
     runStart = GetSecs;
-    timing = -1;
+    %timing = -1;
 end
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);

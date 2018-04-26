@@ -1,6 +1,6 @@
 %ExptWrapper_FileProcess_Subject9
 
-subjectNum = 500;
+subjectNum = 1;
 subjectName = ['behav' num2str(subjectNum)];
 subjectDay = 1;
 % if subjectDay == 1
@@ -47,16 +47,15 @@ end
 
 BehavInstruct(subjectNum,subjectName,1,subjectDay,debug);
 
-%% now run exp sequence
+% now run exp sequence
 runNum = 1;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
-%%
 % change the image paths inside this script
 runNum = 2;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
-
-%runNum = 3;
-%BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
-
+runNum = 3;
+BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
+runNum = 4;
+BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
 %%
 copyallfilesforsubject(subjectNum,subjectDay);

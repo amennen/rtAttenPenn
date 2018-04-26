@@ -395,15 +395,19 @@ fprintf('*********************************************\n\n');
 %% Show Instructions
 
 instruct{1} = 'In this task, you will see multiple images displayed at once.';
-instruct{2} = 'Your only task is to freely view the images, as if you were watching televion or looking at pictures in a photo album.';
-instruct{3} = 'We only ask that you: (1) look at the fixation cross at the start of every trial and (2) look at the images during the entire trial.';
-instruct{4} = 'We are trying to compare pupil sizes during emotional image viewing, so it is very important that you do both of these things.';
-instruct{5} = 'Please repeat these instructions in your own words to the person helping you';
-instruct{6} = 'Press ''1'' to continue to see an example fixation point and press ''1'' again to start the task.';
+instruct{2} = 'Your only task is to freely view the images, as if you were ';
+instruct{3} = 'watching televion or looking at pictures in a photo album.';
+instruct{4} = 'We only ask that you: (1) look at the fixation cross at the';
+instruct{5} = 'start of every trial and (2) look at the images during the entire trial.';
+instruct{6} = 'We are trying to compare pupil sizes during emotional image viewing,';
+instruct{7} = 'so it is very important that you do both of these things.';
+instruct{8} = 'Please repeat these instructions in your own words to the person helping you';
+instruct{9} = 'Press ''1'' to continue to see an example fixation point';
+instruct{10} = 'and press ''1'' again to start the task.';
 
 for i=1:length(instruct)
     tempBounds = Screen('TextBounds',mainWindow,instruct{i});
-    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(i-1),textColor);
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.2*centerY)-tempBounds(4)+1.5*textSpacing*(i-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
@@ -438,10 +442,11 @@ end
 
 instruct = {};
 % another page of instructions?
-instruct{1} = 'Again, your task is to look freely at the images, while keeping your eyes on the images the entire time they are on the screen.';
-instruct{2} = 'Just please remember to look at the fixation between trials.';
-instruct{3} = 'And lastly, please do not move your head throughout the task.';
-instruct{4} = 'Press ''1'' to start the task.';
+instruct{1} = 'Again, your task is to look freely at the images,';
+instruct{2} = 'while keeping your eyes on the images the entire time they are on the screen.';
+instruct{3} = 'Just please remember to look at the fixation between trials.';
+instruct{4} = 'Lastly, please do not move your head throughout the task.';
+instruct{5} = 'Press ''1'' to start the task.';
 
 
 % % show instructions
@@ -455,7 +460,7 @@ instruct{4} = 'Press ''1'' to start the task.';
 
 for i=1:length(instruct)
     tempBounds = Screen('TextBounds',mainWindow,instruct{i});
-    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-tempBounds(4)/5+textSpacing*(i-1),textColor);
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.1*centerY)-tempBounds(4)/5+1.5*textSpacing*(i-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);

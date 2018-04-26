@@ -407,7 +407,7 @@ Priority(MaxPriority(screenNum));
 
 
 runStart = GetSecs;
-timing = -1;
+%timing = -1;
 Screen(mainWindow,'FillRect',backColor);
 Screen(mainWindow,'FillOval',fixColor,fixDotRect);
 Screen('Flip',mainWindow);

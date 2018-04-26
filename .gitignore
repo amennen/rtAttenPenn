@@ -1,4 +1,7 @@
 data/
+testdata
 *~
 tmp/
 BehavExpt/data/
+BehavExpt/testdata/
+BehavExpt/gazedata/
