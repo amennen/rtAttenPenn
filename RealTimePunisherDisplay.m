@@ -93,7 +93,7 @@ allowance = .05;    % secs
 % display parameters
 textColor = 0;
 textFont = 'Arial';
-textSize = 25;
+textSize = 35;
 textSpacing = 25;
 fixColor = 0;
 respColor = 255;
@@ -117,7 +117,7 @@ sceneProp = 1-faceProp;
 gain = 2.3;
 x_shift = .2;
 %y_shift = .05;
-y_shift = 0.1;
+y_shift = 0.12;
 steepness = .9;
 
 ScreenResX = 1280;
@@ -739,6 +739,7 @@ for iBlock=indBlocksPhase2
         blockData(iBlock).RT1(iTrial) = GetSecs;
         FILEFOUND = 'NOSEP';
         if rtfeedback
+            % will start looking at the odd TR numbers on 
             if (mod(iTrial,nTrialsPerTR)==1) && (iTrial>nTrialsPerTR)
                 %number of odd trials - paired with TRs
                 iTrialOdd = ceil(iTrial/2);
