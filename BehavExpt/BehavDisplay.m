@@ -63,9 +63,9 @@ if (~debug) %so that when debugging you can do other things
     %Screen('Preference', 'SkipSyncTests', 1);
    ListenChar(2);  %prevent command window output
    HideCursor;     %hide mouse cursor    
-   Screen('Preference', 'SkipSyncTests', 1);
+   Screen('Preference', 'SkipSyncTests', 2);
 else
-    Screen('Preference', 'SkipSyncTests', 1);
+    Screen('Preference', 'SkipSyncTests', 2);
 end
 
 seed = sum(100*clock); %get random seed
@@ -532,7 +532,7 @@ for iBlock=1:numel(indBlocksPhase1)
         
         %accuracy
         if ~isnan(blockData(iBlock).corrresps(iTrial)) %go trial
-            if (blockData(iBlock).resps(iTrial)==blockData(iBlock).corrresps(iTrial)) %made correct response
+            if ismember(blockData(iBlock).resps(iTrial),LEFT) %made correct response
                 blockData(iBlock).accs(iTrial) = 1; %#ok<AGROW>
             else
                 blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>
@@ -704,7 +704,7 @@ for iBlock=indBlocksPhase2
         
         %accuracy
         if ~isnan(blockData(iBlock).corrresps(iTrial)) %go trial
-            if (blockData(iBlock).resps(iTrial)==blockData(iBlock).corrresps(iTrial)) %made correct response
+            if ismember(blockData(iBlock).resps(iTrial),LEFT) %made correct response
                 blockData(iBlock).accs(iTrial) = 1; %#ok<AGROW>
             else
                 blockData(iBlock).accs(iTrial) = 0; %#ok<AGROW>

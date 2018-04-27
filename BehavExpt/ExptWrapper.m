@@ -59,3 +59,6 @@ runNum = 4;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)
 %%
 copyallfilesforsubject(subjectNum,subjectDay);
+
+%%
+

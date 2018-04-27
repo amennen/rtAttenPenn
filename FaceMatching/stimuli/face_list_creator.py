@@ -34,7 +34,7 @@ for f in folder:
 		row_M=0			
 			
 		for i in range(1,4):
-			with open('/home/vivs/vivi/banda_v6/FaceMatching/blocks/block_'+run+'_'+c+'_'+str(i)+'.csv', 'wb') as csvfile:	
+			with open('/Users/amennen/rtAttenPenn/FaceMatching/blocks/block_'+run+'_'+c+'_'+str(i)+'.csv', 'wb') as csvfile:
 				condWriter = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
 	    			condWriter.writerow(('top_image','left_image', 'right_image','corr_ans'))
 				for g in gender:
