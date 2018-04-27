@@ -1,0 +1,7 @@
+top_image,left_image,right_image,corr_ans
+stimuli/objects/object_64.jpg,stimuli/objects/object_53.jpg,stimuli/objects/object_64.jpg,2
+stimuli/objects/object_58.jpg,stimuli/objects/object_44.jpg,stimuli/objects/object_58.jpg,2
+stimuli/objects/object_59.jpg,stimuli/objects/object_48.jpg,stimuli/objects/object_59.jpg,2
+stimuli/objects/object_72.jpg,stimuli/objects/object_72.jpg,stimuli/objects/object_66.jpg,1
+stimuli/objects/object_47.jpg,stimuli/objects/object_47.jpg,stimuli/objects/object_45.jpg,1
+stimuli/objects/object_40.jpg,stimuli/objects/object_40.jpg,stimuli/objects/object_70.jpg,1

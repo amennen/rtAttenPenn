@@ -24,6 +24,8 @@ from itertools import groupby
 import os
 import csv
 
+from datetime import datetime
+random.seed(datetime.now())
 
 configFile=os.path.abspath( os.path.join(os.path.abspath(__file__), '../..'))
 configFile=os.path.join(configFile,'config.csv')
@@ -50,6 +52,7 @@ expInfo = {}
 dlg1 = gui.Dlg(title="Participant ID")
 dlg1.addField('Participant')
 dlg1.addField('Mode', choices=["Scanner", "Practice"])# , "Debug"])
+dig1.addfield('Day',choices=["1","2"])
 dlg1.addField('Group', choices=["HC", "MDD"])
 dlg1.addField('Session', choices=["ABCD","IPAT2","CMRR"])
 dlg1.addField('Run', choices= ["AB"]) #,"Practice"])
@@ -58,9 +61,10 @@ if dlg1.OK:  # then the user pressed OK
     # add the new entries to expInfo
     expInfo['participant'] = dlg1.data[0]
     expInfo['runMode'] = dlg1.data[1]
-    expInfo['group'] = dlg1.data[2]
-    expInfo['session'] = dlg1.data[3]
-    expInfo['run'] = dlg1.data[4]
+    expInfo['day'] = dlg1.data[2]
+    expInfo['group'] = dlg1.data[3]
+    expInfo['session'] = dlg1.data[4]
+    expInfo['run'] = dlg1.data[5]
     expInfo['CB'] = "1" #dlg2.data[2]
     RunMode = expInfo['runMode']
 else:
@@ -72,8 +76,19 @@ expInfo['date'] = data.getDateStr()  # add a simple timestamp
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
 #filename = 'data/'+expInfo['participant']+ os.path.sep + '%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['session'],expInfo['run'],expName,expInfo['date'])
-filename = output + os.sep + expInfo['participant'] + os.sep +'%s_%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['runMode'],expInfo['session'],expInfo['run'],expInfo['expName'],expInfo['date'])
- 
+filename = output + os.sep + expInfo['participant'] + os.sep +'%s_%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['day'],expInfo['runMode'],expInfo['session'],expInfo['run'],expInfo['expName'],expInfo['date'])
+# now load which condition block we're going to use
+# create if on first day
+if expInfo['day']=="1":
+    t = [1,2]
+    random.shuffle(t)
+    np.save(output + os.sep + expInfo['participant'] + os.sep + 'testorder',t)
+    z = np.load('testorder.npy')
+    today_type = t[0]
+else:
+    t = np.load(output + os.sep + expInfo['participant'] + os.sep + 'testorder')
+    today_type = t[1]
+
 
             
 
@@ -176,7 +191,8 @@ event.waitKeys(keyList=["2","8"])
 
 for r in runs:
     expInfo['run'] = r
-    conditionFile='face_matching_stimuli_'+r+'.csv'###CHANGED CONDITION FILE
+    #conditionFile='face_matching_stimuli_'+r+'.csv'###CHANGED CONDITION FILE
+    conditionFile='ACM_'+str(today_type)+'_stimuli_'+r+'.csv'
     """#Write condition file (randomize block file sequence)
     if expInfo['runMode'] == 'Scanner':
         conditionFile=output+'/FaceMatching_all_blocks_list_3x'+r+'.csv'
