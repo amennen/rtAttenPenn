@@ -52,7 +52,7 @@ expInfo = {}
 dlg1 = gui.Dlg(title="Participant ID")
 dlg1.addField('Participant')
 dlg1.addField('Mode', choices=["Scanner", "Practice"])# , "Debug"])
-dig1.addfield('Day',choices=["1","2"])
+dlg1.addField('Day',choices=["1","2"])
 dlg1.addField('Group', choices=["HC", "MDD"])
 dlg1.addField('Session', choices=["ABCD","IPAT2","CMRR"])
 dlg1.addField('Run', choices= ["AB"]) #,"Practice"])
@@ -76,17 +76,18 @@ expInfo['date'] = data.getDateStr()  # add a simple timestamp
 
 # Data file name stem = absolute path + name; later add .psyexp, .csv, .log, etc
 #filename = 'data/'+expInfo['participant']+ os.path.sep + '%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['session'],expInfo['run'],expName,expInfo['date'])
-filename = output + os.sep + expInfo['participant'] + os.sep +'%s_%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['day'],expInfo['runMode'],expInfo['session'],expInfo['run'],expInfo['expName'],expInfo['date'])
+filename = output + os.sep + expInfo['participant'] + os.sep +'%s_Day%s_%s_%s_%s_%s_%s' %(expInfo['participant'],expInfo['day'],expInfo['runMode'],expInfo['session'],expInfo['run'],expInfo['expName'],expInfo['date'])
 # now load which condition block we're going to use
 # create if on first day
-if expInfo['day']=="1":
+if expInfo['day']=="1" and expInfo['runMode']=="Scanner":
     t = [1,2]
     random.shuffle(t)
+    if not os.path.exists(output + os.sep + expInfo['participant']):
+        os.mkdir(output + os.sep + expInfo['participant'])
     np.save(output + os.sep + expInfo['participant'] + os.sep + 'testorder',t)
-    z = np.load('testorder.npy')
     today_type = t[0]
-else:
-    t = np.load(output + os.sep + expInfo['participant'] + os.sep + 'testorder')
+elif expInfo['day']=="2" and expInfo['runMode']=="Scanner":
+    t = np.load(output + os.sep + expInfo['participant'] + os.sep + 'testorder.npy')
     today_type = t[1]
 
 
@@ -192,7 +193,10 @@ event.waitKeys(keyList=["2","8"])
 for r in runs:
     expInfo['run'] = r
     #conditionFile='face_matching_stimuli_'+r+'.csv'###CHANGED CONDITION FILE
-    conditionFile='ACM_'+str(today_type)+'_stimuli_'+r+'.csv'
+    if expInfo['runMode']=="Scanner":
+        conditionFile='ACM_'+str(today_type)+'_stimuli_'+r+'.csv'
+    elif expInfo['runMode']=="Practice":
+        conditionFile='face_matching_stimuli_'+r+'.csv'
     """#Write condition file (randomize block file sequence)
     if expInfo['runMode'] == 'Scanner':
         conditionFile=output+'/FaceMatching_all_blocks_list_3x'+r+'.csv'
@@ -223,16 +227,17 @@ for r in runs:
     win.flip()
     event.waitKeys(keyList=["q"])
     # Initialize components for Routine "trigger"
-    msgMachine = visual.TextStim(win,text="Waiting for the scanner.", pos=(0,0),colorSpace='rgb',color=1,height=0.1,wrapWidth=1.5,depth=0.01)
-    msgMachine.draw()
-    msgMachine.draw()
-    win.flip()
-    ## CHANGE THIS TO CHANGE HOW THE TRIGGER COMES IN
-    event.waitKeys(keyList=["=","equal", "5", "5%", "%", "=+"])
-    fixation_text.draw()
-    win.flip()
-    # adding to wait 5 TR's at the start of everything
-    core.wait(10)
+    if expInfo['runMode']=="Scanner":
+        msgMachine = visual.TextStim(win,text="Waiting for the scanner.", pos=(0,0),colorSpace='rgb',color=1,height=0.1,wrapWidth=1.5,depth=0.01)
+        msgMachine.draw()
+        msgMachine.draw()
+        win.flip()
+        ## CHANGE THIS TO CHANGE HOW THE TRIGGER COMES IN
+        event.waitKeys(keyList=["=","equal", "5", "5%", "%", "=+"])
+        fixation_text.draw()
+        win.flip()
+        # adding to wait 5 TR's at the start of everything
+        core.wait(10)
     # CHECK THIS
     # the Routine "trigger" was not non-slip safe, so reset the non-slip timer ONCE TRIGGER COMES IN
     routineTimer.reset()
