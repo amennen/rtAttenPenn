@@ -1,7 +1,7 @@
 top_image,left_image,right_image,corr_ans
-stimuli/fear/F_nim/fear_nim_f_13.jpg,stimuli/fear/F_nim/fear_nim_f_13.jpg,stimuli/fear/F_nim/fear_nim_f_06.jpg,1
-stimuli/fear/F_nim/fear_nim_f_02.jpg,stimuli/fear/F_nim/fear_nim_f_02.jpg,stimuli/fear/F_nim/fear_nim_f_17.jpg,1
-stimuli/fear/M_nim/fear_nim_m_27.jpg,stimuli/fear/M_nim/fear_nim_m_30.jpg,stimuli/fear/M_nim/fear_nim_m_27.jpg,2
-stimuli/fear/M_nim/fear_nim_m_26.jpg,stimuli/fear/M_nim/fear_nim_m_26.jpg,stimuli/fear/M_nim/fear_nim_m_34.jpg,1
-stimuli/fear/M_nim/fear_nim_m_31.jpg,stimuli/fear/M_nim/fear_nim_m_28.jpg,stimuli/fear/M_nim/fear_nim_m_31.jpg,2
-stimuli/fear/F_nim/fear_nim_f_00.jpg,stimuli/fear/F_nim/fear_nim_f_05.jpg,stimuli/fear/F_nim/fear_nim_f_00.jpg,2
+stimuli/fear/M_rad/fear_rad_m_03.jpg,stimuli/fear/M_rad/fear_rad_m_03.jpg,stimuli/fear/M_rad/fear_rad_m_21.jpg,1
+stimuli/fear/F_rad/fear_rad_f_01.jpg,stimuli/fear/F_rad/fear_rad_f_01.jpg,stimuli/fear/F_rad/fear_rad_f_61.jpg,1
+stimuli/fear/M_rad/fear_rad_m_28.jpg,stimuli/fear/M_rad/fear_rad_m_25.jpg,stimuli/fear/M_rad/fear_rad_m_28.jpg,2
+stimuli/fear/F_rad/fear_rad_f_57.jpg,stimuli/fear/F_rad/fear_rad_f_57.jpg,stimuli/fear/F_rad/fear_rad_f_16.jpg,1
+stimuli/fear/M_rad/fear_rad_m_20.jpg,stimuli/fear/M_rad/fear_rad_m_38.jpg,stimuli/fear/M_rad/fear_rad_m_20.jpg,2
+stimuli/fear/F_rad/fear_rad_f_08.jpg,stimuli/fear/F_rad/fear_rad_f_37.jpg,stimuli/fear/F_rad/fear_rad_f_08.jpg,2

@@ -1,7 +1,7 @@
 top_image,left_image,right_image,corr_ans
-stimuli/neutral/M_nim/neutral_nim_m_26.jpg,stimuli/neutral/M_nim/neutral_nim_m_28.jpg,stimuli/neutral/M_nim/neutral_nim_m_26.jpg,2
-stimuli/neutral/M_nim/neutral_nim_m_30.jpg,stimuli/neutral/M_nim/neutral_nim_m_30.jpg,stimuli/neutral/M_nim/neutral_nim_m_20.jpg,1
-stimuli/neutral/F_nim/neutral_nim_f_06.jpg,stimuli/neutral/F_nim/neutral_nim_f_06.jpg,stimuli/neutral/F_nim/neutral_nim_f_16.jpg,1
-stimuli/neutral/F_nim/neutral_nim_f_11.jpg,stimuli/neutral/F_nim/neutral_nim_f_12.jpg,stimuli/neutral/F_nim/neutral_nim_f_11.jpg,2
-stimuli/neutral/M_nim/neutral_nim_m_37.jpg,stimuli/neutral/M_nim/neutral_nim_m_37.jpg,stimuli/neutral/M_nim/neutral_nim_m_35.jpg,1
-stimuli/neutral/F_nim/neutral_nim_f_18.jpg,stimuli/neutral/F_nim/neutral_nim_f_13.jpg,stimuli/neutral/F_nim/neutral_nim_f_18.jpg,2
+stimuli/neutral/M_rad/neutral_rad_m_33.jpg,stimuli/neutral/M_rad/neutral_rad_m_28.jpg,stimuli/neutral/M_rad/neutral_rad_m_33.jpg,2
+stimuli/neutral/F_rad/neutral_rad_f_19.jpg,stimuli/neutral/F_rad/neutral_rad_f_19.jpg,stimuli/neutral/F_rad/neutral_rad_f_18.jpg,1
+stimuli/neutral/M_rad/neutral_rad_m_38.jpg,stimuli/neutral/M_rad/neutral_rad_m_38.jpg,stimuli/neutral/M_rad/neutral_rad_m_24.jpg,1
+stimuli/neutral/F_rad/neutral_rad_f_14.jpg,stimuli/neutral/F_rad/neutral_rad_f_02.jpg,stimuli/neutral/F_rad/neutral_rad_f_14.jpg,2
+stimuli/neutral/M_rad/neutral_rad_m_30.jpg,stimuli/neutral/M_rad/neutral_rad_m_30.jpg,stimuli/neutral/M_rad/neutral_rad_m_21.jpg,1
+stimuli/neutral/F_rad/neutral_rad_f_12.jpg,stimuli/neutral/F_rad/neutral_rad_f_32.jpg,stimuli/neutral/F_rad/neutral_rad_f_12.jpg,2

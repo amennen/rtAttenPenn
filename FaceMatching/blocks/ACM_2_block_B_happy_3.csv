@@ -1,7 +1,7 @@
 top_image,left_image,right_image,corr_ans
-stimuli/happy/M_nim/happy_nim_m_22.jpg,stimuli/happy/M_nim/happy_nim_m_29.jpg,stimuli/happy/M_nim/happy_nim_m_22.jpg,2
-stimuli/happy/F_nim/happy_nim_f_06.jpg,stimuli/happy/F_nim/happy_nim_f_06.jpg,stimuli/happy/F_nim/happy_nim_f_02.jpg,1
-stimuli/happy/M_nim/happy_nim_m_23.jpg,stimuli/happy/M_nim/happy_nim_m_20.jpg,stimuli/happy/M_nim/happy_nim_m_23.jpg,2
-stimuli/happy/F_nim/happy_nim_f_14.jpg,stimuli/happy/F_nim/happy_nim_f_16.jpg,stimuli/happy/F_nim/happy_nim_f_14.jpg,2
-stimuli/happy/M_nim/happy_nim_m_32.jpg,stimuli/happy/M_nim/happy_nim_m_32.jpg,stimuli/happy/M_nim/happy_nim_m_30.jpg,1
-stimuli/happy/F_nim/happy_nim_f_05.jpg,stimuli/happy/F_nim/happy_nim_f_05.jpg,stimuli/happy/F_nim/happy_nim_f_01.jpg,1
+stimuli/happy/F_rad/happy_rad_f_26.jpg,stimuli/happy/F_rad/happy_rad_f_26.jpg,stimuli/happy/F_rad/happy_rad_f_08.jpg,1
+stimuli/happy/M_rad/happy_rad_m_24.jpg,stimuli/happy/M_rad/happy_rad_m_20.jpg,stimuli/happy/M_rad/happy_rad_m_24.jpg,2
+stimuli/happy/M_rad/happy_rad_m_30.jpg,stimuli/happy/M_rad/happy_rad_m_30.jpg,stimuli/happy/M_rad/happy_rad_m_23.jpg,1
+stimuli/happy/M_rad/happy_rad_m_03.jpg,stimuli/happy/M_rad/happy_rad_m_03.jpg,stimuli/happy/M_rad/happy_rad_m_09.jpg,1
+stimuli/happy/F_rad/happy_rad_f_16.jpg,stimuli/happy/F_rad/happy_rad_f_12.jpg,stimuli/happy/F_rad/happy_rad_f_16.jpg,2
+stimuli/happy/F_rad/happy_rad_f_32.jpg,stimuli/happy/F_rad/happy_rad_f_14.jpg,stimuli/happy/F_rad/happy_rad_f_32.jpg,2
