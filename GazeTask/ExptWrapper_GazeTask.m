@@ -9,7 +9,7 @@ projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 2);
 % **** types of stimuli to train/show to subjects *******
 
-useTobii=1;
+useTobii=0;
 debug=0;
 KbName('UnifyKeyNames')
 

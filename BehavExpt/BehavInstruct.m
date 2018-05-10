@@ -116,6 +116,12 @@ else
     
     [screenX screenY] = Screen('WindowSize',screenNum);
     % put this back in!!!
+    otherscreen = screenNumbers(1);
+    if otherscreen ~= screenNum
+        % open another window
+        [s2x s2y] = Screen('WindowSize', otherscreen);
+        otherWindow = Screen(otherscreen,'OpenWindow',backColor);
+    end
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
     %resolution = Screen('Resolution', 0); % REMOVE THIS AFTERWARDS!!
@@ -137,7 +143,6 @@ FACE = 2;
 
 % skyra: use current design button box (keys 1,2,3,4)
 LEFT = KbName('1!');
-RETURN = KbName('Return');
 DEVICE = -1;
 LEFT = [KbName('1!') KbName('1')];
 subj_keycode = LEFT;
@@ -215,8 +220,8 @@ switch (respMap)
         error('Impossible response mapping!');
 end
 
-contInstruct = sprintf('Please hit enter to continue');
-startInstruct = sprintf('Please hit enter to start run %d',runNum);
+contInstruct = sprintf('Please hit ''1'' to continue');
+startInstruct = sprintf('Please hit ''1'' to start run %d',runNum);
 
 %% Initialize Screens
 
@@ -354,7 +359,7 @@ for instruct=1:length(runInstruct)
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 %% face instruct
 % clear screen
 Screen(mainWindow,'FillRect',backColor);
@@ -378,7 +383,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% face instruct #2
 
@@ -401,7 +406,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% face stim
 
@@ -483,7 +488,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% Scene instructions
 
@@ -505,7 +510,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% scene stim
 
@@ -584,7 +589,7 @@ for instruct=1:length(fixInstruct)
 end
 FlushEvents('keyDown');
 tFix = Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% scene instruct 2
 
@@ -609,7 +614,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% scene stim
 
@@ -703,7 +708,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% face stim
 
@@ -798,7 +803,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% face stim
 
@@ -950,7 +955,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 
 %% scene stim
 
@@ -1090,7 +1095,7 @@ FlushEvents('keyDown');
 
 % show instructions
 clearvars runInstruct;
-runInstruct{1} = 'Throughout the experiment, you will also be shown blocks that may contain different facial expressions.';
+runInstruct{1} = 'Throughout the experiment, you will also be shown blocks that contain different facial expressions.';
 runInstruct{2} = 'All instructions for the task will remain the same as explained above.';
 runInstruct{3} = ' ';
 runInstruct{4} = contInstruct;
@@ -1102,7 +1107,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 %% first let's do negative faces and natural scenes
 % negative faces: category 5/6
 % neutral scenes: indoor or outdoor 2 - 9/10
@@ -1218,7 +1223,7 @@ for instruct=1:length(runInstruct)
 end
 FlushEvents('keyDown');
 Screen('Flip',mainWindow,tFix+TR);
-waitForKeyboard(RETURN,DEVICE);
+waitForKeyboard(LEFT,DEVICE);
 %% happy faces and natural scenes
 % negative faces: category 5/6
 % neutral scenes: indoor or outdoor 2 - 9/10
