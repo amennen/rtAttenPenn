@@ -1,5 +1,5 @@
 %% first specify things that change
-subjectNum = 10;
+subjectNum = 1;
 subjectRun = 1; % run number for the day
 subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 %imgDirHeader = '/Data1/subjects/';

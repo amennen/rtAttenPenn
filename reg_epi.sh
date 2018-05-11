@@ -47,4 +47,5 @@ fslview $functionalFN'.'nii.gz $functionalFN'_'brain.nii.gz $functionalFN'_'brai
 echo "copying this version of file into subject folder for safe keeping!"
 mkdir -pv $project_path/data/subject$subjectNum/usedscripts/
 cp $project_path/reg_epi.sh $project_path/data/subject$subjectNum/usedscripts/reg_epi.sh
-echo "done!"
+cd $project_path
+echo "done!, moving into project path"
