@@ -189,6 +189,12 @@ else
     % first just make the screen tiny
     
     [screenX screenY] = Screen('WindowSize',screenNum);
+    otherscreen = screenNumbers(1);
+    if otherscreen ~= screenNum
+        % open another window
+        [s2x s2y] = Screen('WindowSize', otherscreen);
+        otherWindow = Screen(otherscreen,'OpenWindow',backColor);
+    end
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
@@ -819,7 +825,8 @@ WaitSecs(2);
 % question: do you want to save it to this computer's data or where you
 % save the data folder???
 save([runHeader '/blockdata_' num2str(runNum) '_' datestr(now,30)],'blockData','runStart', 'timing');
-
+clear blockData;
+pack;
 % clean up and go home
 sca;
 ListenChar(1);

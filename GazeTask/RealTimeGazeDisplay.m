@@ -109,6 +109,7 @@ if (~debug) % use external keyboard
 else
     DEVICE = -1;
 end
+%DEVICE = -1
 % counterbalancing response mapping based on subject assignment
 % correctResp spells out the responses for {INDOOR,OUTDOOR,MALE,FEMALE}
 
@@ -206,6 +207,12 @@ else
     % first just make the screen tiny
     %screenNum = 0; % I'm not sure it's coming up as screen 0
     [screenX screenY] = Screen('WindowSize',screenNum);
+    otherscreen = screenNumbers(1);
+    if otherscreen ~= screenNum
+        % open another window
+        [s2x s2y] = Screen('WindowSize', otherscreen);
+        otherWindow = Screen(otherscreen,'OpenWindow',backColor);
+    end
     % put this back in!!!
     windowSize.degrees = [51 30];
     resolution = Screen('Resolution', screenNum);
@@ -393,21 +400,15 @@ fprintf('*********************************************\n\n');
 
      
 %% Show Instructions
-
-instruct{1} = 'In this task, you will see multiple images displayed at once.';
-instruct{2} = 'Your only task is to freely view the images, as if you were ';
+instruct = {};
+instruct{1} = 'In this task, you will see multiple images displayed at the same time.';
+instruct{2} = 'Your task is to freely view the images, as if you were ';
 instruct{3} = 'watching televion or looking at pictures in a photo album.';
-instruct{4} = 'We only ask that you: (1) look at the fixation cross at the';
-instruct{5} = 'start of every trial and (2) look at the images during the entire trial.';
-instruct{6} = 'We are trying to compare pupil sizes during emotional image viewing,';
-instruct{7} = 'so it is very important that you do both of these things.';
-instruct{8} = 'Please repeat these instructions in your own words to the person helping you';
-instruct{9} = 'Press ''1'' to continue to see an example fixation point';
-instruct{10} = 'and press ''1'' again to start the task.';
+instruct{4} = '-- Please press ''1'' to continue reading instructions --';
 
 for i=1:length(instruct)
     tempBounds = Screen('TextBounds',mainWindow,instruct{i});
-    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.2*centerY)-tempBounds(4)+1.5*textSpacing*(i-1),textColor);
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.05*centerY)-tempBounds(4)+1.5*textSpacing*(i-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);
@@ -416,11 +417,46 @@ Screen('Flip',mainWindow);
 
 % clear screen
 %Screen(mainWindow,'FillRect',backColor);
-FlushEvents('keyDown');
-
-
-
 % wait for experimenter to advance with 'q' key
+FlushEvents('keyDown');
+while(1)
+    temp = GetChar;
+    if (temp == '1')
+        break;
+    end
+end
+
+% next set:
+instruct = {};
+instruct{1} = 'As you view the images, we ask that you:';
+instruct{2} = '(1) look at the fixation cross at the start of every trial'; 
+instruct{3} = '(2) look at the images on the screen for the entire trial.';
+instruct{4} = 'We are trying to compare pupil sizes during emotional image viewing,';
+instruct{5} = 'so it is very important that you do both of these things.';
+instruct{6} = '-- Please press ''1'' to continue reading instructions --';
+for i=1:length(instruct)
+    tempBounds = Screen('TextBounds',mainWindow,instruct{i});
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.15*centerY)-tempBounds(4)/5+1.5*textSpacing*(i-1),textColor);
+    clear tempBounds;
+end
+Screen('Flip',mainWindow);
+FlushEvents('keyDown');
+while(1)
+    temp = GetChar;
+    if (temp == '1')
+        break;
+    end
+end
+instruct = {};
+instruct{1} = 'Please repeat the instructions in your own words to the person helping you';
+instruct{2} = 'Press ''1'' to see an example fixation point';
+instruct{3} = 'and press ''1'' again to continue.';
+for i=1:length(instruct)
+    tempBounds = Screen('TextBounds',mainWindow,instruct{i});
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-tempBounds(4)+1.5*textSpacing*(i-1),textColor);
+    clear tempBounds;
+end
+Screen('Flip',mainWindow);
 FlushEvents('keyDown');
 while(1)
     temp = GetChar;
@@ -438,16 +474,12 @@ while(1)
     end
 end
 
-
-
 instruct = {};
 % another page of instructions?
-instruct{1} = 'Again, your task is to look freely at the images,';
-instruct{2} = 'while keeping your eyes on the images the entire time they are on the screen.';
-instruct{3} = 'Just please remember to look at the fixation between trials.';
-instruct{4} = 'Lastly, please do not move your head throughout the task.';
-instruct{5} = 'Press ''1'' to start the task.';
-
+instruct{1} = 'Again, look freely at the images for the entire time they are on the screen.';
+instruct{2} = 'Please remember to look at the fixation between trials.';
+instruct{3} = 'Lastly, please do not move your head throughout the task.';
+instruct{4} = '-- Please press ''1'' to begin once you understand these instructions. --';
 
 % % show instructions
 % if (blockData(1).type == 1)
@@ -460,7 +492,10 @@ instruct{5} = 'Press ''1'' to start the task.';
 
 for i=1:length(instruct)
     tempBounds = Screen('TextBounds',mainWindow,instruct{i});
-    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.1*centerY)-tempBounds(4)/5+1.5*textSpacing*(i-1),textColor);
+    if i == 4
+        textSpacing = textSpacing*1.5;
+    end
+    Screen('drawtext',mainWindow,instruct{i},centerX-tempBounds(3)/2,centerY-(.15*centerY)-tempBounds(4)/5+1.5*textSpacing*(i-1),textColor);
     clear tempBounds;
 end
 Screen('Flip',mainWindow);

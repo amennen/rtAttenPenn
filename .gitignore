@@ -3,5 +3,8 @@ testdata
 *~
 tmp/
 BehavExpt/data/
+BehavExpt/failedsubj/
 BehavExpt/testdata/
 BehavExpt/gazedata/
+GazeTask/data/
+GazeTask/failedsubj/
