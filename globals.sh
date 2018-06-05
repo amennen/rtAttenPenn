@@ -3,23 +3,21 @@
 #Purpose: register t1 to standard space
 
 # define parameters for subject
-subjectNum=1
+subjectNum=2
 # subj 9 is fake data transferred in ~/temp
 runNum=1
-dayNum=1
+dayNum=3
 #scanDate='1/22/18'
 scanDate='now'
 echo "testing params for subject $subjectNum, runNumber $runNum, day $dayNum"
 
-#highresScan=2
-#functionalScan=4
 dicom_path=/mnt/rtexport/RTexport_Current
 #dicom_path=/home/amennen/temp
 highresScan=6
 functionalScan=6
 #dicom_path=/Data1/subjects
 projectName=rtAttenPenn
-
+echo "highres scan set as $highresScan, functional scan set as $functionalScan"
 # load bxh and fsl modules or source them in bash rc
 bxhpath=/opt/BXH/1.11.1/bin/
 project_path=/home/amennen/code/rtAttenPenn

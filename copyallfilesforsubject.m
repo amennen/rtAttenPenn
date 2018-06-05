@@ -17,10 +17,10 @@ filename = ['ExptWrapper_FileProcess_Subject_' num2str(subjectNum) '_Day' num2st
 unix(sprintf('cp ExptWrapper_FileProcess.m %s%s', dataHeader,filename));
 
 % COPY CLOUD VERSIONS - JUPYTER NOTEBOOK AND CONFIG FLIE
-cloudpath = ['~/rtAtten_cloud/'];
-filename = ['rtAtten_jupyter_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.ipynb'];
-unix(sprintf('cp %srtAtten_jupyter.ipynb %s%s', cloudpath,dataHeader,filename));
-filename = ['exampleCfg_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.toml'];
-unix(sprintf('cp %sexampleCfg.toml %s%s', cloudpath,dataHeader,filename));
+% cloudpath = ['~/rtAtten_cloud/'];
+% filename = ['rtAtten_jupyter_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.ipynb'];
+% unix(sprintf('cp %srtAtten_jupyter.ipynb %s%s', cloudpath,dataHeader,filename));
+% filename = ['PennCfg_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.toml'];
+% unix(sprintf('cp %sPennCfg.toml %s%s', cloudpath,dataHeader,filename));
 
 end
