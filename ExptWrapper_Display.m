@@ -3,9 +3,9 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 10; % subject 9 on penn
+subjectNum = 2; % subject 9 on penn
 subjectRun = 1;
-subjectDay = 1;
+subjectDay = 3;
 
 useButtonBox=1;
 % CHANGE TRIGGER BACK!!!
@@ -31,35 +31,35 @@ addpath(genpath('/opt/psychtoolbox/'))
 %%
 runNum=1;
 % today's scanning number
-fMRI = 12;
+fMRI = 8;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum=2;
-fMRI = 14;
+fMRI = 10;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 3;
-fMRI = 16;
+fMRI = 12;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 4;
-fMRI = 17;
+fMRI = 14;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 5;
-fMRI = 19;
+fMRI = 16;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum = 6;
-fMRI = 20;
+fMRI = 18;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

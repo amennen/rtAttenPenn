@@ -1,7 +1,12 @@
+%%
+seed = sum(100*clock); %get random seed
+RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
+
+
 %% first specify things that change
-subjectNum = 10;
+subjectNum = 2;
 subjectRun = 1; % run number for the day
-subjectDay = 1; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
+subjectDay = 3; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
 %imgDirHeader = '/Data1/subjects/';
 % for testing code at Princeton
 % for Penn
@@ -51,44 +56,56 @@ runNum = 6;
 rtfeedback = 1;
 [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
 
+runNum = 7;
+rtfeedback = 1;
+[blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
+
+runNum = 8;
+rtfeedback = 1;
+[blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
+
+
+runNum = 9;
+rtfeedback = 1;
+[blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
 
 
 %% Run 1 file process
 runNum = 1;
-fMRI = 12;
+fMRI = 8;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %% Run 2 file process
 
 runNum = 2;
-fMRI = 14;
+fMRI = 10;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%
 
 runNum = 3;
-fMRI = 16;
+fMRI = 12;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 4;
-fMRI = 17;
+fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 5;
-fMRI = 18;
+fMRI = 16;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 6;
-fMRI = 20;
+fMRI = 18;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 

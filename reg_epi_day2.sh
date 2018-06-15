@@ -40,4 +40,6 @@ fslview $functional2FN'.'nii.gz $functional2FN'_'brain.nii.gz &
 fslview $functional2FN'.'nii.gz $functional2FN'_'brain_mask.nii.gz mask12func2.nii.gz &
 
 echo="copying this version for safe keeping!"
-cp $project_path/reg_epi_day2.sh $project_path/data/subject$subjectNum/usedscripts/reg_epi_day2.sh
+cp $project_path/reg_epi_day2.sh $project_path/data/subject$subjectNum/usedscripts/reg_epi_day2_$dayNum'.'sh
+
+cd $project_path
