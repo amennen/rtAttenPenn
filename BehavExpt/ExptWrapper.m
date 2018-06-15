@@ -1,8 +1,8 @@
 %ExptWrapper_FileProcess_Subject9
-
+% add line to be in right directory!!
 subjectNum = 1;
 subjectName = ['behav' num2str(subjectNum)];
-subjectDay = 1;
+subjectDay = 4;
 % if subjectDay == 1
 %    % then you want it so the day order is going to be shuffled for that subject
 %    % randomize order fore that person and save in that day order
@@ -20,6 +20,8 @@ rtData = 0;
 fMRI = 0;
 debug = 0;
 ex_image_dir = pwd;
+
+
 KbName('UnifyKeyNames')
 addpath(genpath('/opt/psychtoolbox/'))
 addpath(genpath('~/rtAttenPenn/'))
@@ -45,8 +47,9 @@ end
 
 %% now run instructions
 
-BehavInstruct(subjectNum,subjectName,1,subjectDay,debug);
-
+if subjectDay == 1
+    BehavInstruct(subjectNum,subjectName,1,subjectDay,debug);
+end
 % now run exp sequence
 runNum = 1;
 BehavDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,rtData,debug)

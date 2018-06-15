@@ -34,21 +34,18 @@ end
 
 
 
-if (debug~=1) && (debug~=0)
-    error('debug must be either 1 (if debugging) or 0 (if not)')
-end
 
 %
 %% Boilerplate
 
 if (~debug) %so that when debugging you can do other things
-    %Screen('Preference', 'SkipSyncTests', 1);
+    Screen('Preference', 'SkipSyncTests', 2);
     
     
     % ListenChar(2);  %prevent command window output
     % HideCursor;     %hide mouse cursor
 else
-   % Screen('Preference', 'SkipSyncTests', 1);
+    Screen('Preference', 'SkipSyncTests', 2);
 end
 
 seed = sum(100*clock); %get random seed
@@ -67,9 +64,11 @@ instructTRnum = 1;  % TRs
 %fixationOn = TR-.3; % secs
 
 % trial timing
-if debug
+if debug == 1
     stim.picDuration = 5; %change for debugging;        % secs
-else
+elseif debug == 2 % you just want to check that eye tracking works
+    stim.picDuration = 5;
+elseif debug == 0
     stim.picDuration = 30;
 end
 stim.isiDuration = 1; %ITI
@@ -99,7 +98,7 @@ DEVICE = -1;
 LEFT = [KbName('1!') KbName('1')];
 subj_keycode = LEFT;
 DEVICENAME = 'Dell KB216 Wired Keyboard';
-if (~debug) % use external keyboard
+if debug == 0 % use external keyboard
     [index devName] = GetKeyboardIndices;
     for device = 1:length(index)
         if strcmp(devName(device),DEVICENAME)
@@ -144,7 +143,7 @@ while ~done
         % now make sure none repeat in the same position for two trials in
         % row
         %if ~any(any(diff(stim.position)==0))
-            done = 1;
+        done = 1;
         %end
     end
 end
@@ -180,19 +179,50 @@ done = 0;
 while ~done
     stim.trialType = Shuffle([ones(1,nTrialsReg) 2*ones(1,nFillers)]);
     neutrals = find(stim.trialType==2);
-    if ~any(diff(neutrals)==1)
+    if ~any(diff(neutrals)==1) && ~any(diff(neutrals)>4)
         done=1;
     end
 end
 % so 1 = regular trial and 2 = filler
-
-
+%% CALIBRATION WOO! - have to have the screen
+% if this doesn't work move it back to where I initialized both screens
+response = 0;
+if eyeTrack
+    while ~response
+        try
+            Tobii_Initialize;
+            isEyeTracking=1;
+        catch
+            warning('EYE TRACKER NOT FOUND');
+            isEyeTracking=0;
+        end
+        
+        %Calibrate the eye tracker
+        if isEyeTracking==1
+            Continue=0;
+            while Continue==0
+                % to do: figure out how to get matlab figures to open on whole
+                % screen ***
+                Calib=Tobii_Calibration(0); % is psychtoolbox and use monitor
+                %Calib = Tobii_Calibration(1,window);
+                Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
+            end
+        end
+        
+        okaytocontinue = input('calibokay?\n');
+        % return to normal screen
+        % here run the check that it's collecting enough points
+        if okaytocontinue
+            response = checksetup(subjectNum,expDay,eyeTrack,debug);
+        end
+    end
+end
 %% Initialize Screens
 
 screenNumbers = Screen('Screens');
 
 % show full screen if real, otherwise part of screen
-if debug
+if debug == 1
     screenNum = 0;
     %screenNum = screenNumbers(end);
 else
@@ -200,7 +230,7 @@ else
 end
 
 %retrieve the size of the display screen
-if debug
+if debug == 1
     screenX = 500;
     screenY = 500;
 else
@@ -220,33 +250,10 @@ else
     screenX = windowSize.pixels(1);
     screenY = windowSize.pixels(2);
 end
-%% CALIBRATION WOO! - have to have the screen 
-if eyeTrack
-     try
-        Tobii_Initialize;
-        isEyeTracking=1;
-    catch
-        warning('EYE TRACKER NOT FOUND');
-        isEyeTracking=0;
-    end
-    
-    %Calibrate the eye tracker
-    if isEyeTracking==1
-        Continue=0;
-        while Continue==0
-            % to do: figure out how to get matlab figures to open on whole
-            % screen ***
-            Calib=Tobii_Calibration(0); % is psychtoolbox and use monitor
-            %Calib = Tobii_Calibration(1,window);
-            Continue=Tobii_Eyetracking_Feedback(0, Calib, 0);
-        end
-    end
-    
-    % return to normal screen
-end
+
 %%
 
-if debug
+if debug == 1
     mainWindow = Screen(screenNum, 'OpenWindow', backColor,[0 0 screenX screenY]);
 else
     mainWindow = Screen(screenNum, 'OpenWindow', backColor);
@@ -356,11 +363,11 @@ for categ=1:nSubCategs
             for img=1:numImages(categ)
                 
                 % update progress bar
-%                 Screen('FrameRect',mainWindow,0,progRect,10);
-%                 Screen('FillRect',mainWindow,0,progRect);
-%                 Screen('FillRect',mainWindow,[255 0 0],progRect-[0 0 round((1-img/numImages(categ))*progWidth) 0]);
-%                 Screen('Flip',mainWindow);
-%                 
+                %                 Screen('FrameRect',mainWindow,0,progRect,10);
+                %                 Screen('FillRect',mainWindow,0,progRect);
+                %                 Screen('FillRect',mainWindow,[255 0 0],progRect-[0 0 round((1-img/numImages(categ))*progWidth) 0]);
+                %                 Screen('Flip',mainWindow);
+                %
                 % read images
                 images{categ,img} = imread(dirList{categ}(img).name); %#ok<AGROW>
             end
@@ -398,7 +405,7 @@ fprintf(['* debug: ' num2str(debug) '\n']);
 fprintf('*********************************************\n\n');
 
 
-     
+
 %% Show Instructions
 instruct = {};
 instruct{1} = 'In this task, you will see multiple images displayed at the same time.';
@@ -429,7 +436,7 @@ end
 % next set:
 instruct = {};
 instruct{1} = 'As you view the images, we ask that you:';
-instruct{2} = '(1) look at the fixation cross at the start of every trial'; 
+instruct{2} = '(1) look at the fixation cross at the start of every trial';
 instruct{3} = '(2) look at the images on the screen for the entire trial.';
 instruct{4} = 'We are trying to compare pupil sizes during emotional image viewing,';
 instruct{5} = 'so it is very important that you do both of these things.';
@@ -478,7 +485,7 @@ instruct = {};
 % another page of instructions?
 instruct{1} = 'Again, look freely at the images for the entire time they are on the screen.';
 instruct{2} = 'Please remember to look at the fixation between trials.';
-instruct{3} = 'Lastly, please do not move your head throughout the task.';
+instruct{3} = 'Lastly, please avoid all head/chin movement (up/down/shaking/nodding).';
 instruct{4} = '-- Please press ''1'' to begin once you understand these instructions. --';
 
 % % show instructions
@@ -553,7 +560,7 @@ for iTrial=1:config.nTrials
     
     %present ISI
     timespec = timing.plannedOnsets.preITI(iTrial) - SLACK;
-     timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
+    timing.actualOnsets.preITI(iTrial) = isi_specific(mainWindow,fixColor, timespec);
     % now close previous trial's data
     if eyeTrack
         if iTrial > 1

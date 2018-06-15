@@ -1,5 +1,6 @@
 %d = importdata('~/tfMRI_output/test1_0329/test1_0329_Scanner_ABCD_AB_FaceMatching_2018_Mar_29_0836.log');
-d = importdata('~/tfMRI_output/test0405_ST/test0405_ST_Scanner_ABCD_AB_FaceMatching_2018_Apr_05_1650.log');
+%d = importdata('~/tfMRI_output/test0405_ST/test0405_ST_Scanner_ABCD_AB_FaceMatching_2018_Apr_05_1650.log');
+d = importdata('~/tfMRI_output/RT002/RT002_Day2_Scanner_ABCD_AB_FaceMatching_2018_May_16_1949.log');
 
 %%
 trigger_str = 'Keypress: 5';

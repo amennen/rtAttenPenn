@@ -471,7 +471,12 @@ for r in runs:
     # completed 1 repeats of 'trials'
 
     thisExp.nextEntry()
-         
+    # adding to wait another 5 TR's at the end
+    win.flip()
+    fixation_text.draw()
+    win.flip()
+    core.wait(14)
+    
 
 
 # Initialize components for Routine "thanks"
