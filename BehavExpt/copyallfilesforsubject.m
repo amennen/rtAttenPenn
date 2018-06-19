@@ -11,7 +11,7 @@ if ~exist(dataHeader)
     mkdir(dataHeader)
 end
 % FIRST EXPT WRAPPERS
-filename = ['ExptWrapper_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.m'];
+filename = ['BehavExptWrapper_Subject_' num2str(subjectNum) '_Day' num2str(DAYNUM) '.m'];
 unix(sprintf('cp ExptWrapper.m %s%s', dataHeader,filename));
 
 end

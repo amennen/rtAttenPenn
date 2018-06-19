@@ -3,13 +3,13 @@ cd(exptDir)
 addpath(genpath('/Applications/Psychtoolbox/'))
 addpath(genpath('~/Tobii/'))
 
-subjectNum = 1;
-subjectDay=1;
+subjectNum =1;
+subjectDay=4;
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 2);
 % **** types of stimuli to train/show to subjects *******
 
-useTobii=0;
+useTobii=1;
 debug=0;
 KbName('UnifyKeyNames')
 
