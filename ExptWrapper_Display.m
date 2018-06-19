@@ -6,7 +6,25 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 subjectNum = 10; % subject 9 on penn
 subjectRun = 1;
 subjectDay = 1;
+group='HC'; %or 'MDD';
 
+% check that subject number makes sense
+if strcmp(group,'HC')
+    if subjectNum < 100
+        fprintf('HC numbering starts at 1.\n')
+    else
+        error('ERROR: HC numbering too high.')
+    end
+elseif strcmp(group, 'MDD')
+   if subjectNum <= 100
+       error('ERROR: MDD numbering needs to be increased.')
+   else
+       fprintf('MDD numbering starts at 101.\n')
+   end
+else
+    error('ERROR: incorrect group label.')
+end
+%%
 useButtonBox=1;
 % CHANGE TRIGGER BACK!!!
 realtimeData = 1;
@@ -14,8 +32,7 @@ debug=0;
 usepyoutput = 0;
 fprintf('Running for subject %i, run% i, day %i\n', subjectNum,subjectRun,subjectDay);
 fprintf('usebuttonbox: %i\nrealtimedata: %i\ndebug: %i\nusepyoutput: %i\n', useButtonBox,realtimeData,debug, usepyoutput);
-%% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
-copyallfilesforsubject(subjectNum,subjectDay)
+
 %% then specify everything else
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
@@ -83,3 +100,5 @@ fMRI = 22;
 runNum = 9;
 fMRI = 24;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
+%% DO THIS AT THE END: COPY ALL FILES INTO SUBJECT FOLDER
+copyallfilesforsubject(subjectNum,subjectDay)

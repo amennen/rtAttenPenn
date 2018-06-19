@@ -7,6 +7,26 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 subjectNum = 2;
 subjectRun = 1; % run number for the day
 subjectDay = 3; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
+group='HC'; %or 'MDD';
+% check that subject number makes sense
+if strcmp(group,'HC')
+    if subjectNum < 100
+        fprintf('HC numbering starts at 1.\n')
+    else
+        error('ERROR: HC numbering too high.')
+    end
+elseif strcmp(group, 'MDD')
+   if subjectNum <= 100
+       error('ERROR: MDD numbering needs to be increased.')
+   else
+       fprintf('MDD numbering starts at 101.\n')
+   end
+else
+    error('ERROR: incorrect group label.')
+end
+
+
+%%
 %imgDirHeader = '/Data1/subjects/';
 % for testing code at Princeton
 % for Penn
@@ -59,16 +79,17 @@ rtfeedback = 1;
 runNum = 7;
 rtfeedback = 1;
 [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
-
-runNum = 8;
-rtfeedback = 1;
-[blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
-
-
-runNum = 9;
-rtfeedback = 1;
-[blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
-
+if dayNum > 1 % don't need to make if on day 1
+    runNum = 8;
+    rtfeedback = 1;
+    [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
+    
+    if dayNum == 2
+        runNum = 9;
+        rtfeedback = 1;
+        [blockData patterns] = RealTimePunisherExptSequence(subjectNum,subjectName,runNum,rtfeedback,typeNum,subjectDay)
+    end
+end
 
 %% Run 1 file process
 runNum = 1;
