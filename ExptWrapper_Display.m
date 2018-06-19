@@ -3,9 +3,9 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 2; % subject 9 on penn
+subjectNum = 10; % subject 9 on penn
 subjectRun = 1;
-subjectDay = 3;
+subjectDay = 1;
 
 useButtonBox=1;
 % CHANGE TRIGGER BACK!!!
@@ -19,6 +19,7 @@ copyallfilesforsubject(subjectNum,subjectDay)
 %% then specify everything else
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
+Screen('Preference', 'Verbosity', 4)
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;

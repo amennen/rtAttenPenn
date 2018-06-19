@@ -7,6 +7,7 @@ subjectNum=2
 runNum=1
 dayNum=3
 scanDate='5/22/18'
+transferDicoms=0
 #scanDate='now'
 echo "testing params for subject $subjectNum, runNumber $runNum, day $dayNum"
 projectName=rtAttenPenn
@@ -23,9 +24,11 @@ echo "subject number is $subjectNum, day $dayNum, run $runNum"
 # first transfer fmri data
 
 cheadDir=/data/jag/cnds/amennen/rtAttenPenn/fmridata
-
-#scp -r $scanFolder amennen@chead:$cheadDir/transferredImages/
-echo "moving data files $scanFolder to $cheadDir"
+if [ $transferDicoms -eq 1 ] 
+then
+    scp -r $scanFolder amennen@chead:$cheadDir/transferredImages/
+    echo "moving data files $scanFolder to $cheadDir"
+fi
 
 # transfer all data from subject folder if day number 3 (overwrite if want to anyway)
 subject_local_folder=$project_path/data/subject$subjectNum
