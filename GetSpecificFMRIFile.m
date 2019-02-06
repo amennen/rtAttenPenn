@@ -15,11 +15,20 @@ elseif fileNum <100
 else
     fileStr = num2str(fileNum);
 end
-
+% if using separate mount, they come in as 001
 specificFile = ['001_0000' scanStr '_000' fileStr '.dcm'];
-
 if exist([imgDir specificFile],'file');
     fileAvail = 1;
 else
     fileAvail = 0;
 end
+% 
+% patternFile = ['*_0000' scanStr '_000' fileStr '.dcm'];
+% filetomatch=dir([imgDir, patternFile]);
+% if ~isempty(filetomatch)
+%     specificFile = filetomatch.name;
+%     fileAvail = 1;
+% else
+%     specificFile = [];
+%     fileAvail = 0;
+% end

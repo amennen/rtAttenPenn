@@ -3,9 +3,9 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 10; % subject 9 on penn
+subjectNum = 3; %
 subjectRun = 1;
-subjectDay = 1;
+subjectDay = 3;
 group='HC'; %or 'MDD';
 
 % check that subject number makes sense
@@ -36,7 +36,7 @@ fprintf('usebuttonbox: %i\nrealtimedata: %i\ndebug: %i\nusepyoutput: %i\n', useB
 %% then specify everything else
 projectName = 'rtAttenPenn';
 Screen('Preference', 'SkipSyncTests', 1);
-Screen('Preference', 'Verbosity', 4)
+%Screen('Preference', 'Verbosi1ty', 4)
 % **** types of stimuli to train/show to subjects *******
 NEUTRAL = 1;
 SAD = 2;
@@ -54,44 +54,44 @@ fMRI = 8;
 
 %%
 runNum=2;
-fMRI = 10;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
-
-
-%%
-runNum = 3;
 fMRI = 12;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
-runNum = 4;
+runNum = 3;
 fMRI = 14;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
-runNum = 5;
+runNum = 4;
 fMRI = 16;
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
+
+
+%%
+runNum = 5;
+fMRI =18;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum = 6;
-fMRI = 18;
-[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
-
-
-%%
-
-runNum = 7;
 fMRI = 20;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
-runNum = 8;
+runNum = 7;
 fMRI = 22;
+[blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
+
+
+%%
+
+runNum = 8;
+fMRI = 24;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

@@ -159,7 +159,11 @@ patterns.raw_sm_filt = nan(nTRs,numel(roiInds));
 patterns.raw_sm_filt_z = nan(nTRs,numel(roiInds));
 patterns.categoryseparation = NaN(1,nTRs);
 patterns.firstTestTR = find(patterns.regressor(1,:)+patterns.regressor(2,:),1,'first') ; %(because took out first 10)
-
+timing.foundDicom = NaN(1,nTRs);
+timing.readDicom = NaN(1,nTRs);
+timing.processDicom = NaN(1,nTRs);
+timing.classifyDicom = NaN(1,nTRs);
+timing.writeDicom = NaN(1,nTRs);
 %% Output Files Setup
 
 % open and set-up output file
@@ -294,12 +298,12 @@ for iTrialPhase2=firstVolPhase2:nVols
     
     % if file available, perform preprocessing and test classifier
     if (patterns.fileAvail(iTrialPhase2))
-        
+        timing.foundDicom(iTrialPhase2) = GetSecs;
         pause(.2);
         
         [newVol patterns.timeRead{iTrialPhase2}] = ReadFile([imgDir patterns.newFile{iTrialPhase2}],imgmat,roi);
+        timing.readDicom(iTrialPhase2) = GetSecs;
         patterns.raw(iTrialPhase2,:) = newVol;  % keep patterns for later training
-        
         if (any(isnan(patterns.raw(iTrialPhase2,:))))
             patterns.fileload(iTrialPhase2) = 0;
             indLastValidPatterns = find(patterns.fileload,1,'last');
@@ -318,17 +322,18 @@ for iTrialPhase2=firstVolPhase2:nVols
     patterns.raw_sm_filt(iTrialPhase2,:) = HighPassRealTime(patterns.raw_sm(1:iTrialPhase2,:),TR,cutoff);
     % only update if the latest file wasn't nan
     patterns.raw_sm_filt_z(iTrialPhase2,:) = (patterns.raw_sm_filt(iTrialPhase2,:) - patterns.phase1Mean(1,:))./patterns.phase1Std(1,:);
-    
+   timing.processDicom(iTrialPhase2) = GetSecs; 
     if rtfeedback
         if any(patterns.regressor(:,iTrialPhase2))
             [patterns.predict(iTrialPhase2),~,~,patterns.activations(:,iTrialPhase2)] = Test_L2_RLR_realtime(trainedModel,patterns.raw_sm_filt_z(iTrialPhase2,:),patterns.regressor(:,iTrialPhase2)); %#ok<NODEF>
-            
+            timing.classifyDicom(iTrialPhase2) = GetSecs;
             categ = find(patterns.regressor(:,iTrialPhase2));
             otherCateg = mod(categ,2)+1;
             patterns.categoryseparation(iTrialPhase2) = patterns.activations(categ,iTrialPhase2)-patterns.activations(otherCateg,iTrialPhase2);
             
             classOutput = patterns.categoryseparation(iTrialPhase2); %#ok<NASGU>
             save([classOutputDir '/vol_' num2str(patterns.fileNum(iTrialPhase2))],'classOutput');
+            timing.writeDicom(iTrialPhase2) = GetSecs;
         else
             patterns.categoryseparation(iTrialPhase2) = NaN;
             
@@ -430,7 +435,7 @@ end
 
 %%
 
-save([runHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns');
+save([runHeader '/patternsdata_' num2str(runNum) '_' datestr(now,30)],'patterns', 'timing');
 save([runHeader '/trainedModel_' num2str(runNum) '_' datestr(now,30)],'trainedModel','trainPats','trainLabels');
 
 % clean up and go home

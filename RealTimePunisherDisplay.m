@@ -750,13 +750,18 @@ for iBlock=indBlocksPhase2
                 tClassOutputFileTimeout = GetSecs + deltat;
                 
                 %check for classifier output file
+                timing.classifierLoadStart(iBlock,iTrial)=GetSecs;
                 while (~blockData(iBlock).classOutputFileLoad(iTrial) && (GetSecs < tClassOutputFileTimeout))
                     [blockData(iBlock).classOutputFileLoad(iTrial) blockData(iBlock).classOutputFile{iTrial}] = GetSpecificClassOutputFile(classOutputDir,volCounter-2,usepython); %#ok<AGROW>
                 end
-                
+               timing.classifierLoadEnd(iBlock,iTrial)=GetSecs; 
                 % get newest file in that TR
                 blockData(iBlock).fileList{iTrial} = ls(classOutputDir);
-                allFn = dir([classOutputDir '/vol' '*.mat']);
+                if ~usepython
+                    allFn = dir([classOutputDir '/vol' '*.mat']);
+                else
+                    allFn = dir([classOutputDir '/vol' '*_py.txt']);
+                end
                 dates = [allFn.datenum];
                 names = {allFn.name};
                 [~,newestIndex] = max(dates);
@@ -766,7 +771,11 @@ for iBlock=indBlocksPhase2
                 %load classifier output file
                 if blockData(iBlock).classOutputFileLoad(iTrial)
                     tempStruct = load([classOutputDir '/' blockData(iBlock).classOutputFile{iTrial}]);
-                    blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
+                    if ~usepython
+                        blockData(iBlock).categsep(iTrial) = tempStruct.classOutput; %#ok<AGROW>
+                    else
+                        blockData(iBlock).categsep(iTrial) = tempStruct;
+                    end
                     FILEFOUND = 'FSEP';
                 else
                     blockData(iBlock).classOutputFile{iTrial} = 'notload'; %#ok<AGROW>
