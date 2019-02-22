@@ -1,0 +1,48 @@
+[experiment]
+experimentName = "rtAttenPenn"
+experimentId = 2
+model = "rtAtten"
+
+[session]
+rtData = true
+date = "today" # "2018-08-16"  # or "today", "now", "2018-03-01" or "03/01/2018" etc.
+#sessionId = "20180816T123000"
+subjectName = "1214181_rtAttenPenn"
+subjectNum = 511
+subjectDay = 2
+## DISPLAY PARAMETERS ##
+useButtonBox = 0
+debugMode = 0
+usePyOutput = 0
+## DISPLAY PARAMETERS ##
+
+## EXP DESIGN ##
+#NEUTRAL = 1
+#SAD = 2
+#HAPPY = 3
+typeNum = 2
+## EXP DESIGN ##
+
+dataDir = "/Data1/code/rtAttenPenn/data/"
+imgDir = "/Data1/subjects/"
+buildImgPath = true
+serverDataDir = "data/server"
+findNewestPatterns = true
+watchFilePattern = "*.dcm"
+dicomNamePattern = "001_0000{}_000{}.dcm"
+minExpectedDicomSize = 300000
+retrieveServerFiles = false
+legacyRun1Phase2Mode = true
+enforceDeadlines = true
+calcClockSkewIters = 30
+sliceDim = 64
+cutoff = 200
+FWHM = 5
+Runs = [1]
+ScanNums = [6]
+## !Below here! --> Fields for replaying already collected data ##
+replayMatFileMode = false  # will use validationData[] mat files to replay
+validate = false
+patternsDesignFiles = ["patternsdesign_1_20180105T000000.mat", "patternsdesign_2_20180105T000000.mat", "patternsdesign_3_20180105T000000.mat"]
+validationData = ["patternsdata_1_20180105T_1048.mat", "patternsdata_2_20180105T_1049.mat", "patternsdata_3_20180105T_1049.mat"]
+validationModels = ["trainedModel_1_20180105T_1048.mat", "trainedModel_2_20180105T_1049.mat", "trainedModel_3_20180105T_1049.mat"]
