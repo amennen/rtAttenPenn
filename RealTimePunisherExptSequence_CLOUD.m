@@ -1,5 +1,5 @@
-function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,runNum,rtfeedback,typeNum,expDay)
-% function [testTiming blockData] = RealTimePunisherExptOutline(subjectNum,subjectName,runNum)
+function [blockData patterns] = RealTimePunisherExptSequence_CLOUD(subjectNum,runNum,rtfeedback,typeNum,expDay)
+% function [testTiming blockData] = RealTimePunisherExptOutline_CLOUD(subjectNum,runNum,rtfeedback,typeNum,expDay)
 %
 % Face/house attention experiment with real-time classifier feedback
 %
@@ -7,16 +7,19 @@ function [blockData patterns] = RealTimePunisherExptSequence(subjectNum,runNum,r
 % REQUIRED INPUTS:
 % - subjectNum:  participant number [any integer]
 %                if subjectNum = 0, no information will be saved
-% - subjectName: ntblab subject naming convention [MMDDYY#_REALTIME02]
 % - runNum:      run number [any integer]
+% - rtfeedback:  if you're doing rt-feedback in that run (no for first run, yes for others) 
+% - typeNum:     if you want to show negative/positive/neutral faces during NF
+% - expDay:      day of NF training (determines how many runs there are)
+
 %
 % OUTPUTS
 % - testTiming: elapsed time for each iteration of SVM testing
 % - patterns:   ?????
 %
-% Written by: Megan deBettencourt
-% Version: 1.0
-% Last modified: Feb 2012
+% Written by: Megan deBettencourt/Anne Mennen
+% Version: 2.0
+% Last modified: Jan 2020 - changing to be used with toml file
 
 %% check inputs
 
@@ -45,7 +48,7 @@ dataHeader = ['data/subject' num2str(subjectNum)];
 dayHeader = [dataHeader '/day' num2str(expDay)];
 runHeader = [dayHeader '/run' num2str(runNum)];
 classOutputDir = [runHeader '/classoutput'];
-
+expDayInt = floor(expDay); % make sure you get the actual day number
 %% create subject folder
 
 %somehow assert that subject/run combo has not already been run!
@@ -229,7 +232,7 @@ cd ..;
 % this is fine if type is NEUTRAL--counterbalance across all
 
 if (mod(subjectNum,8) == 1) || (mod(subjectNum,8) == 2) || (mod(subjectNum,8) == 3) || (mod(subjectNum,8) == 4)
-    if mod(expDay,2)==1
+    if mod(expDayInt,2)==1
         if (mod(runNum,2)==1)
             blockSequencePhase1 = [SCENE FACE FACE SCENE];
             categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));
@@ -259,7 +262,7 @@ if (mod(subjectNum,8) == 1) || (mod(subjectNum,8) == 2) || (mod(subjectNum,8) ==
         end
     end
 else
-    if (mod(expDay,2)==1)
+    if (mod(expDayInt,2)==1)
         if (mod(runNum,2)==1)
             blockSequencePhase1 = [FACE SCENE SCENE FACE];
             categOrderPhase1 = repmat(blockSequencePhase1,1,nBlocksPerPhase/numel(blockSequencePhase1));

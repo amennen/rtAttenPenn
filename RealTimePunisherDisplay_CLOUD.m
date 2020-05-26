@@ -6,6 +6,7 @@ raw_text = fileread(toml_file);
 Cfg = toml.decode(raw_text);
 subjectNum = Cfg.session.subjectNum;
 subjectDay = Cfg.session.subjectDay;
+subjectDayInt = floor(subjectDay); get the actual day number
 useButtonBox = Cfg.session.useButtonBox;
 rtData = Cfg.session.rtData;
 debugMode = Cfg.session.debugMode;
@@ -72,7 +73,7 @@ if (rtData~=1) && (rtData~=0)
 end
 
 if (debugMode~=1) && (debugMode~=0)
-    error('debug must be either 1 (if debugging) or 0 (if not)')
+    error('debugMode must be either 1 (if debugging) or 0 (if not)')
 end
 
 
@@ -160,7 +161,8 @@ if useButtonBox && (~debugMode)
     end
 else
     % let's set it to look for the Dell keyboard instead
-    DEVICENAME = 'Dell KB216 Wired Keyboard';
+    %DEVICENAME = 'Dell KB216 Wired Keyboard';
+    DEVICENAME = 'DELL Dell QuietKey Keyboard';
     [index devName] = GetKeyboardIndices;
     for device = 1:length(index)
         if strcmp(devName(device),DEVICENAME)
@@ -227,11 +229,12 @@ else
     %screenX = windowSize.pixels(1);
     %screenY = windowSize.pixels(2);
     % new: setting resolution manually
-     %screenX = 1920;
-     %screenY = 1080;
+    % for Penn
+     screenX = 1920;
+     screenY = 1080;
      % for Princeton
-     screenX = 1280;
-     screenY =  720;
+     %screenX = 1280;
+     %screenY =  720;
 %     %to ensure that the images are standardized (they take up the same degrees of the visual field) for all subjects
 %     if (screenX ~= ScreenResX) || (screenY ~= ScreenResY)
 %         fprintf('The screen dimensions may be incorrect. For screenNum = %d,screenX = %d (not 1152) and screenY = %d (not 864)',screenNum, screenX, screenY);
