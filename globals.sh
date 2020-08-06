@@ -3,7 +3,7 @@
 #Purpose: register t1 to standard space
 
 # define parameters for subject
-subjectNum=2
+subjectNum=114
 # subj 9 is fake data transferred in ~/temp
 runNum=1
 dayNum=3
@@ -11,9 +11,9 @@ dayNum=3
 scanDate='now'
 echo "testing params for subject $subjectNum, runNumber $runNum, day $dayNum"
 
-dicom_path=/mnt/rtexport/RTexport_Current
-#dicom_path=/home/amennen/temp
-highresScan=6
+#dicom_path=/mnt/rtexport/RTexport_Current
+dicom_path=/mnt/Data
+highresScan=5
 functionalScan=6
 #dicom_path=/Data1/subjects
 projectName=rtAttenPenn

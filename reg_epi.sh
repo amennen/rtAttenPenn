@@ -42,7 +42,7 @@ then
 	
 fi
 bet $functionalFN'.'nii.gz $functionalFN'_'brain.nii.gz -R -m
-fslview $functionalFN'.'nii.gz $functionalFN'_'brain.nii.gz $functionalFN'_'brain_mask.nii.gz &
+fslview $functionalFN'.'nii.gz $functionalFN'_'brain.nii.gz $functionalFN'_'brain_mask.nii.gz $roi_name'_'exfunc.nii.gz &
 
 echo "copying this version of file into subject folder for safe keeping!"
 mkdir -pv $project_path/data/subject$subjectNum/usedscripts/

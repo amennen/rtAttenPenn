@@ -27,7 +27,7 @@ then
 	rm -r $subject_save_path/tempdcm
 fi
 
-bet $highresFN.nii.gz $highresFN'_'brain.nii.gz -R -m -f 0.6 
+bet $highresFN.nii.gz $highresFN'_'brain.nii.gz -R -m -f 0.6
 
 fslview $highresFN.nii.gz $highresFN'_'brain.nii.gz $highresFN'_'brain_mask.nii.gz &
 echo "copying this version of file into subject folder for safe keeping!"

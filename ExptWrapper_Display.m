@@ -3,10 +3,10 @@ seed = sum(100*clock); %get random seed
 RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 %% first specify the things that change
-subjectNum = 3; %
+subjectNum = 114; %
 subjectRun = 1;
 subjectDay = 3;
-group='HC'; %or 'MDD';
+group='MDD'; %or 'MDD';
 
 % check that subject number makes sense
 if strcmp(group,'HC')
@@ -24,12 +24,12 @@ elseif strcmp(group, 'MDD')
 else
     error('ERROR: incorrect group label.')
 end
-%%
+
 useButtonBox=1;
 % CHANGE TRIGGER BACK!!!
 realtimeData = 1;
 debug=0;
-usepyoutput = 0;
+usepyoutput = 1; % run 4 on
 fprintf('Running for subject %i, run% i, day %i\n', subjectNum,subjectRun,subjectDay);
 fprintf('usebuttonbox: %i\nrealtimedata: %i\ndebug: %i\nusepyoutput: %i\n', useButtonBox,realtimeData,debug, usepyoutput);
 
@@ -54,44 +54,44 @@ fMRI = 8;
 
 %%
 runNum=2;
-fMRI = 12;
+fMRI = 10;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 3;
-fMRI = 14;
+fMRI = 12;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 4;
-fMRI = 16;
+fMRI = 14;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 runNum = 5;
-fMRI =18;
+fMRI =16;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 %%
 runNum = 6;
-fMRI = 20;
+fMRI = 18;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
 runNum = 7;
-fMRI = 22;
+fMRI = 20;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 
 %%
 
 runNum = 8;
-fMRI = 24;
+fMRI = 22;
 [blockData] = RealTimePunisherDisplay(subjectNum,subjectName,runNum,subjectDay,useButtonBox,fMRI,realtimeData,debug,usepyoutput)
 
 

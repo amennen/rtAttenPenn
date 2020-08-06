@@ -4,10 +4,10 @@ RandStream.setGlobalStream(RandStream('mt19937ar','seed',seed));%set seed
 
 
 %% first specify things that change
-subjectNum = 3;
+subjectNum = 114;
 subjectRun = 1; % run number for the day
 subjectDay = 3; % this will determine which mask the RT thing will use VERY IMPORTANT AND COUNTERBALANCING
-group='HC'; %or 'MDD';
+group='MDD'; %or 'MDD';
 % check that subject number makes sense
 if strcmp(group,'HC')
     if subjectNum < 100
@@ -94,54 +94,54 @@ end
 
 %% Run 1 file process
 runNum = 1;
-fMRI = 8;
+fMRI = 15;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
-%% Run 2 file process
+%% Run 2 fi1le process
 
-runNum = 2511511;
-fMRI = 12;
+runNum = 2;
+fMRI = 17;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%
 
 runNum = 3;
-fMRI = 14;
+fMRI = 19;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 4;
-fMRI = 16;
+fMRI = 14;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 5;
-fMRI = 18;
+fMRI = 16;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 6;
-fMRI = 20;
+fMRI = 18;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 7;
-fMRI = 22;
+fMRI = 20;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 
 %%
 
 runNum = 8;
-fMRI = 24;
+fMRI = 22;
 [patterns] = RealTimePunisherFileProcess(imgDirHeader,subjectNum,subjectName,runNum,fMRI,realtimeData,subjectDay)
 
 %%
